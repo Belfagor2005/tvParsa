@@ -2,7 +2,7 @@ Tv Parsa
 
 Enigma2 project
 
-<img src="https://github.com/Belfagor2005/tvDream/blob/main/usr/lib/enigma2/python/Plugins/Extensions/parsatv/logo.png">
+<img src="https://github.com/Belfagor2005/tvParsa/blob/main/usr/lib/enigma2/python/Plugins/Extensions/parsatv/logo.png">
 
 Player for Parsa TV
 
