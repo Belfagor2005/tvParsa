@@ -1,0 +1,62 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: parsatv\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-10 00:06+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: ))^^(( <>\n"
+"Language-Team: *\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 1.8.7\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Basepath: ../../../..\n"
+"X-Poedit-SearchPath-0: plugin.py\n"
+
+#: plugin.py:249 plugin.py:277 plugin.py:348 plugin.py:453
+msgid "Please select ..."
+msgstr "Bitte auswählen ..."
+
+#: plugin.py:252
+msgid "Select"
+msgstr "Wählen"
+
+#: plugin.py:253
+msgid "Exit"
+msgstr "Ausfahrt"
+
+#: plugin.py:284
+msgid "PARSA SPORT"
+msgstr ""
+
+#: plugin.py:286
+msgid "PARSA TV"
+msgstr ""
+
+#: plugin.py:304 plugin.py:405
+msgid "Getting the list, please wait ..."
+msgstr "die Liste bekommen , bitte warten ..."
+
+#: plugin.py:305 plugin.py:406
+msgid "Play"
+msgstr "Play"
+
+#: plugin.py:306 plugin.py:407
+msgid "Back"
+msgstr "Zurück"
+
+#: plugin.py:430
+msgid "Try again later ..."
+msgstr "Try again later ..."
+
+#: plugin.py:570
+msgid "Parsa TV"
+msgstr ""
+
+#: plugin.py:578
+#, python-format
+msgid "..:: Parsa TV by Lululla %s ::.. "
+msgstr ""

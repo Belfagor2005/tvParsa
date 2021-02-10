@@ -1,0 +1,89 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: parsatv\n"
+"POT-Creation-Date: 2021-02-10 15:28+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7\n"
+"X-Poedit-Basepath: ../../../..\n"
+"X-Poedit-SearchPath-0: plugin.py\n"
+
+#: plugin.py:277 plugin.py:305 plugin.py:404 plugin.py:558
+msgid "Please select ..."
+msgstr "Seleziona Prego ..."
+
+#: plugin.py:280
+msgid "Select"
+msgstr "Seleziona"
+
+#: plugin.py:281
+msgid "Exit"
+msgstr "Uscire"
+
+#: plugin.py:312
+msgid "PARSA SPORT"
+msgstr "PARSA SPORT"
+
+#: plugin.py:314
+msgid "PARSA TV"
+msgstr "PARSA TV"
+
+#: plugin.py:332 plugin.py:490
+msgid "Getting the list, please wait ..."
+msgstr "Ricevo l'elenco , si prega di attendere ..."
+
+#: plugin.py:333 plugin.py:491
+msgid "Play"
+msgstr "Play"
+
+#: plugin.py:334 plugin.py:492
+msgid "Back"
+msgstr "Indietro"
+
+#: plugin.py:335 plugin.py:493
+msgid "Convert"
+msgstr "Esporta Bouquet"
+
+#: plugin.py:359
+#, python-format
+msgid "Do you want to Convert %s to favorite .tv ?"
+msgstr "Vuoi convertire %s in .tv Favoriti?"
+
+#: plugin.py:518
+#, python-format
+msgid ""
+"Do you want to Convert %s to favorite .tv ?\n"
+"\n"
+"Attention!! Wait more than 5 minutes!!! "
+msgstr ""
+"Vuoi convertire %s in .tv Preferiti?\n"
+"Attenzione!! Aspetta più di 5 minuti !!!"
+
+#: plugin.py:718
+msgid "Check  /tmp/temporary2.m3u"
+msgstr "Controlla se esiste il file /tmp/temporary.m3u"
+
+#: plugin.py:743
+msgid "Wait please... "
+msgstr ""
+
+#: plugin.py:756
+msgid "Bouquet converted successful"
+msgstr "Bouquet convertito con successo"
+
+#: plugin.py:772 plugin.py:781
+msgid "Parsa TV"
+msgstr ""
+
+#: plugin.py:780
+#, python-format
+msgid "..:: Parsa TV by Lululla %s ::.. "
+msgstr ""
+
+#~ msgid "Try again later ..."
+#~ msgstr "Prova più tardi ..."
