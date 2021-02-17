@@ -1,7 +1,7 @@
 from Components.Language import language
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS, SCOPE_LANGUAGE
-import gettext
 from os import environ as os_environ
+import gettext
 plugin_path = '/usr/lib/enigma2/python/Plugins/Extensions/parsatv/'
 PluginLanguageDomain = 'parsatv'
 PluginLanguagePath = 'Extensions/parsatv/res/locale'

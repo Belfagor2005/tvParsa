@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: parsatv\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-10 00:06+0100\n"
+"POT-Creation-Date: 2021-02-11 20:13+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: ))^^(( <>\n"
 "Language-Team: *\n"
@@ -16,47 +16,74 @@ msgstr ""
 "X-Poedit-Basepath: ../../../..\n"
 "X-Poedit-SearchPath-0: plugin.py\n"
 
-#: plugin.py:249 plugin.py:277 plugin.py:348 plugin.py:453
+#: plugin.py:277 plugin.py:305 plugin.py:396 plugin.py:554
 msgid "Please select ..."
 msgstr "Bitte auswählen ..."
 
-#: plugin.py:252
+#: plugin.py:280
 msgid "Select"
 msgstr "Wählen"
 
-#: plugin.py:253
+#: plugin.py:281
 msgid "Exit"
 msgstr "Ausfahrt"
 
-#: plugin.py:284
+#: plugin.py:312
 msgid "PARSA SPORT"
-msgstr ""
+msgstr "PARSA SPORT"
 
-#: plugin.py:286
+#: plugin.py:314
 msgid "PARSA TV"
-msgstr ""
+msgstr "PARSA TV"
 
-#: plugin.py:304 plugin.py:405
+#: plugin.py:332 plugin.py:480
 msgid "Getting the list, please wait ..."
 msgstr "die Liste bekommen , bitte warten ..."
 
-#: plugin.py:305 plugin.py:406
+#: plugin.py:333 plugin.py:481
 msgid "Play"
 msgstr "Play"
 
-#: plugin.py:306 plugin.py:407
+#: plugin.py:334 plugin.py:482
 msgid "Back"
 msgstr "Zurück"
 
-#: plugin.py:430
-msgid "Try again later ..."
-msgstr "Try again later ..."
+#: plugin.py:335 plugin.py:483
+msgid "Convert"
+msgstr "Konvertieren"
 
-#: plugin.py:570
+#: plugin.py:358
+#, python-format
+msgid "Do you want to Convert %s to favorite .tv ?"
+msgstr "Möchten Sie %s in Lieblings-TV konvertieren?"
+
+#: plugin.py:507
+#, python-format
+msgid "Do you want to Convert %s to favorite .tv ?\n"
+"\n"
+"Attention!! Wait more than 5 minutes!!! "
+msgstr "Möchten Sie %s in Lieblings-TV konvertieren?\n"
+"\n"
+"Beachtung!! Warten Sie mehr als 5 Minuten !!!"
+
+#: plugin.py:709
+msgid "Check  /tmp/temporary2.m3u"
+msgstr "Überprüfen Sie /tmp/temporary2.m3u"
+
+#: plugin.py:734
+msgid "Wait please... "
+msgstr "Wait please... "
+
+#: plugin.py:747
+msgid "Bouquet converted successful"
+msgstr "Blumenstrauß erfolgreich umgesetzt"
+
+#: plugin.py:763 plugin.py:772
 msgid "Parsa TV"
-msgstr ""
+msgstr "Parsa TV"
 
-#: plugin.py:578
+#: plugin.py:771
 #, python-format
 msgid "..:: Parsa TV by Lululla %s ::.. "
-msgstr ""
+msgstr "..:: Parsa TV by Lululla %s ::.. "
+

@@ -92,13 +92,35 @@ try:
 except ImportError:
     eDVBDB = None
 
+# try:
+    # _create_unverified_https_context = ssl._create_unverified_context
+# except AttributeError:
+    # pass
+# else:
+    # ssl._create_default_https_context = _create_unverified_https_context
 try:
-    _create_unverified_https_context = ssl._create_unverified_context
-except AttributeError:
-    pass
-else:
-    ssl._create_default_https_context = _create_unverified_https_context
+    from OpenSSL import SSL
+    from twisted.internet import ssl
+    from twisted.internet._sslverify import ClientTLSOptions
+    sslverify = True
+except:
+    sslverify = False
 
+if sslverify:
+    try:
+        from urlparse import urlparse
+    except:
+        from urllib.parse import urlparse
+
+    class SNIFactory(ssl.ClientContextFactory):
+        def __init__(self, hostname=None):
+            self.hostname = hostname
+
+        def getContext(self):
+            ctx = self._contextFactory(self.method)
+            if self.hostname:
+                ClientTLSOptions(self.hostname, ctx)
+            return ctx
 def checkStr(txt):
     if PY3:
         if type(txt) == type(bytes()):
@@ -134,16 +156,40 @@ def checkUrl(url):
     else:
         return True
 
+# def getUrl(url):
+    # print(" Here in getUrl url =", url)
+    # req = Request(url)
+    # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+    # response = checkStr(urlopen(req))
+    # # response = checkStr(ssl_urlopen(req))    
+    # link = response.read()
+    # response.close()
+    # return link
 def getUrl(url):
-    print(" Here in getUrl url =", url)
-    req = Request(url)
-    req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-    response = checkStr(urlopen(req))
-    # response = checkStr(ssl_urlopen(req))    
-    link = response.read()
-    response.close()
-    return link
-
+    try:
+        if url.startswith("https") and sslverify:
+            parsed_uri = urlparse(url)
+            domain = parsed_uri.hostname
+            sniFactory = SNIFactory(domain)
+        if PY3 == 3:
+            url = url.encode()
+                
+        req = Request(url)
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
+        response = urlopen(req)
+        link = response.read()
+        response.close()
+        print("link =", link)
+        return link
+    except:
+        e = URLError
+        print('We failed to open "%s".' % url)
+        if hasattr(e, 'code'):
+            print('We failed with error code - %s.' % e.code)
+        if hasattr(e, 'reason'):
+            print('We failed to reach a server.')
+            print('Reason: ', e.reason)
+            
 def remove_line(filename, what):
     if os.path.isfile(filename):
         file_read = open(filename).readlines()
