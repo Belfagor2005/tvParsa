@@ -218,6 +218,8 @@ def ReloadBouquet():
 DESKHEIGHT = getDesktop(0).size().height()
 currversion = '1.1'
 title_plug = '..:: Parsa TV V. %s ::..' % currversion
+desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
+name_plugin = ('Parsa TV')
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
 skin_path = plugin_path
 pluglogo = plugin_path + '/res/pics/logo.png'
@@ -225,7 +227,6 @@ pngx = plugin_path + '/res/pics/plugins.png'
 pngl = plugin_path + '/res/pics/plugin.png'
 pngs = plugin_path + '/res/pics/setting.png'
 HD = getDesktop(0).size()
-
 
 if HD.width() > 1280:
     if isDreamOS:
@@ -814,8 +815,7 @@ def Plugins(**kwargs):
     ico_path = 'logo.png'
     if not isDreamOS:
         ico_path = plugin_path + '/res/pics/logo.png'
-    desc_plugin = (_('..:: Parsa TV by Lululla %s ::.. ' % currversion))
-    name_plugin = (_('Parsa TV'))
+
     # main_menu = PluginDescriptor(name = name_plugin, description = desc_plugin, where = PluginDescriptor.WHERE_MENU, fnc = StartSetup, needsRestart = True)
     extensions_menu = PluginDescriptor(name = name_plugin, description = desc_plugin, where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main, needsRestart = True)
     result = [PluginDescriptor(name = name_plugin, description = desc_plugin, where = PluginDescriptor.WHERE_PLUGINMENU, icon = ico_path, fnc = main)]
