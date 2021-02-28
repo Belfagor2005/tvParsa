@@ -129,7 +129,15 @@ def checkStr(txt):
         if type(txt) == type(unicode()):
             txt = txt.encode('utf-8')
     return txt
-
+    
+def clear_Title(txt):
+    txt = re.sub('<.+?>', '', txt)
+    txt = txt.replace("&quot;", "\"").replace('()', '').replace("&#038;", "&").replace('&#8211;', ':')
+    txt = txt.replace("&amp;", "&").replace('&#8217;', "'").replace('&#039;', ':').replace('&#;', '\'')
+    txt = txt.replace("&#38;", "&").replace('&#8221;', '"').replace('&#8216;', '"').replace('&#160;', '')
+    txt = txt.replace("&nbsp;", "").replace('&#8220;', '"').replace('\t', ' ').replace('\n', ' ')
+    return txt
+    
 def checkInternet():
     try:
         response = checkStr(urlopen("http://google.com", None, 5))
@@ -431,7 +439,7 @@ class parsasport(Screen):
                 pic = " "                 
                 print("getVideos5 name =", name)
                 print("getVideos5 url =", url)
-                name1 = name.replace("&#x27;","'").replace("&amp;","&") #url2
+                name1 = clear_Title(name)
             
                 e.write('#EXTINF:-1,' + name1 +'\n')
                 e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")                    
