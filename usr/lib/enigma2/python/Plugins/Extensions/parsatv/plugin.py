@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             09/02/2021               *
+*             09/03/2021               *
 *       Skin by MMark                  *
 ****************************************
 '''
@@ -42,10 +42,11 @@ import sys
 import shutil
 import ssl
 import glob
+import six
 from Tools.LoadPixmap import LoadPixmap
 from Components.Console import Console as iConsole
 global isDreamOS
-global pngx, pngl, pngs
+global pngs #, pngl
 try:
         from enigma import eDVBDB
 except ImportError:
@@ -121,22 +122,25 @@ if sslverify:
             if self.hostname:
                 ClientTLSOptions(self.hostname, ctx)
             return ctx
+
 def checkStr(txt):
     if PY3:
-        if type(txt) == type(bytes()):
+        if isinstance(txt, type(bytes())):
             txt = txt.decode('utf-8')
     else:
-        if type(txt) == type(unicode()):
+        if isinstance(txt, type(six.text_type())):
             txt = txt.encode('utf-8')
     return txt
     
-def clear_Title(txt):
-    txt = re.sub('<.+?>', '', txt)
-    txt = txt.replace("&quot;", "\"").replace('()', '').replace("&#038;", "&").replace('&#8211;', ':')
-    txt = txt.replace("&amp;", "&").replace('&#8217;', "'").replace('&#039;', ':').replace('&#;', '\'')
-    txt = txt.replace("&#38;", "&").replace('&#8221;', '"').replace('&#8216;', '"').replace('&#160;', '')
-    txt = txt.replace("&nbsp;", "").replace('&#8220;', '"').replace('\t', ' ').replace('\n', ' ')
-    return txt
+# def clear_Title(txt):
+    # txt = re.sub('<.+?>', '', txt)
+    # txt = txt.replace("&quot;", "\"").replace('()', '').replace("&#038;", "&").replace('&#8211;', ':')
+    # txt = txt.replace("&amp;", "&").replace('&#8217;', "'").replace('&#039;', ':').replace('&#;', '\'')
+    # txt = txt.replace("&#38;", "&").replace('&#8221;', '"').replace('&#8216;', '"').replace('&#160;', '')
+    # txt = txt.replace("&nbsp;", "").replace('&#8220;', '"').replace('\t', ' ').replace('\n', ' ')
+    # return txt
+
+
     
 def checkInternet():
     try:
@@ -180,7 +184,8 @@ def getUrl(url):
             domain = parsed_uri.hostname
             sniFactory = SNIFactory(domain)
         if PY3 == 3:
-            url = url.encode()
+            # url = url.encode()
+            url = six.binary_type(url,encoding="utf-8") 
                 
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
@@ -225,14 +230,14 @@ def ReloadBouquet():
         
 DESKHEIGHT = getDesktop(0).size().height()
 currversion = '1.1'
-title_plug = '..:: Parsa TV V. %s ::..' % currversion
+title_plug = 'Parsa TV '
 desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
-name_plugin = ('Parsa TV')
+
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
 skin_path = plugin_path
 pluglogo = plugin_path + '/res/pics/logo.png'
-pngx = plugin_path + '/res/pics/plugins.png'
-pngl = plugin_path + '/res/pics/plugin.png'
+# pngs = plugin_path + '/res/pics/plugins.png'
+# pngl = plugin_path + '/res/pics/plugin.png'
 pngs = plugin_path + '/res/pics/setting.png'
 HD = getDesktop(0).size()
 
@@ -298,10 +303,10 @@ def OneSetListEntry(name):
 
     res = [name]
     if HD.width() > 1280:
-        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 12), size = (34, 25), png = loadPNG(pngx)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 12), size = (34, 25), png = loadPNG(pngs)))
         res.append(MultiContentEntryText(pos = (60, 0), size = (1200, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 6), size = (34, 25), png = loadPNG(pngx)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 6), size = (34, 25), png = loadPNG(pngs)))
         res.append(MultiContentEntryText(pos = (60, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT))
     return res
 
@@ -411,17 +416,19 @@ class parsasport(Screen):
 
     def convert(self):
             self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% self.name, MessageBox.TYPE_YESNO, timeout = 15, default = True)
-
+        
+        
     def _gotPageLoad(self):
         url = self.url
         name = self.name
         content = getUrl(url)
+        content = six.ensure_str(content)
         self.names = []
         self.urls = []        
         
         xxxname = '/tmp/temporary.m3u'
         if os.path.exists(xxxname):
-            print('permantly remove file ', file)
+            print('permantly remove file ', xxxname)
             os.remove(xxxname)        
         with open(xxxname, 'w') as e:
             e.write("#EXTM3U\n")
@@ -439,7 +446,7 @@ class parsasport(Screen):
                 pic = " "                 
                 print("getVideos5 name =", name)
                 print("getVideos5 url =", url)
-                name1 = clear_Title(name)
+                name1 = decodeHtml(name)
             
                 e.write('#EXTINF:-1,' + name1 +'\n')
                 e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")                    
@@ -473,6 +480,7 @@ class parsasport(Screen):
                 elif line.startswith("http"):
                     url =line
                     content = getUrl(url)
+                    content = six.ensure_str(content)
                     n1 = content.find('<body>', 0)
                     n2 = content.find("</body>", n1)
                     content = content[n1:n2]
@@ -498,6 +506,7 @@ class parsasport(Screen):
         # print('urlok:  ', url)
         # try:
         content = getUrl(url)
+        # content = six.ensure_str(content)
         # print("content B =", content)
         n1 = content.find('<body>', 0)
         n2 = content.find("</body>", n1)
@@ -575,6 +584,7 @@ class parsatv(Screen):
             url = self.url
             name = self.name
             content = getUrl(url)
+            content = six.ensure_str(content)
             # try:
             # print("content B =", content)
             n1 = content.find('channels">', 0)
@@ -622,6 +632,7 @@ class parsatv(Screen):
         # print('url:  ', url)
         try:
             content = getUrl(url)
+            # content = six.ensure_str(content)
             # print("content B =", content)
             n1 = content.find('class="myButton" id=', 0)
             n2 = content.find("</button></a>", n1)
@@ -661,6 +672,7 @@ class parsatv(Screen):
                 elif line.startswith("http"):
                     url =line
                     content = getUrl(url)
+                    content = six.ensure_str(content)
                     # print("content B =", content)
                     n1 = content.find('class="myButton" id=', 0)
                     n2 = content.find("</button></a>", n1)
@@ -824,9 +836,122 @@ def Plugins(**kwargs):
     if not isDreamOS:
         ico_path = plugin_path + '/res/pics/logo.png'
 
-    # main_menu = PluginDescriptor(name = name_plugin, description = desc_plugin, where = PluginDescriptor.WHERE_MENU, fnc = StartSetup, needsRestart = True)
-    extensions_menu = PluginDescriptor(name = name_plugin, description = desc_plugin, where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main, needsRestart = True)
-    result = [PluginDescriptor(name = name_plugin, description = desc_plugin, where = PluginDescriptor.WHERE_PLUGINMENU, icon = ico_path, fnc = main)]
+    # main_menu = PluginDescriptor(name = title_plug, description = desc_plugin, where = PluginDescriptor.WHERE_MENU, fnc = StartSetup, needsRestart = True)
+    extensions_menu = PluginDescriptor(name = title_plug, description = desc_plugin, where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main, needsRestart = True)
+    result = [PluginDescriptor(name = title_plug, description = desc_plugin, where = PluginDescriptor.WHERE_PLUGINMENU, icon = ico_path, fnc = main)]
     result.append(extensions_menu)
     # result.append(main_menu)
     return result
+
+def decodeUrl(text):
+	text = text.replace('%20',' ')
+	text = text.replace('%21','!')
+	text = text.replace('%22','"')
+	text = text.replace('%23','&')
+	text = text.replace('%24','$')
+	text = text.replace('%25','%')
+	text = text.replace('%26','&')
+	text = text.replace('%2B','+')
+	text = text.replace('%2F','/')
+	text = text.replace('%3A',':')
+	text = text.replace('%3B',';')
+	text = text.replace('%3D','=')
+	text = text.replace('&#x3D;','=')
+	text = text.replace('%3F','?')
+	text = text.replace('%40','@')
+	return text
+
+def decodeHtml(text):
+	text = text.replace('&auml;','ä')
+	text = text.replace('\u00e4','ä')
+	text = text.replace('&#228;','ä')
+	text = text.replace('&oacute;','ó')
+	text = text.replace('&eacute;','e')
+	text = text.replace('&aacute;','a')
+	text = text.replace('&ntilde;','n')
+
+	text = text.replace('&Auml;','Ä')
+	text = text.replace('\u00c4','Ä')
+	text = text.replace('&#196;','Ä')
+	
+	text = text.replace('&ouml;','ö')
+	text = text.replace('\u00f6','ö')
+	text = text.replace('&#246;','ö')
+	
+	text = text.replace('&ouml;','Ö')
+	text = text.replace('\u00d6','Ö')
+	text = text.replace('&#214;','Ö')
+	
+	text = text.replace('&uuml;','ü')
+	text = text.replace('\u00fc','ü')
+	text = text.replace('&#252;','ü')
+	
+	text = text.replace('&Uuml;','Ü')
+	text = text.replace('\u00dc','Ü')
+	text = text.replace('&#220;','Ü')
+	
+	text = text.replace('&szlig;','ß')
+	text = text.replace('\u00df','ß')
+	text = text.replace('&#223;','ß')
+	
+	text = text.replace('&amp;','&')
+	text = text.replace('&quot;','\"')
+	text = text.replace('&quot_','\"')
+
+	text = text.replace('&gt;','>')
+	text = text.replace('&apos;',"'")
+	text = text.replace('&acute;','\'')
+	text = text.replace('&ndash;','-')
+	text = text.replace('&bdquo;','"')
+	text = text.replace('&rdquo;','"')
+	text = text.replace('&ldquo;','"')
+	text = text.replace('&lsquo;','\'')
+	text = text.replace('&rsquo;','\'')
+	text = text.replace('&#034;','\'')
+	text = text.replace('&#038;','&')
+	text = text.replace('&#039;','\'')
+	text = text.replace('&#39;','\'')
+	text = text.replace('&#160;',' ')
+	text = text.replace('\u00a0',' ')
+	text = text.replace('&#174;','')
+	text = text.replace('&#225;','a')
+	text = text.replace('&#233;','e')
+	text = text.replace('&#243;','o')
+	text = text.replace('&#8211;',"-")
+	text = text.replace('\u2013',"-")
+	text = text.replace('&#8216;',"'")
+	text = text.replace('&#8217;',"'")
+	text = text.replace('#8217;',"'")
+	text = text.replace('&#8220;',"'")
+	text = text.replace('&#8221;','"')
+	text = text.replace('&#8222;',',')
+	text = text.replace('&#x27;',"'")
+	text = text.replace('&#8230;','...')
+	text = text.replace('\u2026','...')
+	text = text.replace('&#41;',')')
+	text = text.replace('&lowbar;','_')
+	text = text.replace('&rsquo;','\'')
+	text = text.replace('&lpar;','(')
+	text = text.replace('&rpar;',')')
+	text = text.replace('&comma;',',')
+	text = text.replace('&period;','.')
+	text = text.replace('&plus;','+')
+	text = text.replace('&num;','#')
+	text = text.replace('&excl;','!')
+	text = text.replace('&#039','\'')
+	text = text.replace('&semi;','')
+	text = text.replace('&lbrack;','[')
+	text = text.replace('&rsqb;',']')
+	text = text.replace('&nbsp;','')
+	text = text.replace('&#133;','')
+	text = text.replace('&#4','')
+	text = text.replace('&#40;','')
+
+	text = text.replace('&atilde;',"'")
+	text = text.replace('&colon;',':')
+	text = text.replace('&sol;','/')
+	text = text.replace('&percnt;','%')
+	text = text.replace('&commmat;',' ')
+	text = text.replace('&#58;',':')
+
+	return text	
