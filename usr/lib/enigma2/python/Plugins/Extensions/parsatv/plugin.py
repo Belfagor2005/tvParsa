@@ -179,13 +179,15 @@ def checkUrl(url):
     # return link
 def getUrl(url):
     try:
+        if PY3 == 3:
+            # url = url.encode()
+            url = six.binary_type(url,encoding="utf-8")     
+    
         if url.startswith("https") and sslverify:
             parsed_uri = urlparse(url)
             domain = parsed_uri.hostname
             sniFactory = SNIFactory(domain)
-        if PY3 == 3:
-            # url = url.encode()
-            url = six.binary_type(url,encoding="utf-8") 
+
                 
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
@@ -421,8 +423,6 @@ class parsasport(Screen):
     def _gotPageLoad(self):
         url = self.url
         name = self.name
-        content = getUrl(url)
-        content = six.ensure_str(content)
         self.names = []
         self.urls = []        
         
@@ -432,6 +432,10 @@ class parsasport(Screen):
             os.remove(xxxname)        
         with open(xxxname, 'w') as e:
             e.write("#EXTM3U\n")
+            
+            content = getUrl(url)
+            content = six.ensure_str(content)
+        
             n1 = content.find('name="link"', 0)
             n2 = content.find("</select>", n1)
             content2 = content[n1:n2]
@@ -478,9 +482,9 @@ class parsasport(Screen):
                     name = '%s' % line.split(',')[-1]            
                     name1 = name.replace('%20', ' ').rstrip ('\n')
                 elif line.startswith("http"):
-                    url =line
+                    url = line
                     content = getUrl(url)
-                    content = six.ensure_str(content)
+                    # content = six.ensure_str(content)
                     n1 = content.find('<body>', 0)
                     n2 = content.find("</body>", n1)
                     content = content[n1:n2]
@@ -506,7 +510,7 @@ class parsasport(Screen):
         # print('urlok:  ', url)
         # try:
         content = getUrl(url)
-        # content = six.ensure_str(content)
+        content = six.ensure_str(content)
         # print("content B =", content)
         n1 = content.find('<body>', 0)
         n2 = content.find("</body>", n1)
@@ -632,7 +636,7 @@ class parsatv(Screen):
         # print('url:  ', url)
         try:
             content = getUrl(url)
-            # content = six.ensure_str(content)
+            content = six.ensure_str(content)
             # print("content B =", content)
             n1 = content.find('class="myButton" id=', 0)
             n2 = content.find("</button></a>", n1)
