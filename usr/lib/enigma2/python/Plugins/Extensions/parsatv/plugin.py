@@ -168,15 +168,7 @@ def checkUrl(url):
     else:
         return True
 
-# def getUrl(url):
-    # print(" Here in getUrl url =", url)
-    # req = Request(url)
-    # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-    # response = checkStr(urlopen(req))
-    # # response = checkStr(ssl_urlopen(req))    
-    # link = response.read()
-    # response.close()
-    # return link
+
 def getUrl(url):
     try:
         if PY3 == 3:
@@ -187,8 +179,6 @@ def getUrl(url):
             parsed_uri = urlparse(url)
             domain = parsed_uri.hostname
             sniFactory = SNIFactory(domain)
-
-                
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
         response = urlopen(req)
