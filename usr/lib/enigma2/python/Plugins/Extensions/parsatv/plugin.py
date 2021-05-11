@@ -171,14 +171,14 @@ def checkUrl(url):
 
 def getUrl(url):
     try:
-        if PY3 == 3:
-            # url = url.encode()
-            url = six.binary_type(url,encoding="utf-8")     
+        # if PY3 == 3:
+            # # url = url.encode()
+            # url = six.binary_type(url,encoding="utf-8")     
     
-        if url.startswith("https") and sslverify:
-            parsed_uri = urlparse(url)
-            domain = parsed_uri.hostname
-            sniFactory = SNIFactory(domain)
+        # if url.startswith("https") and sslverify:
+            # parsed_uri = urlparse(url)
+            # domain = parsed_uri.hostname
+            # sniFactory = SNIFactory(domain)
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
         response = urlopen(req)
@@ -224,26 +224,18 @@ DESKHEIGHT = getDesktop(0).size().height()
 currversion = '1.1'
 title_plug = 'Parsa TV '
 desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
-
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
-skin_path = plugin_path
-pluglogo = plugin_path + '/res/pics/logo.png'
-# pngs = plugin_path + '/res/pics/plugins.png'
-# pngl = plugin_path + '/res/pics/plugin.png'
-pngs = plugin_path + '/res/pics/setting.png'
+res_plugin_path=plugin_path + '/res/'
+pngs=res_plugin_path + 'pics/setting.png'
+pluglogo=res_plugin_path + 'pics/logo.png'
 HD = getDesktop(0).size()
-
 if HD.width() > 1280:
-    if isDreamOS:
-        skin_path = plugin_path + '/res/skins/fhd/dreamOs/'
-    else:
-        skin_path = plugin_path + '/res/skins/fhd/'
+    skin_path=res_plugin_path + 'skins/fhd/'
 else:
-    if isDreamOS:
-        skin_path = plugin_path + '/res/skins/hd/dreamOs/'
-    else:
-        skin_path = plugin_path + '/res/skins/hd/'
-
+    skin_path=res_plugin_path + 'skins/hd/'
+if isDreamOS:
+    skin_path=skin_path + 'dreamOs/'
+    
 Panel_Dlist = [
  ('PARSA SPORT'),
  ('PARSA TV')
@@ -310,7 +302,6 @@ def showlistpars(data, list):
         plist.append(OneSetListEntry(name))
         icount = icount+1
         list.setList(plist)
-
 
 class MainParsa(Screen):
     def __init__(self, session):
@@ -408,7 +399,6 @@ class parsasport(Screen):
 
     def convert(self):
             self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% self.name, MessageBox.TYPE_YESNO, timeout = 15, default = True)
-        
         
     def _gotPageLoad(self):
         url = self.url
