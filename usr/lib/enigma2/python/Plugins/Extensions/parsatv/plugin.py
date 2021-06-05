@@ -8,7 +8,7 @@
 *       Skin by MMark                  *
 ****************************************
 '''
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Button import Button
 from Components.Label import Label
@@ -46,7 +46,7 @@ import six
 from Tools.LoadPixmap import LoadPixmap
 from Components.Console import Console as iConsole
 global isDreamOS
-global pngs #, pngl
+global pngs 
 try:
         from enigma import eDVBDB
 except ImportError:
@@ -93,12 +93,6 @@ try:
 except ImportError:
     eDVBDB = None
 
-# try:
-    # _create_unverified_https_context = ssl._create_unverified_context
-# except AttributeError:
-    # pass
-# else:
-    # ssl._create_default_https_context = _create_unverified_https_context
 try:
     from OpenSSL import SSL
     from twisted.internet import ssl
@@ -132,16 +126,6 @@ def checkStr(txt):
             txt = txt.encode('utf-8')
     return txt
     
-# def clear_Title(txt):
-    # txt = re.sub('<.+?>', '', txt)
-    # txt = txt.replace("&quot;", "\"").replace('()', '').replace("&#038;", "&").replace('&#8211;', ':')
-    # txt = txt.replace("&amp;", "&").replace('&#8217;', "'").replace('&#039;', ':').replace('&#;', '\'')
-    # txt = txt.replace("&#38;", "&").replace('&#8221;', '"').replace('&#8216;', '"').replace('&#160;', '')
-    # txt = txt.replace("&nbsp;", "").replace('&#8220;', '"').replace('\t', ' ').replace('\n', ' ')
-    # return txt
-
-
-    
 def checkInternet():
     try:
         response = checkStr(urlopen("http://google.com", None, 5))
@@ -155,30 +139,8 @@ def checkInternet():
     else:
         return True
 
-def checkUrl(url):
-    try:
-        response = checkStr(urlopen(url, None, 5))
-        response.close()
-    except HTTPError:
-        return False
-    except URLError:
-        return False
-    except socket.timeout:
-        return False
-    else:
-        return True
-
-
 def getUrl(url):
     try:
-        # if PY3 == 3:
-            # # url = url.encode()
-            # url = six.binary_type(url,encoding="utf-8")     
-    
-        # if url.startswith("https") and sslverify:
-            # parsed_uri = urlparse(url)
-            # domain = parsed_uri.hostname
-            # sniFactory = SNIFactory(domain)
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
         response = urlopen(req)
@@ -284,7 +246,6 @@ class OneSetList(MenuList):
             self.l.setFont(0, gFont('Regular', textfont))
 
 def OneSetListEntry(name):
-
     res = [name]
     if HD.width() > 1280:
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 12), size = (34, 25), png = loadPNG(pngs)))
@@ -405,17 +366,14 @@ class parsasport(Screen):
         name = self.name
         self.names = []
         self.urls = []        
-        
         xxxname = '/tmp/temporary.m3u'
         if os.path.exists(xxxname):
             print('permantly remove file ', xxxname)
             os.remove(xxxname)        
         with open(xxxname, 'w') as e:
             e.write("#EXTM3U\n")
-            
             content = getUrl(url)
             content = six.ensure_str(content)
-        
             n1 = content.find('name="link"', 0)
             n2 = content.find("</select>", n1)
             content2 = content[n1:n2]
@@ -423,7 +381,6 @@ class parsasport(Screen):
             regexvideo = 'value=".*?link=(.*?)".*?>(.*?)</option>'
             match = re.compile(regexvideo,re.DOTALL).findall(content2)
             # print("match =", match)
-            
             for url, name in match:   
                 url = "http://www.parsatv.com/streams/fetch/varzeshtv.php?link=" + url
                 name = 'Sport ' + name
@@ -431,14 +388,11 @@ class parsasport(Screen):
                 print("getVideos5 name =", name)
                 print("getVideos5 url =", url)
                 name1 = decodeHtml(name)
-            
                 e.write('#EXTINF:-1,' + name1 +'\n')
                 e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")                    
                 e.write(url+'\n')    
-
                 self.names.append(name1)
                 self.urls.append(url)
-
         self['info'].setText(_('Please select ...'))
         showlistpars(self.names, self['text'])
 
@@ -482,7 +436,6 @@ class parsasport(Screen):
         convert_bouquet(namex)            
 
     def okRun(self):
-
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
@@ -508,8 +461,6 @@ class parsasport(Screen):
         # except:
             # print('error: ')
             # pass
-
-
 
 class parsatv(Screen):
 
@@ -564,7 +515,6 @@ class parsatv(Screen):
             os.remove(xxxname)        
         with open(xxxname, 'w') as e:
             e.write("#EXTM3U\n")        
-
             url = self.url
             name = self.name
             content = getUrl(url)
@@ -577,35 +527,27 @@ class parsatv(Screen):
             regexvideo = '<li><a href="(.*?)"><button.*?myButton">(.*?)</button'
             match = re.compile(regexvideo,re.DOTALL).findall(content)
             # print("getVideos match =", match)
-           
             for url, name in match:
                 # url = url.replace('https','http')
                 name1 = name.replace('%20', ' ')
                 print("getVideos15 name =", name1)
                 print("getVideos15 url =", url)
-                
                 item = name + "###" + url
                 items.append(item)                
-                
                 e.write('#EXTINF:-1,' + name1 +'\n')
                 e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")                    
                 e.write(url+'\n')    
-
             items.sort()
-            
             for item in items:
                 name = item.split("###")[0]
                 url = item.split("###")[1]            
-            
                 self.names.append(name)
                 self.urls.append(url)            
-                
             self['info'].setText(_('Please select ...'))
             showlistpars(self.names, self['text'])            
         # except:
             # print('error: ')
             # pass
-
 
     def okRun(self):
         selection = str(self['text'].getCurrent())
@@ -669,7 +611,6 @@ class parsatv(Screen):
                         # url = url.replace('https','http')
                     print("getVideos5 name =", name)
                     print("getVideos5 url =", url) 
-                    
                     e.write('#EXTINF:-1,' + name +'\n')
                     e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")                    
                     e.write(url+'\n') 
@@ -750,8 +691,6 @@ class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications
     def keyNumberGlobal(self, number):
         self['text'].number(number)
 
-
-
 def convert_bouquet(namex):
     # xxxname = '/tmp/temporary.m3u'
     xxxname = '/tmp/temporary2.m3u'
@@ -797,10 +736,7 @@ def convert_bouquet(namex):
                     outfile.close()
     message = (_("Bouquet converted successful"))
     web_info(message)    
-    
     ReloadBouquet()
-
-
 
 
 def main(session, **kwargs):
@@ -819,12 +755,9 @@ def Plugins(**kwargs):
     ico_path = 'logo.png'
     if not isDreamOS:
         ico_path = plugin_path + '/res/pics/logo.png'
-
-    # main_menu = PluginDescriptor(name = title_plug, description = desc_plugin, where = PluginDescriptor.WHERE_MENU, fnc = StartSetup, needsRestart = True)
     extensions_menu = PluginDescriptor(name = title_plug, description = desc_plugin, where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main, needsRestart = True)
     result = [PluginDescriptor(name = title_plug, description = desc_plugin, where = PluginDescriptor.WHERE_PLUGINMENU, icon = ico_path, fnc = main)]
     result.append(extensions_menu)
-    # result.append(main_menu)
     return result
 
 def decodeUrl(text):
