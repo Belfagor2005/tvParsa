@@ -11,6 +11,7 @@
 from __future__ import print_function, unicode_literals
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Button import Button
+from Components.Console import Console as iConsole
 from Components.Label import Label
 from Components.MenuList import MenuList
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
@@ -18,17 +19,18 @@ from Components.Pixmap import Pixmap
 from Components.PluginComponent import plugins
 from Components.PluginList import *
 from Components.ScrollLabel import ScrollLabel
+from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
 from Screens.Console import Console
+from Screens.InfoBar import MoviePlayer, InfoBar
+from Screens.InfoBarGenerics import *
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Screens.InfoBarGenerics import *
-from Screens.InfoBar import MoviePlayer, InfoBar
-from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Tools.Directories import *
 from Tools.Directories import resolveFilename, SCOPE_LANGUAGE, fileExists
+from Tools.LoadPixmap import LoadPixmap
 from enigma import *
 from enigma import RT_HALIGN_LEFT, getDesktop, RT_HALIGN_RIGHT, RT_HALIGN_CENTER
 from enigma import eTimer, eListboxPythonMultiContent, eListbox, eConsoleAppContainer, gFont
@@ -36,21 +38,20 @@ from os import path, listdir, remove, mkdir, chmod
 from twisted.web.client import downloadPage, getPage
 from xml.dom import Node, minidom
 import base64
+import glob
 import os
 import re
-import sys
 import shutil
-import ssl
-import glob
 import six
-from Tools.LoadPixmap import LoadPixmap
-from Components.Console import Console as iConsole
+import ssl
+import sys
+
 global isDreamOS
 global pngs 
 try:
-        from enigma import eDVBDB
+    from enigma import eDVBDB
 except ImportError:
-        eDVBDB = None
+    eDVBDB = None
 
 isDreamOS = False
 try:
@@ -59,21 +60,23 @@ try:
 except:
     isDreamOS = False
 
-PY3 = sys.version_info[0] == 3
-
-if PY3:
-    from urllib.request import urlopen, Request
-    from urllib.error import URLError, HTTPError
-    from urllib.parse import urlparse
-    from urllib.parse import urlencode, quote, quote_plus
-    from urllib.request import urlretrieve
-else:
-    from urllib2 import urlopen, Request
-    from urllib2 import URLError, HTTPError
-    from urlparse import urlparse
-    from urllib import urlencode, quote, quote_plus
-    from urllib import urlretrieve
-
+PY3 = sys.version_info.major >= 3
+print('Py3: ',PY3)
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import Request
+from six.moves.urllib.error import HTTPError, URLError
+from six.moves.urllib.request import urlretrieve    
+from six.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import parse_qs
+from six.moves.urllib.request import build_opener
+from six.moves.urllib.parse import quote_plus
+from six.moves.urllib.parse import unquote_plus
+from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import unquote
+from six.moves.urllib.parse import urlencode
+import six.moves.urllib.request
+import six.moves.urllib.parse
+import six.moves.urllib.error
 
 if sys.version_info >= (2, 7, 9):
     try:
@@ -102,11 +105,6 @@ except:
     sslverify = False
 
 if sslverify:
-    try:
-        from urlparse import urlparse
-    except:
-        from urllib.parse import urlparse
-
     class SNIFactory(ssl.ClientContextFactory):
         def __init__(self, hostname=None):
             self.hostname = hostname
@@ -224,7 +222,6 @@ class MainParsaList(MenuList):
 def DListEntry(name, idx):
     res = [name]
     if HD.width() > 1280:
-
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 12), size = (34, 25), png = loadPNG(pngs)))
         res.append(MultiContentEntryText(pos = (60, 0), size = (1900, 50), font = 7, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
