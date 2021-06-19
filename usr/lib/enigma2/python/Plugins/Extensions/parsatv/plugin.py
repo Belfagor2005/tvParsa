@@ -8,7 +8,7 @@
 *       Skin by MMark                  *
 ****************************************
 '''
-from __future__ import print_function, unicode_literals
+from __future__ import print_function#, unicode_literals
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Button import Button
 from Components.Console import Console as iConsole
