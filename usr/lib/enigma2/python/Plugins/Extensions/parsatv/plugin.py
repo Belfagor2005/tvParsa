@@ -342,7 +342,6 @@ class parsasport(Screen):
         self.list = []
         self.name = 'Parsa Sport'
         # self.url = 'http://www.parsatv.com/m/name=Varzesh-TV#persian' 
-        
         self.url ='http://www.parsatv.com/m/'
         self['text'] = OneSetList([])
         self['info'] = Label(_('Getting the list, please wait ...'))
@@ -373,7 +372,6 @@ class parsasport(Screen):
     def convert(self):
             self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% self.name, MessageBox.TYPE_YESNO, timeout = 15, default = True)
 
-
     def _gotPageLoad(self):
         self.names = []
         self.urls = []
@@ -383,7 +381,6 @@ class parsasport(Screen):
         device = downloadparsa
         xxxname = device + 'ParsaSport.m3u'
         print('path device file ', xxxname)      
-        
         if os.path.exists(xxxname):
             print('permantly remove file ', xxxname)
             os.remove(xxxname)        
@@ -392,23 +389,20 @@ class parsasport(Screen):
             content = getUrl(url)
             if PY3:
                 content = six.ensure_str(content)
-            # try:
-            print("content B =", content)
+            # print("content B =", content)
             n1 = content.find('channels">', 0)
             n2 = content.find("</table>", n1)
             content = content[n1:n2]
             regexvideo = '<li><a href="(.*?)"><button.*?myButton">(.*?)</button'
             match = re.compile(regexvideo,re.DOTALL).findall(content)
-            print("getVideos match =", match)
+            # print("getVideos match =", match)
             for url, name in match:
-                #<li><a href="https://www.parsatv.com/m/name=Yahoo-Sports-Radio#radio"><button class="myButton">Yahoo Sports</button></a></li>
                 if 'sport' in str(url).lower():
                     name1 = name.replace('%20', ' ')
-                    print("getVideos15 name =", name1)
-                    print("getVideos15 url =", url)
+                    # print("getVideos15 name =", name1)
+                    # print("getVideos15 url =", url)
                     item = name + "###" + url
                     items.append(item)                
-
                     #save m3u
                     e.write('#EXTINF:-1,' + name1 +'\n')
                     e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")                     
@@ -445,7 +439,7 @@ class parsasport(Screen):
             print('permantly remove file ', xxxname2)
             os.remove(xxxname2)   
         xxxname = device + 'ParsaSport.m3u'
-        print('path device file ', xxxname)      
+        # print('path device file ', xxxname)      
         if not os.path.exists(xxxname):
             return
         with open(xxxname2, 'w') as e:
@@ -457,37 +451,8 @@ class parsasport(Screen):
                     name = name.replace('%20', ' ').rstrip ('\n')
                 elif line.startswith("http"):
                     url =line
-                    content = getUrl(url)
-                    if PY3:
-                        content = six.ensure_str(content)
-                    # print("content B =", content)
-                    n1 = content.find('class="myButton" id=', 0)
-                    n2 = content.find("</button></a>", n1)
-                    content = content[n1:n2]
-                    regexvideo = '<a href="(.*?)"><b'
-                    match = re.compile(regexvideo,re.DOTALL).findall(content)
-                    # print("getVideos match =", match)
-                    for url in match:
-                        if url.startswith("http"):
-                            url=url
-                        else:
-                            #http://www.parsatv.com/streams/fetch/asg/sh3.php?token=8786d7a4
-                            #try but not work fine
-                            url = 'http://www.parsatv.com' + url
-                            content = getUrl(url)
-                            if PY3:    
-                                content = six.ensure_str(content)
-                            # print("content B =", content)
-                            n1 = content.find('class="myButton" id=', 0)
-                            n2 = content.find("</button></a>", n1)
-                            content = content[n1:n2]
-                            regexvideo = '<a href="(.*?)"><b'
-                            match = re.compile(regexvideo,re.DOTALL).findall(content)
-                            for url in match:
-                                url=url                    
-                        # url = url.replace('https','http')
-                    print("getVideos5 name =", name)
-                    print("getVideos5 url =", url) 
+                    # print("getVideos5 name =", name)
+                    # print("getVideos5 url =", url) 
                     e.write('#EXTINF:-1,' + name +'\n')
                     e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")                    
                     e.write(url+'\n') 
@@ -570,11 +535,9 @@ class parsatv(Screen):
         self.names = []
         self.urls = []
         items = []
-        
         device = downloadparsa
         xxxname = device + 'ParsaTV.m3u'
         print('path device file ', xxxname)      
-        
         if os.path.exists(xxxname):
             print('permantly remove file ', xxxname)
             os.remove(xxxname)        
@@ -585,7 +548,6 @@ class parsatv(Screen):
             content = getUrl(url)
             if PY3:
                 content = six.ensure_str(content)
-            # try:
             # print("content B =", content)
             n1 = content.find('channels">', 0)
             n2 = content.find("</table>", n1)
@@ -596,8 +558,8 @@ class parsatv(Screen):
             for url, name in match:
                 # url = url.replace('https','http')
                 name1 = name.replace('%20', ' ')
-                print("getVideos15 name =", name1)
-                print("getVideos15 url =", url)
+                # print("getVideos15 name =", name1)
+                # print("getVideos15 url =", url)
                 item = name + "###" + url
                 items.append(item)                
                 e.write('#EXTINF:-1,' + name1 +'\n')
@@ -611,9 +573,6 @@ class parsatv(Screen):
                 self.urls.append(url)            
             self['info'].setText(_('Please select ...'))
             showlistpars(self.names, self['text'])            
-        # except:
-            # print('error: ')
-            # pass
 
     def okRun(self):
         selection = str(self['text'].getCurrent())
@@ -637,8 +596,8 @@ class parsatv(Screen):
                 # url = url.replace('https','http')
                 name = name
                 pic = ''                 
-                print("getVideos15 name =", name)
-                print("getVideos15 url =", url)
+                # print("getVideos15 name =", name)
+                # print("getVideos15 url =", url)
                 self.session.open(Playgo, name, url)
         except:
             print('error: ')
@@ -649,15 +608,12 @@ class parsatv(Screen):
         name = 'ParsaTv'
         url = ''
         device = downloadparsa
-        
         xxxname2 = device + 'Parsa2.m3u'
         if os.path.exists(xxxname2):
             print('permantly remove file ', xxxname2)
             os.remove(xxxname2)  
-           
         xxxname = device + 'ParsaTV.m3u'
         print('path device file ', xxxname)      
-        
         if not os.path.exists(xxxname):
             return
         with open(xxxname2, 'w') as e:
@@ -683,8 +639,6 @@ class parsatv(Screen):
                         if url.startswith("http"):
                             url=url
                         else:
-                            #http://www.parsatv.com/streams/fetch/asg/sh3.php?token=8786d7a4
-                            #try but not work fine
                             url = 'http://www.parsatv.com' + url
                             content = getUrl(url)
                             if PY3:
@@ -697,14 +651,12 @@ class parsatv(Screen):
                             match = re.compile(regexvideo,re.DOTALL).findall(content)
                             for url in match:
                                 url=url                    
-                        # url = url.replace('https','http')
-                    print("getVideos5 name =", name)
-                    print("getVideos5 url =", url) 
+                    # print("getVideos5 name =", name)
+                    # print("getVideos5 url =", url) 
                     e.write('#EXTINF:-1,' + name +'\n')
                     e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")                    
                     e.write(url+'\n') 
         convert_bouquet(namex)  
-
 
 class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
 
@@ -781,18 +733,14 @@ class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications
         self['text'].number(number)
 
 def convert_bouquet(namex):
-    # xxxname = '/tmp/Parsa.m3u'
-    
     device = downloadparsa
     xxxname = device + 'Parsa2.m3u'
     print('path device file ', xxxname)      
-        
     name = namex.replace(' ','').lower() 
     if not os.path.exists(xxxname):
         self.mbox = self.session.open(openMessageBox, _('Check %sParsa2.m3u') %device, openMessageBox.TYPE_INFO, timeout=5)
         return        
     parsabouquet = 'userbouquet.%s.tv' % name
-    # self.iConsole = iConsole()
     desk_tmp = ''
     in_bouquets = 0
     if os.path.isfile('/etc/enigma2/%s' % parsabouquet):
@@ -830,7 +778,6 @@ def convert_bouquet(namex):
     message = (_("Bouquet converted successful"))
     web_info(message)    
     ReloadBouquet()
-
 
 def main(session, **kwargs):
     if checkInternet():
