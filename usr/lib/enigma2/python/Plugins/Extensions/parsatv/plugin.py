@@ -47,7 +47,7 @@ import ssl
 import sys
 
 global isDreamOS
-global pngs
+global pngs 
 try:
     from enigma import eDVBDB
 except ImportError:
@@ -65,7 +65,7 @@ print('Py3: ',PY3)
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.error import HTTPError, URLError
-from six.moves.urllib.request import urlretrieve
+from six.moves.urllib.request import urlretrieve    
 from six.moves.urllib.parse import urlparse
 from six.moves.urllib.parse import parse_qs
 from six.moves.urllib.request import build_opener
@@ -79,14 +79,18 @@ import six.moves.urllib.parse
 import six.moves.urllib.error
 
 global downloadparsa
+
 downloadparsa = None
+
 try:
     from Components.UsageConfig import defaultMoviePath
     downloadparsa = defaultMoviePath()
+    # cfg.downloadlocation = ConfigDirectory(default=downloadparsa)
 except:
     if os.path.exists("/usr/bin/apt-get"):
         downloadparsa = ('/media/hdd/movie/')
-
+        
+        
 if sys.version_info >= (2, 7, 9):
     try:
         import ssl
@@ -132,7 +136,7 @@ def checkStr(txt):
         if isinstance(txt, type(six.text_type())):
             txt = txt.encode('utf-8')
     return txt
-
+    
 def checkInternet():
     try:
         response = checkStr(urlopen("http://google.com", None, 5))
@@ -163,7 +167,7 @@ def getUrl(url):
         if hasattr(e, 'reason'):
             print('We failed to reach a server.')
             print('Reason: ', e.reason)
-
+            
 def remove_line(filename, what):
     if os.path.isfile(filename):
         file_read = open(filename).readlines()
@@ -172,7 +176,7 @@ def remove_line(filename, what):
             if what not in line:
                 file_write.write(line)
         file_write.close()
-
+        
 def web_info(message):
     try:
         message = quote_plus(str(message))
@@ -181,14 +185,14 @@ def web_info(message):
         os.popen(cmd)
     except:
         print("web_info ERROR")
-
+        
 def ReloadBouquet():
     try:
         eDVBDB.getInstance().reloadServicelist()
         eDVBDB.getInstance().reloadBouquets()
     except:
         os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
-
+        
 DESKHEIGHT = getDesktop(0).size().height()
 currversion = '1.2'
 title_plug = 'Parsa TV '
@@ -204,7 +208,7 @@ else:
     skin_path=res_plugin_path + 'skins/hd/'
 if isDreamOS:
     skin_path=skin_path + 'dreamOs/'
-
+    
 Panel_Dlist = [
  ('PARSA SPORT'),
  ('PARSA TV')
@@ -337,7 +341,9 @@ class parsasport(Screen):
         self.setTitle(title_plug)
         self.list = []
         self.name = 'Parsa Sport'
-        self.url = 'http://www.parsatv.com/name=Varzesh-TV#persian'
+        # self.url = 'http://www.parsatv.com/m/name=Varzesh-TV#persian' 
+        
+        self.url ='http://www.parsatv.com/m/'
         self['text'] = OneSetList([])
         self['info'] = Label(_('Getting the list, please wait ...'))
         self['key_green'] = Button(_('Play'))
@@ -356,7 +362,7 @@ class parsasport(Screen):
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
          'green': self.okRun,
          'red': self.close,
-         'yellow': self.convert,
+         'yellow': self.convert, 
          'cancel': self.close}, -2)
 
     def convert2(self, result):
@@ -367,128 +373,155 @@ class parsasport(Screen):
     def convert(self):
             self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% self.name, MessageBox.TYPE_YESNO, timeout = 15, default = True)
 
+
     def _gotPageLoad(self):
-        url = self.url
-        name = self.name
         self.names = []
         self.urls = []
-
+        items = []
+        url = self.url
+        name = self.name        
         device = downloadparsa
         xxxname = device + 'ParsaSport.m3u'
-        print('path device file ', xxxname)
-
+        print('path device file ', xxxname)      
+        
         if os.path.exists(xxxname):
             print('permantly remove file ', xxxname)
-            os.remove(xxxname)
+            os.remove(xxxname)        
         with open(xxxname, 'w') as e:
-            e.write("#EXTM3U\n")
+            e.write("#EXTM3U\n")        
             content = getUrl(url)
-            content = six.ensure_str(content)
-            try:
-                n1 = content.find('referrerpolicy="no-referrer"', 0)
-                n2 = content.find(">Copyright", n1)
-                content1 = content[n1:n2]
-                regexvideo = 'token=(.*?)"'
-                match = re.compile(regexvideo,re.DOTALL).findall(content1)
-                for token in match:
-                    url = 'http://www.parsatv.com/streams/fetch/varzeshtv.php?token=' + token
-                    print('url token: ', url)
-            except:
-                print('2 urliss: ', url)
-                url = 'http://www.parsatv.com/streams/fetch/varzeshtv.php?token=8786d7a4'
-                pass
-            print('url final ', url)
-            content = getUrl(url)
-            content = six.ensure_str(content)
-            n1 = content.find('name="link"', 0)
-            n2 = content.find("</select>", n1)
-            content2 = content[n1:n2]
-            regexvideo = 'option value="(.*?)".*?>(.*?)</option>'
-            match = re.compile(regexvideo,re.DOTALL).findall(content2)
+            if PY3:
+                content = six.ensure_str(content)
+            # try:
+            print("content B =", content)
+            n1 = content.find('channels">', 0)
+            n2 = content.find("</table>", n1)
+            content = content[n1:n2]
+            regexvideo = '<li><a href="(.*?)"><button.*?myButton">(.*?)</button'
+            match = re.compile(regexvideo,re.DOTALL).findall(content)
+            print("getVideos match =", match)
             for url, name in match:
-                url = "http://www.parsatv.com/streams/fetch/varzeshtv.php" + url
-                name = 'Sport ' + name
-                pic = " "
-                print("getVideos5 name =", name)
-                print("getVideos5 url =", url)
-                name1 = decodeHtml(name)
-                e.write('#EXTINF:-1,' + name1 +'\n')
-                e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
-                e.write(url+'\n')
-                self.names.append(name1)
-                self.urls.append(url)
-        self['info'].setText(_('Please select ...'))
-        showlistpars(self.names, self['text'])
+                #<li><a href="https://www.parsatv.com/m/name=Yahoo-Sports-Radio#radio"><button class="myButton">Yahoo Sports</button></a></li>
+                if 'sport' in str(url).lower():
+                    name1 = name.replace('%20', ' ')
+                    print("getVideos15 name =", name1)
+                    print("getVideos15 url =", url)
+                    item = name + "###" + url
+                    items.append(item)                
 
+                    #save m3u
+                    e.write('#EXTINF:-1,' + name1 +'\n')
+                    e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")                     
+                    content = getUrl(url)
+                    if PY3:
+                        content = six.ensure_str(content)
+                    # print("content B =", content)
+                    n1 = content.find('class="myButton" id=', 0)
+                    n2 = content.find("</button></a>", n1)
+                    content = content[n1:n2]
+                    regexvideo = '<a href="(.*?)"><b'
+                    match = re.compile(regexvideo,re.DOTALL).findall(content)
+                    # print("getVideos match =", match)
+                    for url2 in match:
+                        url2 = url2
+                        e.write(url2+'\n')   
+                    #save m3u end                        
+            items.sort()
+            for item in items:
+                name = item.split("###")[0]
+                url = item.split("###")[1]            
+                self.names.append(name)
+                self.urls.append(url)            
+            self['info'].setText(_('Please select ...'))
+            showlistpars(self.names, self['text']) 
 
     def make_m3u(self):
         namex = self.name
         name = 'sport'
         url = ''
-
         device = downloadparsa
         xxxname2 = device + 'Parsa2.m3u'
         if os.path.exists(xxxname2):
             print('permantly remove file ', xxxname2)
-            os.remove(xxxname2)
-
+            os.remove(xxxname2)   
         xxxname = device + 'ParsaSport.m3u'
-        print('path device file ', xxxname)
+        print('path device file ', xxxname)      
         if not os.path.exists(xxxname):
             return
         with open(xxxname2, 'w') as e:
             e.write("#EXTM3U\n")
-            file_read = open(xxxname).readlines()
+            file_read = open(xxxname).readlines() 
             for line in file_read:
                 if line.startswith('#EXTINF'):
-                    name = '%s' % line.split(',')[-1]
-                    name1 = name.replace('%20', ' ').rstrip ('\n')
+                    name = '%s' % line.split(',')[-1]            
+                    name = name.replace('%20', ' ').rstrip ('\n')
                 elif line.startswith("http"):
-                    url = line
+                    url =line
                     content = getUrl(url)
-                    # content = six.ensure_str(content)
-                    n1 = content.find('<body>', 0)
-                    n2 = content.find("</body>", n1)
+                    if PY3:
+                        content = six.ensure_str(content)
+                    # print("content B =", content)
+                    n1 = content.find('class="myButton" id=', 0)
+                    n2 = content.find("</button></a>", n1)
                     content = content[n1:n2]
-                    regexvideo = '.*?file:.*?"(.*?)"'
+                    regexvideo = '<a href="(.*?)"><b'
                     match = re.compile(regexvideo,re.DOTALL).findall(content)
                     # print("getVideos match =", match)
                     for url in match:
-                        url = url
+                        if url.startswith("http"):
+                            url=url
+                        else:
+                            #http://www.parsatv.com/streams/fetch/asg/sh3.php?token=8786d7a4
+                            #try but not work fine
+                            url = 'http://www.parsatv.com' + url
+                            content = getUrl(url)
+                            if PY3:    
+                                content = six.ensure_str(content)
+                            # print("content B =", content)
+                            n1 = content.find('class="myButton" id=', 0)
+                            n2 = content.find("</button></a>", n1)
+                            content = content[n1:n2]
+                            regexvideo = '<a href="(.*?)"><b'
+                            match = re.compile(regexvideo,re.DOTALL).findall(content)
+                            for url in match:
+                                url=url                    
                         # url = url.replace('https','http')
-                    print("getVideos5 name =", name1)
-                    print("getVideos5 url =", url)
-                    e.write('#EXTINF:-1,' + name1 +'\n')
-                    e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
-                    e.write(url+'\n')
-        convert_bouquet(namex)
+                    print("getVideos5 name =", name)
+                    print("getVideos5 url =", url) 
+                    e.write('#EXTINF:-1,' + name +'\n')
+                    e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")                    
+                    e.write(url+'\n') 
+        convert_bouquet(namex)          
 
     def okRun(self):
+        selection = str(self['text'].getCurrent())
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
-        # print('nameok : ', name)
-        # print('urlok:  ', url)
-        # try:
-        content = getUrl(url)
-        content = six.ensure_str(content)
-        # print("content B =", content)
-        n1 = content.find('<body>', 0)
-        n2 = content.find("</body>", n1)
-        content = content[n1:n2]
-        regexvideo = '.*?file:.*?"(.*?)"'
-        match = re.compile(regexvideo,re.DOTALL).findall(content)
-        # print("getVideos match =", match)
-        for url in match:
-            # url = url.replace('https','http')
-            name = name.replace('%20', ' ')
-            pic = ''
-            # print("getVideos15 name =", name)
-            # print ("getVideos15 url =", url)
-            self.session.open(Playgo, name, url)
-        # except:
-            # print('error: ')
-            # pass
+        # print('name : ', name)
+        # print('url:  ', url)
+        try:
+            content = getUrl(url)
+            if PY3:
+                content = six.ensure_str(content)
+            # print("content B =", content)
+            n1 = content.find('class="myButton" id=', 0)
+            n2 = content.find("</button></a>", n1)
+            content = content[n1:n2]
+            regexvideo = '<a href="(.*?)"><b'
+            match = re.compile(regexvideo,re.DOTALL).findall(content)
+            # print("getVideos match =", match)
+            for url in match:
+                # url = url.replace('https','http')
+                name = name
+                pic = ''                 
+                print("getVideos15 name =", name)
+                print("getVideos15 url =", url)
+                self.session.open(Playgo, name, url)
+        except:
+            print('error: ')
+            pass
+            
 
 class parsatv(Screen):
 
@@ -537,20 +570,21 @@ class parsatv(Screen):
         self.names = []
         self.urls = []
         items = []
-
+        
         device = downloadparsa
         xxxname = device + 'ParsaTV.m3u'
-        print('path device file ', xxxname)
-
+        print('path device file ', xxxname)      
+        
         if os.path.exists(xxxname):
             print('permantly remove file ', xxxname)
-            os.remove(xxxname)
+            os.remove(xxxname)        
         with open(xxxname, 'w') as e:
-            e.write("#EXTM3U\n")
+            e.write("#EXTM3U\n")        
             url = self.url
             name = self.name
             content = getUrl(url)
-            content = six.ensure_str(content)
+            if PY3:
+                content = six.ensure_str(content)
             # try:
             # print("content B =", content)
             n1 = content.find('channels">', 0)
@@ -565,18 +599,18 @@ class parsatv(Screen):
                 print("getVideos15 name =", name1)
                 print("getVideos15 url =", url)
                 item = name + "###" + url
-                items.append(item)
+                items.append(item)                
                 e.write('#EXTINF:-1,' + name1 +'\n')
-                e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
-                e.write(url+'\n')
+                e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")                    
+                e.write(url+'\n')    
             items.sort()
             for item in items:
                 name = item.split("###")[0]
-                url = item.split("###")[1]
+                url = item.split("###")[1]            
                 self.names.append(name)
-                self.urls.append(url)
+                self.urls.append(url)            
             self['info'].setText(_('Please select ...'))
-            showlistpars(self.names, self['text'])
+            showlistpars(self.names, self['text'])            
         # except:
             # print('error: ')
             # pass
@@ -590,7 +624,8 @@ class parsatv(Screen):
         # print('url:  ', url)
         try:
             content = getUrl(url)
-            content = six.ensure_str(content)
+            if PY3:
+                content = six.ensure_str(content)
             # print("content B =", content)
             n1 = content.find('class="myButton" id=', 0)
             n2 = content.find("</button></a>", n1)
@@ -601,7 +636,7 @@ class parsatv(Screen):
             for url in match:
                 # url = url.replace('https','http')
                 name = name
-                pic = ''
+                pic = ''                 
                 print("getVideos15 name =", name)
                 print("getVideos15 url =", url)
                 self.session.open(Playgo, name, url)
@@ -614,28 +649,29 @@ class parsatv(Screen):
         name = 'ParsaTv'
         url = ''
         device = downloadparsa
-
+        
         xxxname2 = device + 'Parsa2.m3u'
         if os.path.exists(xxxname2):
             print('permantly remove file ', xxxname2)
-            os.remove(xxxname2)
-
+            os.remove(xxxname2)  
+           
         xxxname = device + 'ParsaTV.m3u'
-        print('path device file ', xxxname)
-
+        print('path device file ', xxxname)      
+        
         if not os.path.exists(xxxname):
             return
         with open(xxxname2, 'w') as e:
             e.write("#EXTM3U\n")
-            file_read = open(xxxname).readlines()
+            file_read = open(xxxname).readlines() 
             for line in file_read:
                 if line.startswith('#EXTINF'):
-                    name = '%s' % line.split(',')[-1]
+                    name = '%s' % line.split(',')[-1]            
                     name = name.replace('%20', ' ').rstrip ('\n')
                 elif line.startswith("http"):
                     url =line
                     content = getUrl(url)
-                    content = six.ensure_str(content)
+                    if PY3:
+                        content = six.ensure_str(content)
                     # print("content B =", content)
                     n1 = content.find('class="myButton" id=', 0)
                     n2 = content.find("</button></a>", n1)
@@ -651,7 +687,8 @@ class parsatv(Screen):
                             #try but not work fine
                             url = 'http://www.parsatv.com' + url
                             content = getUrl(url)
-                            content = six.ensure_str(content)
+                            if PY3:
+                                content = six.ensure_str(content)
                             # print("content B =", content)
                             n1 = content.find('class="myButton" id=', 0)
                             n2 = content.find("</button></a>", n1)
@@ -659,14 +696,14 @@ class parsatv(Screen):
                             regexvideo = '<a href="(.*?)"><b'
                             match = re.compile(regexvideo,re.DOTALL).findall(content)
                             for url in match:
-                                url=url
+                                url=url                    
                         # url = url.replace('https','http')
                     print("getVideos5 name =", name)
-                    print("getVideos5 url =", url)
+                    print("getVideos5 url =", url) 
                     e.write('#EXTINF:-1,' + name +'\n')
-                    e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
-                    e.write(url+'\n')
-        convert_bouquet(namex)
+                    e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")                    
+                    e.write(url+'\n') 
+        convert_bouquet(namex)  
 
 
 class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
@@ -745,15 +782,15 @@ class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications
 
 def convert_bouquet(namex):
     # xxxname = '/tmp/Parsa.m3u'
-
+    
     device = downloadparsa
     xxxname = device + 'Parsa2.m3u'
-    print('path device file ', xxxname)
-
-    name = namex.replace(' ','').lower()
+    print('path device file ', xxxname)      
+        
+    name = namex.replace(' ','').lower() 
     if not os.path.exists(xxxname):
         self.mbox = self.session.open(openMessageBox, _('Check %sParsa2.m3u') %device, openMessageBox.TYPE_INFO, timeout=5)
-        return
+        return        
     parsabouquet = 'userbouquet.%s.tv' % name
     # self.iConsole = iConsole()
     desk_tmp = ''
@@ -778,7 +815,7 @@ def convert_bouquet(namex):
                     desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
         outfile.close()
         message = (_("Wait please... "))
-        web_info(message)
+        web_info(message)   
     if os.path.isfile('/etc/enigma2/bouquets.tv'):
         for line in open('/etc/enigma2/bouquets.tv'):
             if parsabouquet in line:
@@ -791,7 +828,7 @@ def convert_bouquet(namex):
                     outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % parsabouquet)
                     outfile.close()
     message = (_("Bouquet converted successful"))
-    web_info(message)
+    web_info(message)    
     ReloadBouquet()
 
 
@@ -846,27 +883,27 @@ def decodeHtml(text):
 	text = text.replace('&Auml;','Ä')
 	text = text.replace('\u00c4','Ä')
 	text = text.replace('&#196;','Ä')
-
+	
 	text = text.replace('&ouml;','ö')
 	text = text.replace('\u00f6','ö')
 	text = text.replace('&#246;','ö')
-
+	
 	text = text.replace('&ouml;','Ö')
 	text = text.replace('\u00d6','Ö')
 	text = text.replace('&#214;','Ö')
-
+	
 	text = text.replace('&uuml;','ü')
 	text = text.replace('\u00fc','ü')
 	text = text.replace('&#252;','ü')
-
+	
 	text = text.replace('&Uuml;','Ü')
 	text = text.replace('\u00dc','Ü')
 	text = text.replace('&#220;','Ü')
-
+	
 	text = text.replace('&szlig;','ß')
 	text = text.replace('\u00df','ß')
 	text = text.replace('&#223;','ß')
-
+	
 	text = text.replace('&amp;','&')
 	text = text.replace('&quot;','\"')
 	text = text.replace('&quot_','\"')
@@ -927,4 +964,4 @@ def decodeHtml(text):
 	text = text.replace('&commmat;',' ')
 	text = text.replace('&#58;',':')
 
-	return text
+	return text	
