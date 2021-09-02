@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             09/06/2021               *
+*             02/09/2021               *
 *       Skin by MMark                  *
 ****************************************
 '''
@@ -46,22 +46,12 @@ import six
 import ssl
 import sys
 import socket
-global isDreamOS
 global pngs
 try:
     from enigma import eDVBDB
 except ImportError:
     eDVBDB = None
 
-isDreamOS = False
-try:
-    from enigma import eMediaDatabase
-    isDreamOS = True
-except:
-    isDreamOS = False
-
-PY3 = sys.version_info.major >= 3
-print('Py3: ',PY3)
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.error import HTTPError, URLError
@@ -120,7 +110,7 @@ if sslverify:
             return ctx
 
 def checkStr(txt):
-    if PY3:
+    if six.PY3:
         if isinstance(txt, type(bytes())):
             txt = txt.decode('utf-8')
     else:
@@ -135,7 +125,7 @@ def checkInternet():
         return True
     except:
         return False
-            
+
 def getUrl(url):
     try:
         req = Request(url)
@@ -180,7 +170,7 @@ def ReloadBouquet():
         os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
 
 DESKHEIGHT = getDesktop(0).size().height()
-currversion = '1.3'
+currversion = '1.4'
 title_plug = 'Parsa TV '
 desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
@@ -192,12 +182,13 @@ if HD.width() > 1280:
     skin_path=res_plugin_path + 'skins/fhd/'
 else:
     skin_path=res_plugin_path + 'skins/hd/'
-if isDreamOS:
+if os.path.exists('/var/lib/dpkg/status'):
     skin_path=skin_path + 'dreamOs/'
 
 Panel_Dlist = [
  ('PARSA SPORT'),
- ('PARSA TV')
+ ('PARSA TV CATEGORY'),
+ ('PARSA ALL TV')
  ]
 
 class MainParsaList(MenuList):
@@ -310,11 +301,257 @@ class MainParsa(Screen):
         sel = self.menu_list[idx]
         if sel == _('PARSA SPORT'):
             self.session.open(parsasport)
-        elif sel == _('PARSA TV'):
+        elif sel == _('PARSA ALL TV'):
             self.session.open(parsatv)
+        elif sel == _('PARSA TV CATEGORY'):
+            self.session.open(parsatv2)
+        else:
+            pass
+
+class parsatv2(Screen):
+    def __init__(self, session):
+        self.session = session
+        skin = skin_path + 'settings.xml'
+        with open(skin, 'r') as f:
+            self.skin = f.read()
+        self.setup_title = ('ParsaTV')
+        Screen.__init__(self, session)
+        self.setTitle(title_plug)
+        self.list = []
+        self.name = 'Parsa Sport'
+        # self.url = 'http://www.parsatv.com/name=Varzesh-TV#persian'
+        self.url = 'https://www.parsatv.com/m/'
+        self['text'] = OneSetList([])
+        self['info'] = Label(_('Getting the list, please wait ...'))
+        self['key_green'] = Button(_('Play'))
+        self['key_red'] = Button(_('Back'))
+        self['key_yellow'] = Button('')
+        self["key_blue"] = Button('')
+        # self['key_yellow'].hide()
+        self['key_blue'].hide()
+        self.timer = eTimer()
+        self.timer.start(1500, True)
+        if os.path.exists('/var/lib/dpkg/status'):
+            self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
+        else:
+            self.timer.callback.append(self._gotPageLoad)
+        self['title'] = Label(title_plug)
+        self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
+         'green': self.okRun,
+         'red': self.close,
+         # 'yellow': self.convert,
+         'cancel': self.close}, -2)
+
+    def _gotPageLoad(self):
+            url = self.url
+            name = self.name
+            self.names = []
+            self.urls = []
+            items = []
+            content = getUrl(url)
+            if six.PY3:
+                content = six.ensure_str(content)
+                #<td id="irib"><li>IRIB<a></a></td>
+                #<td id="ukraine"><li>Ukraine<a></a></li></td>
+            # if '<a></a></td>' in content:
+                # content.replace('<a></a></td>','<a></a></li></td>')
+            n6 = content.find("<a></a></td>")
+            if str(n6) in content:
+                content.replace(str(n6),'<a></a></li></td>')
+                print('yes is n6')
+            else:
+                print('no, no n6 in content!')
+            regexvideo = '<tr>.*?<td id=".*?><li>(.*?)<a>.*?</td>.*?</tr>'
+            #<td id="ostani"><li>IRIB Ostani<a></a></li></td>
+            # regexvideo = '><li>(.*?)<a></a></li></td>'
+            #regexvideo = '<tr>.*?"><li>(.*?)<a></a></li></td>.*?</tr>'            
+            
+            match = re.compile(regexvideo,re.DOTALL).findall(content)
+            for name in match:
+                url = url
+                name = name #.replace('<a></a></td>','')
+                print("getVideos5 name =", name)
+                print("getVideos5 url =", url)
+                item = name + "###" + url
+                items.append(item)
+            items.sort()
+            for item in items:
+                name = item.split("###")[0]
+                url = item.split("###")[1]
+                self.names.append(name)
+                self.urls.append(url)
+            self['info'].setText(_('Please select ...'))
+            showlistpars(self.names, self['text'])
+
+    def okRun(self):
+        idx = self["text"].getSelectionIndex()
+        name = self.names[idx]
+        url = self.urls[idx]
+        self.session.open(parsatv3, name, url)
+
+
+class parsatv3(Screen):
+    def __init__(self, session, name, url):
+        self.session = session
+        skin = skin_path + 'settings.xml'
+        with open(skin, 'r') as f:
+            self.skin = f.read()
+        self.setup_title = ('Parsa TV')
+        Screen.__init__(self, session)
+        self.setTitle(title_plug)
+        self.list = []
+        self.name = name
+        self.url = url
+        self['text'] = OneSetList([])
+        self['info'] = Label(_('Getting the list, please wait ...'))
+        self['key_green'] = Button(_('Play'))
+        self['key_red'] = Button(_('Back'))
+        self['key_yellow'] = Button(_('Convert'))
+        self["key_blue"] = Button(_(''))
+        # self['key_yellow'].hide()
+        self['key_blue'].hide()
+        self.timer = eTimer()
+        self.timer.start(1500, True)
+        if os.path.exists('/var/lib/dpkg/status'):
+            self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
+        else:
+            self.timer.callback.append(self._gotPageLoad)
+        self['title'] = Label(title_plug)
+        self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
+         'green': self.okRun,
+         'red': self.close,
+         'yellow': self.convert,
+         'cancel': self.close}, -2)
+
+    def convert2(self, result):
+        if result:
+            name= self.name
+            self.make_m3u()
+
+    def convert(self):
+            self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% self.name, MessageBox.TYPE_YESNO, timeout = 15, default = True)
+
+    def _gotPageLoad(self):
+        # url = self.url
+        name = self.name
+        self.names = []
+        self.urls = []
+        items = []
+        device = downloadparsa
+        xxxname = device + name + '.m3u'
+        print('path device file ', xxxname)
+
+        if os.path.exists(xxxname):
+            print('permantly remove file ', xxxname)
+            os.remove(xxxname)
+        with open(xxxname, 'w') as e:
+            e.write("#EXTM3U\n")
+            content = getUrl('https://www.parsatv.com/m/')
+            if six.PY3:
+                content = six.ensure_str(content)
+            n6 = content.find("<a></a></td>")
+            if str(n6) in content:
+                content.replace(str(n6),'<a></a></li></td>')
+                print('yes is n6')
+            else:
+                print('no, no n6 in content!')
+            #<td id="ukraine"><li>Ukraine<a></a></li></td>                
+            #<td id="ostani"><li>IRIB Ostani<a></a></li></td>    
+            #<td id="irib"><li>IRIB<a></a></td>
+            #regexvideo = '<tr>.*?<td id=".*?><li>(.*?)<a>.*?</td>.*?</tr>'
+            s1 = name + "<a></a>"                
+            # s1 = name + "<a></a></li></td>"
+            n1 = content.find(s1)
+            n2 = content.find("<td id=", n1)
+            content2 = content[n1:n2]
+            print("showContent22 content2=", content2)
+            #<li><a href="https://www.parsatv.com/m/name=Abadan#ostani"><button class="myButton">Abadan</button></a></li>
+            regexvideo = '<li><a href="(.*?)".*?"myButton">(.*?)</button></a></li>'
+            match = re.compile(regexvideo,re.DOTALL).findall(content2)
+            print("showContent22 match =", match)
+            for url, name in match:
+                url = url
+                name = name
+
+                e.write('#EXTINF:-1,' + name +'\n')
+                e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
+                e.write(url+'\n')
+
+                item = name + "###" + url
+                items.append(item)
+            items.sort()
+            for item in items:
+                name = item.split("###")[0]
+                url = item.split("###")[1]
+
+                self.names.append(name)
+                self.urls.append(url)
+                e.close()
+        self['info'].setText(_('Please select ...'))
+        showlistpars(self.names, self['text'])
+
+    def make_m3u(self):
+        namex = self.name
+        url = ''
+        device = downloadparsa
+        xxxname = device + namex + '.m3u'
+        # if os.path.exists(xxxname2):
+            # print('permantly remove file ', xxxname2)
+            # os.remove(xxxname2)
+        xxxname2 = device + namex + '_conv.m3u'
+        print('path device file ', xxxname)
+        if not os.path.exists(xxxname):
+            return
+        with open(xxxname2, 'w') as e:
+            e.write("#EXTM3U\n")
+            file_read = open(xxxname).readlines()
+            for line in file_read:
+                if line.startswith('#EXTINF'):
+                    name = '%s' % line.split(',')[-1]
+                    name1 = name.replace('%20', ' ').rstrip ('\n')
+                elif line.startswith("http"):
+                    url = line
+                    content = getUrl(url)
+                    if six.PY3:
+                        content = six.ensure_str(content)
+                    n1 = content.find('<body>', 0)
+                    n2 = content.find("</body>", n1)
+                    content = content[n1:n2]
+                    regexvideo = '.*?file:.*?"(.*?)"'
+                    match = re.compile(regexvideo,re.DOTALL).findall(content)
+                    # print("getVideos match =", match)
+                    for url in match:
+                        url = url
+                        # url = url.replace('https','http')
+                    print("getVideos6 name =", name1)
+                    print("getVideos6 url =", url)
+                    e.write('#EXTINF:-1,' + name1 +'\n')
+                    e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
+                    e.write(url+'\n')
+            e.close()
+        convert_bouquet(namex)
+
+    def okRun(self):
+        idx = self["text"].getSelectionIndex()
+        name = self.names[idx]
+        url = self.urls[idx]
+        content = getUrl(url)
+        if six.PY3:
+            content = six.ensure_str(content)
+        print("content B =", content)
+        n1 = content.find('class="myButton" id=', 0)
+        n2 = content.find("</button></a>", n1)
+        content = content[n1:n2]
+        regexvideo = '<a href="(.*?)"><b'
+        match = re.compile(regexvideo,re.DOTALL).findall(content)
+        print("getVideos match =", match)
+        for url in match:
+            url = url
+            name = name
+        self.session.open(Playgo, name, url)
+
 
 class parsasport(Screen):
-
     def __init__(self, session):
         self.session = session
         skin = skin_path + 'settings.xml'
@@ -324,8 +561,9 @@ class parsasport(Screen):
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
-        self.name = 'Parsa Sport'
+        self.name = 'ParsaSport'
         # self.url = 'http://www.parsatv.com/m/name=Varzesh-TV#persian'
+        # self.url2 ='http://www.parsatv.com/streams/fetch/varzeshtv.php'
         self.url ='http://www.parsatv.com/m/'
         self['text'] = OneSetList([])
         self['info'] = Label(_('Getting the list, please wait ...'))
@@ -337,7 +575,7 @@ class parsasport(Screen):
         self['key_blue'].hide()
         self.timer = eTimer()
         self.timer.start(1500, True)
-        if isDreamOS:
+        if os.path.exists('/var/lib/dpkg/status'):
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
@@ -361,17 +599,17 @@ class parsasport(Screen):
         self.urls = []
         items = []
         url = self.url
-        name = self.name
+        namex = self.name
         device = downloadparsa
-        xxxname = device + 'ParsaSport.m3u'
+        xxxname = device + namex +'.m3u'
         print('path device file ', xxxname)
         if os.path.exists(xxxname):
             print('permantly remove file ', xxxname)
             os.remove(xxxname)
-        with open(xxxname, 'w') as e:
-            e.write("#EXTM3U\n")
+        # with open(xxxname, 'w') as e:
+            # e.write("#EXTM3U\n")
             content = getUrl(url)
-            if PY3:
+            if six.PY3:
                 content = six.ensure_str(content)
             # print("content B =", content)
             n1 = content.find('channels">', 0)
@@ -380,6 +618,10 @@ class parsasport(Screen):
             regexvideo = '<li><a href="(.*?)"><button.*?myButton">(.*?)</button'
             match = re.compile(regexvideo,re.DOTALL).findall(content)
             # print("getVideos match =", match)
+
+            with open(xxxname, 'w') as e:
+                e.write("#EXTM3U\n")
+
             for url, name in match:
                 if 'sport' in str(url).lower():
                     name1 = name.replace('%20', ' ')
@@ -391,7 +633,7 @@ class parsasport(Screen):
                     e.write('#EXTINF:-1,' + name1 +'\n')
                     e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                     content = getUrl(url)
-                    if PY3:
+                    if six.PY3:
                         content = six.ensure_str(content)
                     # print("content B =", content)
                     n1 = content.find('class="myButton" id=', 0)
@@ -404,12 +646,13 @@ class parsasport(Screen):
                         url2 = url2
                         e.write(url2+'\n')
                     #save m3u end
-            items.sort()
-            for item in items:
-                name = item.split("###")[0]
-                url = item.split("###")[1]
-                self.names.append(name)
-                self.urls.append(url)
+                items.sort()
+                for item in items:
+                    name = item.split("###")[0]
+                    url = item.split("###")[1]
+                    self.names.append(name)
+                    self.urls.append(url)
+                e.close()
             self['info'].setText(_('Please select ...'))
             showlistpars(self.names, self['text'])
 
@@ -418,11 +661,11 @@ class parsasport(Screen):
         name = 'sport'
         url = ''
         device = downloadparsa
-        xxxname2 = device + 'Parsa2.m3u'
-        if os.path.exists(xxxname2):
-            print('permantly remove file ', xxxname2)
-            os.remove(xxxname2)
-        xxxname = device + 'ParsaSport.m3u'
+        xxxname = device + namex +'.m3u'
+        # if os.path.exists(xxxname2):
+            # print('permantly remove file ', xxxname2)
+            # os.remove(xxxname2)
+        xxxname2 = device + self.name + '_conv.m3u'
         # print('path device file ', xxxname)
         if not os.path.exists(xxxname):
             return
@@ -435,8 +678,6 @@ class parsasport(Screen):
                     name = name.replace('%20', ' ').rstrip ('\n')
                 elif line.startswith("http"):
                     url =line
-                    # print("getVideos5 name =", name)
-                    # print("getVideos5 url =", url)
                     e.write('#EXTINF:-1,' + name +'\n')
                     e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                     e.write(url+'\n')
@@ -451,7 +692,7 @@ class parsasport(Screen):
         # print('url:  ', url)
         try:
             content = getUrl(url)
-            if PY3:
+            if six.PY3:
                 content = six.ensure_str(content)
             # print("content B =", content)
             n1 = content.find('class="myButton" id=', 0)
@@ -472,7 +713,6 @@ class parsasport(Screen):
             pass
 
 class parsatv(Screen):
-
     def __init__(self, session):
         self.session = session
         skin = skin_path + 'settings.xml'
@@ -482,7 +722,7 @@ class parsatv(Screen):
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
-        self.name = 'Parsa Tv'
+        self.name = 'ParsaTv'
         self.url = 'https://www.parsatv.com/m/'
         self['text'] = OneSetList([])
         self['info'] = Label(_('Getting the list, please wait ...'))
@@ -494,7 +734,7 @@ class parsatv(Screen):
         self['key_blue'].hide()
         self.timer = eTimer()
         self.timer.start(1500, True)
-        if isDreamOS:
+        if os.path.exists('/var/lib/dpkg/status'):
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
@@ -518,7 +758,8 @@ class parsatv(Screen):
         self.urls = []
         items = []
         device = downloadparsa
-        xxxname = device + 'ParsaTV.m3u'
+        namex = self.name
+        xxxname = device + namex + '_conv.m3u'
         print('path device file ', xxxname)
         if os.path.exists(xxxname):
             print('permantly remove file ', xxxname)
@@ -528,7 +769,7 @@ class parsatv(Screen):
             url = self.url
             name = self.name
             content = getUrl(url)
-            if PY3:
+            if six.PY3:
                 content = six.ensure_str(content)
             # print("content B =", content)
             n1 = content.find('channels">', 0)
@@ -565,7 +806,7 @@ class parsatv(Screen):
         # print('url:  ', url)
         try:
             content = getUrl(url)
-            if PY3:
+            if six.PY3:
                 content = six.ensure_str(content)
             # print("content B =", content)
             n1 = content.find('class="myButton" id=', 0)
@@ -587,18 +828,16 @@ class parsatv(Screen):
 
     def make_m3u(self):
         namex = self.name
-        name = 'ParsaTv'
-        url = ''
         device = downloadparsa
-        xxxname2 = device + 'Parsa2.m3u'
-        if os.path.exists(xxxname2):
-            print('permantly remove file ', xxxname2)
-            os.remove(xxxname2)
-        xxxname = device + 'ParsaTV.m3u'
+        # xxxname2 = device + self.name + '.m3u'
+        # if os.path.exists(xxxname2):
+            # print('permantly remove file ', xxxname2)
+            # os.remove(xxxname2)
+        xxxname = device + namex + '_conv.m3u'
         print('path device file ', xxxname)
         if not os.path.exists(xxxname):
             return
-        with open(xxxname2, 'w') as e:
+        with open(xxxname, 'w') as e:
             e.write("#EXTM3U\n")
             file_read = open(xxxname).readlines()
             for line in file_read:
@@ -608,7 +847,7 @@ class parsatv(Screen):
                 elif line.startswith("http"):
                     url =line
                     content = getUrl(url)
-                    if PY3:
+                    if six.PY3:
                         content = six.ensure_str(content)
                     # print("content B =", content)
                     n1 = content.find('class="myButton" id=', 0)
@@ -623,7 +862,7 @@ class parsatv(Screen):
                         else:
                             url = 'http://www.parsatv.com' + url
                             content = getUrl(url)
-                            if PY3:
+                            if six.PY3:
                                 content = six.ensure_str(content)
                             # print("content B =", content)
                             n1 = content.find('class="myButton" id=', 0)
@@ -716,11 +955,11 @@ class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications
 
 def convert_bouquet(namex):
     device = downloadparsa
-    xxxname = device + 'Parsa2.m3u'
+    xxxname = device + namex + '_conv.m3u'
     print('path device file ', xxxname)
     name = namex.replace(' ','').lower()
     if not os.path.exists(xxxname):
-        self.mbox = self.session.open(openMessageBox, _('Check %sParsa2.m3u') %device, openMessageBox.TYPE_INFO, timeout=5)
+        self.mbox = self.session.open(openMessageBox, _('Check %s.m3u') %xxxname, openMessageBox.TYPE_INFO, timeout=5)
         return
     parsabouquet = 'userbouquet.%s.tv' % name
     desk_tmp = ''
@@ -775,7 +1014,7 @@ def StartSetup(menuid, **kwargs):
 
 def Plugins(**kwargs):
     ico_path = 'logo.png'
-    if not isDreamOS:
+    if not os.path.exists('/var/lib/dpkg/status'):
         ico_path = plugin_path + '/res/pics/logo.png'
     extensions_menu = PluginDescriptor(name = title_plug, description = desc_plugin, where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main, needsRestart = True)
     result = [PluginDescriptor(name = title_plug, description = desc_plugin, where = PluginDescriptor.WHERE_PLUGINMENU, icon = ico_path, fnc = main)]
