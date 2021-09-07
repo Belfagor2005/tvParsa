@@ -2,22 +2,17 @@ from Components.Language import language
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS, SCOPE_LANGUAGE
 from os import environ as os_environ
 import gettext
-plugin_path = '/usr/lib/enigma2/python/Plugins/Extensions/parsatv/'
+import os
 PluginLanguageDomain = 'parsatv'
 PluginLanguagePath = 'Extensions/parsatv/res/locale'
-try:
-    from enigma import eMediaDatabase
-    isDreamOS = True
-except:
-    isDreamOS = False
 
 def localeInit():
-    if isDreamOS:
+    if os.path.exists('/var/lib/dpkg/status'):
         lang = language.getLanguage()[:2]
         os_environ['LANGUAGE'] = lang
     gettext.bindtextdomain(PluginLanguageDomain, resolveFilename(SCOPE_PLUGINS, PluginLanguagePath))
 
-if isDreamOS:
+if os.path.exists('/var/lib/dpkg/status'):
     _ = lambda txt: gettext.dgettext(PluginLanguageDomain, txt) if txt else ""
     localeInit()
     language.addCallback(localeInit)
