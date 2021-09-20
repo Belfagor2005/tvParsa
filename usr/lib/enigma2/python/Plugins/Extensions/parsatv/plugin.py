@@ -9,6 +9,7 @@
 ****************************************
 '''
 from __future__ import print_function#, unicode_literals
+from . import _
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Button import Button
 from Components.Console import Console as iConsole
@@ -128,6 +129,7 @@ def checkInternet():
 
 def getUrl(url):
     try:
+        url = checkStr(url)
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
         response = urlopen(req)
@@ -563,7 +565,7 @@ class parsasport(Screen):
         self.list = []
         self.name = 'ParsaSport'
         # self.url = 'http://www.parsatv.com/m/name=Varzesh-TV#persian'
-        # self.url2 ='http://www.parsatv.com/streams/fetch/varzeshtv.php'
+        self.url2 ='http://www.parsatv.com/streams/fetch/varzeshtv.php'
         self.url ='http://www.parsatv.com/m/'
         self['text'] = OneSetList([])
         self['info'] = Label(_('Getting the list, please wait ...'))
@@ -916,7 +918,7 @@ class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications
         name = name.replace("›", "-")
         name = name.replace(",", "-")
         print("Here in Playvid name B2 =", name)
-        if url is not None:
+        if url != None:
             url = str(url)
             url = url.replace(":", "%3a")
             url = url.replace("\\", "/")
