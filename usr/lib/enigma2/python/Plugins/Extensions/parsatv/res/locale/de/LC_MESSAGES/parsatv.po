@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: parsatv\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-11 20:13+0100\n"
+"POT-Creation-Date: 2021-10-09 20:55+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: ))^^(( <>\n"
 "Language-Team: *\n"
@@ -16,74 +16,81 @@ msgstr ""
 "X-Poedit-Basepath: ../../../..\n"
 "X-Poedit-SearchPath-0: plugin.py\n"
 
-#: plugin.py:277 plugin.py:305 plugin.py:396 plugin.py:554
+#: plugin.py:349 plugin.py:377 plugin.py:459 plugin.py:600 plugin.py:721
+#: plugin.py:847
 msgid "Please select ..."
 msgstr "Bitte auswählen ..."
 
-#: plugin.py:280
+#: plugin.py:352
 msgid "Select"
 msgstr "Wählen"
 
-#: plugin.py:281
+#: plugin.py:353
 msgid "Exit"
 msgstr "Ausfahrt"
 
-#: plugin.py:312
+#: plugin.py:384
 msgid "PARSA SPORT"
 msgstr "PARSA SPORT"
 
-#: plugin.py:314
-msgid "PARSA TV"
-msgstr "PARSA TV"
+#: plugin.py:386
+msgid "PARSA ALL TV"
+msgstr ""
 
-#: plugin.py:332 plugin.py:480
+#: plugin.py:388
+msgid "PARSA TV CATEGORY"
+msgstr ""
+
+#: plugin.py:407 plugin.py:483 plugin.py:642 plugin.py:768
 msgid "Getting the list, please wait ..."
 msgstr "die Liste bekommen , bitte warten ..."
 
-#: plugin.py:333 plugin.py:481
+#: plugin.py:408 plugin.py:484 plugin.py:643 plugin.py:769
 msgid "Play"
 msgstr "Play"
 
-#: plugin.py:334 plugin.py:482
+#: plugin.py:409 plugin.py:485 plugin.py:644 plugin.py:770
 msgid "Back"
 msgstr "Zurück"
 
-#: plugin.py:335 plugin.py:483
+#: plugin.py:486 plugin.py:645 plugin.py:771
 msgid "Convert"
 msgstr "Konvertieren"
 
-#: plugin.py:358
+#: plugin.py:517 plugin.py:674 plugin.py:800
 #, python-format
-msgid "Do you want to Convert %s to favorite .tv ?"
-msgstr "Möchten Sie %s in Lieblings-TV konvertieren?"
-
-#: plugin.py:507
-#, python-format
-msgid "Do you want to Convert %s to favorite .tv ?\n"
+msgid ""
+"Do you want to Convert %s to favorite .tv ?\n"
 "\n"
 "Attention!! Wait more than 5 minutes!!! "
-msgstr "Möchten Sie %s in Lieblings-TV konvertieren?\n"
+msgstr ""
+"Möchten Sie %s in Lieblings-TV konvertieren?\n"
 "\n"
 "Beachtung!! Warten Sie mehr als 5 Minuten !!!"
 
-#: plugin.py:709
-msgid "Check  /tmp/temporary2.m3u"
-msgstr "Überprüfen Sie /tmp/temporary2.m3u"
-
-#: plugin.py:734
+#: plugin.py:1031
 msgid "Wait please... "
 msgstr "Wait please... "
 
-#: plugin.py:747
-msgid "Bouquet converted successful"
-msgstr "Blumenstrauß erfolgreich umgesetzt"
+#: plugin.py:1044
+msgid "Bouquet successfully exported"
+msgstr "Blumenstrauß erfolgreich exportiert"
 
-#: plugin.py:763 plugin.py:772
+#: plugin.py:1056
 msgid "Parsa TV"
 msgstr "Parsa TV"
 
-#: plugin.py:771
-#, python-format
-msgid "..:: Parsa TV by Lululla %s ::.. "
-msgstr "..:: Parsa TV by Lululla %s ::.. "
+#~ msgid "PARSA TV"
+#~ msgstr "PARSA TV"
 
+#~ msgid "Do you want to Convert %s to favorite .tv ?"
+#~ msgstr "Möchten Sie %s in Lieblings-TV konvertieren?"
+
+#~ msgid "Check  /tmp/temporary2.m3u"
+#~ msgstr "Überprüfen Sie /tmp/temporary2.m3u"
+
+#~ msgid "Bouquet converted successful"
+#~ msgstr "Blumenstrauß erfolgreich umgesetzt"
+
+#~ msgid "..:: Parsa TV by Lululla %s ::.. "
+#~ msgstr "..:: Parsa TV by Lululla %s ::.. "

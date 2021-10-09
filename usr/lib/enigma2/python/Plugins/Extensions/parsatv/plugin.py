@@ -4,11 +4,12 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             02/09/2021               *
+*             10/09/2021               *
 *       Skin by MMark                  *
 ****************************************
 '''
 from __future__ import print_function#, unicode_literals
+from . import _
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Button import Button
 from Components.Console import Console as iConsole
@@ -47,29 +48,72 @@ import ssl
 import sys
 import socket
 global pngs
+global downloadparsa
+downloadparsa = None
 try:
     from enigma import eDVBDB
 except ImportError:
     eDVBDB = None
-
+from random import choice
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.error import HTTPError, URLError
-from six.moves.urllib.request import urlretrieve
-from six.moves.urllib.parse import urlparse
-from six.moves.urllib.parse import parse_qs
-from six.moves.urllib.request import build_opener
 from six.moves.urllib.parse import quote_plus
-from six.moves.urllib.parse import unquote_plus
 from six.moves.urllib.parse import quote
-from six.moves.urllib.parse import unquote
-from six.moves.urllib.parse import urlencode
-import six.moves.urllib.request
-import six.moves.urllib.parse
-import six.moves.urllib.error
+ListAgent = [
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.14 (KHTML, like Gecko) Chrome/24.0.1292.0 Safari/537.14',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1284.0 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8',
+          'Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2',
+          'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.16) Gecko/20120427 Firefox/15.0a1',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:15.0) Gecko/20120910144328 Firefox/15.0.2',
+          'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:15.0) Gecko/20100101 Firefox/15.0.1',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:9.0a2) Gecko/20111101 Firefox/9.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110612 Firefox/6.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0',
+          'Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)',
+          'Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)',
+          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0;  it-IT)',
+          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)'
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/13.0.782.215)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/11.0.696.57)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0) chromeframe/10.0.648.205',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.1; SV1; .NET CLR 2.8.52393; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; chromeframe/11.0.696.57)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/4.0; GTB7.4; InfoPath.3; SV1; .NET CLR 3.1.76908; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.2; SV1; .NET CLR 3.3.69573; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.8.36217; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
+          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; it-IT)',
+          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)',
+          'Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02',
+          'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00',
+          'Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00',
+          'Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00',
+          'Opera/12.0(Windows NT 5.1;U;en)Presto/22.9.168 Version/12.00',
+          'Mozilla/5.0 (Windows NT 5.1) Gecko/20100101 Firefox/14.0 Opera/12.0',
+          'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10',
+          'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3'
+          ]
 
-global downloadparsa
-downloadparsa = None
 try:
     from Components.UsageConfig import defaultMoviePath
     downloadparsa = defaultMoviePath()
@@ -109,6 +153,10 @@ if sslverify:
                 ClientTLSOptions(self.hostname, ctx)
             return ctx
 
+def RequestAgent():
+    RandomAgent = choice(ListAgent)
+    return RandomAgent
+
 def checkStr(txt):
     if six.PY3:
         if isinstance(txt, type(bytes())):
@@ -118,31 +166,51 @@ def checkStr(txt):
             txt = txt.encode('utf-8')
     return txt
 
+def convert_to_unicode(text):
+    """Converts `text` to Unicode (if it's not already), assuming utf-8 input."""
+    if six.PY3:
+        if isinstance(text, str):
+            return text
+        elif isinstance(text, bytes):
+            return six.ensure_text(text, "utf-8", "ignore")
+        else:
+            raise ValueError("Unsupported string type: %s" % (type(text)))
+    elif six.PY2:
+        if isinstance(text, str):
+            return six.ensure_text(text, "utf-8", "ignore")
+        elif isinstance(text, six.text_type):
+            return text
+        else:
+            raise ValueError("Unsupported string type: %s" % (type(text)))
+    else:
+        raise ValueError("Not running on Python2 or Python 3?")
+
 def checkInternet():
     try:
-        socket.setdefaulttimeout(0.5)
+        socket.setdefaulttimeout(5.0)
         socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", 53))
         return True
     except:
         return False
 
 def getUrl(url):
+    link = []
+    url = checkStr(url)
+    print(  "Here in getUrl url =", url)
+    req = Request(url)
+    req.add_header('User-Agent',RequestAgent())
     try:
-        req = Request(url)
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
         response = urlopen(req)
-        link = response.read()
+        link=response.read()
         response.close()
-        # print("link =", link)
         return link
     except:
-        e = URLError
-        print('We failed to open "%s".' % url)
-        if hasattr(e, 'code'):
-            print('We failed with error code - %s.' % e.code)
-        if hasattr(e, 'reason'):
-            print('We failed to reach a server.')
-            print('Reason: ', e.reason)
+        import ssl
+        gcontext = ssl._create_unverified_context()
+        response = urlopen(req, context=gcontext)
+        link=response.read()
+        response.close()
+        return link
 
 def remove_line(filename, what):
     if os.path.isfile(filename):
@@ -155,9 +223,9 @@ def remove_line(filename, what):
 
 def web_info(message):
     try:
-        message = quote_plus(str(message))
-        cmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' 2>/dev/null &" % message
-        debug(cmd, "CMD -> Console -> WEBIF")
+        message = quote_plus(message)
+        cmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
+        # debug(cmd, "CMD -> Console -> WEBIF")
         os.popen(cmd)
     except:
         print("web_info ERROR")
@@ -170,7 +238,7 @@ def ReloadBouquet():
         os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
 
 DESKHEIGHT = getDesktop(0).size().height()
-currversion = '1.4'
+currversion = '1.5'
 title_plug = 'Parsa TV '
 desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
@@ -186,9 +254,9 @@ if os.path.exists('/var/lib/dpkg/status'):
     skin_path=skin_path + 'dreamOs/'
 
 Panel_Dlist = [
- ('PARSA SPORT'),
+ ('PARSA ALL TV'),
  ('PARSA TV CATEGORY'),
- ('PARSA ALL TV')
+ ('PARSA SPORT')
  ]
 
 class MainParsaList(MenuList):
@@ -260,8 +328,6 @@ class MainParsa(Screen):
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self['text'] = MainParsaList([])
-        self.working = False
-        self.selection = 'all'
         self['title'] = Label(title_plug)
         self['info'] = Label('')
         self['info'].setText(_('Please select ...'))
@@ -306,7 +372,7 @@ class MainParsa(Screen):
         elif sel == _('PARSA TV CATEGORY'):
             self.session.open(parsatv2)
         else:
-            pass
+            return
 
 class parsatv2(Screen):
     def __init__(self, session):
@@ -323,18 +389,19 @@ class parsatv2(Screen):
         self.url = 'https://www.parsatv.com/m/'
         self['text'] = OneSetList([])
         self['info'] = Label(_('Getting the list, please wait ...'))
-        self['key_green'] = Button(_('Play'))
+        self['key_green'] = Button(_('Select'))
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button('')
         self["key_blue"] = Button('')
         # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
-        self.timer.start(1500, True)
+
         if os.path.exists('/var/lib/dpkg/status'):
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
+        self.timer.start(1500, True)
         self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
          'green': self.okRun,
@@ -343,35 +410,28 @@ class parsatv2(Screen):
          'cancel': self.close}, -2)
 
     def _gotPageLoad(self):
-            url = self.url
-            name = self.name
-            self.names = []
-            self.urls = []
-            items = []
+        url = self.url
+        name = self.name
+        self.names = []
+        self.urls = []
+        items = []
+        try:
             content = getUrl(url)
             if six.PY3:
                 content = six.ensure_str(content)
-                #<td id="irib"><li>IRIB<a></a></td>
-                #<td id="ukraine"><li>Ukraine<a></a></li></td>
-            # if '<a></a></td>' in content:
-                # content.replace('<a></a></td>','<a></a></li></td>')
             n6 = content.find("<a></a></td>")
             if str(n6) in content:
                 content.replace(str(n6),'<a></a></li></td>')
                 print('yes is n6')
             else:
-                print('no, no n6 in content!')
-            regexvideo = '<tr>.*?<td id=".*?><li>(.*?)<a>.*?</td>.*?</tr>'
-            #<td id="ostani"><li>IRIB Ostani<a></a></li></td>
-            # regexvideo = '><li>(.*?)<a></a></li></td>'
-            #regexvideo = '<tr>.*?"><li>(.*?)<a></a></li></td>.*?</tr>'            
-            
+                print('no, no n6 in parsatv2!')
+            regexvideo = '<tr>.*?<td id=".*?><li>(.+?)<a>.*?</td>.*?</tr>'
             match = re.compile(regexvideo,re.DOTALL).findall(content)
             for name in match:
-                url = url
-                name = name #.replace('<a></a></td>','')
-                print("getVideos5 name =", name)
-                print("getVideos5 url =", url)
+                url = url.replace(' ','%20')
+                name = name
+                # print("parsatv2 name =", name)
+                # print("parsatv2 url =", url)
                 item = name + "###" + url
                 items.append(item)
             items.sort()
@@ -382,13 +442,14 @@ class parsatv2(Screen):
                 self.urls.append(url)
             self['info'].setText(_('Please select ...'))
             showlistpars(self.names, self['text'])
+        except Exception as e:
+            print('error parsatv2', e)
 
     def okRun(self):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
         self.session.open(parsatv3, name, url)
-
 
 class parsatv3(Screen):
     def __init__(self, session, name, url):
@@ -411,11 +472,11 @@ class parsatv3(Screen):
         # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
-        self.timer.start(1500, True)
         if os.path.exists('/var/lib/dpkg/status'):
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
+        self.timer.start(1500, True)
         self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
          'green': self.okRun,
@@ -425,111 +486,106 @@ class parsatv3(Screen):
 
     def convert2(self, result):
         if result:
-            name= self.name
-            self.make_m3u()
+            namex = self.name.lower()
+            namex = namex.replace(' ','-')
+            namex = namex.strip()
+            if os.path.exists('/var/lib/dpkg/status'):
+                self.timer_conn = self.timer.timeout.connect(make_m3u2(namex))
+            else:
+                self.timer.callback.append(make_m3u2(namex))
+            self.timer.start(500, True)
+            # make_m3u2(namex)
 
     def convert(self):
-            self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% self.name, MessageBox.TYPE_YESNO, timeout = 15, default = True)
-
+        # self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% self.name, MessageBox.TYPE_YESNO, timeout = 10, default = True)
+        self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?\n\nAttention!! Wait more than 5 minutes!!! ")% self.name, MessageBox.TYPE_YESNO, timeout = 10, default = True)
+        
     def _gotPageLoad(self):
-        # url = self.url
-        name = self.name
         self.names = []
         self.urls = []
         items = []
-        device = downloadparsa
-        xxxname = device + name + '.m3u'
-        print('path device file ', xxxname)
+        url = self.url
+        name = self.name
+        namex = self.name.lower()
+        namex = namex.replace(' ','-')
+        namex = namex.strip()
+        if os.path.exists(downloadparsa):
+            xxxname = downloadparsa + namex + '_conv.m3u'
+        else:
+            xxxname = '/tmp/' + namex + '_conv.m3u'
+        try:
+            with open(xxxname, 'w') as e:
+                e.write("#EXTM3U\n")
+                content = getUrl('https://www.parsatv.com/m/')
+                if six.PY3:
+                    content = six.ensure_str(content)
+                n6 = content.find("<a></a></td>")
+                if str(n6) in content:
+                    content.replace(str(n6),'<a></a></li></td>')
+                    print('yes is n6')
+                else:
+                    print('no, not n6 in content!')
+                s1 = name + "<a></a>"
+                # s1 = name + "<a></a></li></td>"
+                n1 = content.find(s1)
+                n2 = content.find("<td id=", n1)
+                content2 = content[n1:n2]
+                print("showContent22 content2=", content2)
+                #<li><a href="https://www.parsatv.com/m/name=Abadan#ostani"><button class="myButton">Abadan</button></a></li>
+                #<li><a href="https://www.parsatv.com/m/name=Song-TV-Armenia#armenian"><button class="myButton">Song TV</button></a></li>
+                # regexvideo = '<li><a href="(.*?)".*?"myButton">(.*?)</button></a></li>'
+                regexvideo = '<li><a href="(.+?)#.*?"><button.*?myButton">(.+?)</button'
+                match = re.compile(regexvideo,re.DOTALL).findall(content2)
+                print("showContent22 match =", match)
+                for url, name in match:
+                    if url.startswith('http'):
+                        url = url.replace(' ','%20')
+                        name1 = name.replace('%20', ' ')
+                        # print("getVideos15 name =", name1)
+                        # print("getVideos15 url =", url)
+                        item = name1 + "###" + url
+                        items.append(item)
+                        #save m3u
+                        e.write('#EXTINF:-1,' + name1 +'\n')
+                        e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
+                        e.write(url +'\n')
+                        # content = getUrl(url)
+                        # if six.PY3:
+                            # content = six.ensure_text(content, "utf-8", "ignore")
+                        # # if six.PY3:
+                            # # # content = six.ensure_binary(content)
+                            # # content = content.decode("utf-8")
+                        # # content =convert_to_unicode(content)
+                        # print("parsatv3 content B =", content)
+                        # n1 = content.find('class="myButton" id=', 0)
+                        # n2 = content.find("</button></a>", n1)
+                        # content2 = content[n1:n2]
+                        # # if six.PY3:
+                            # # content2 = content2.decode("utf-8")
+                        # if content2 != None:
+                            # regexvideo = '<a href="(.+?)"><b'
+                            # match = re.compile(regexvideo,re.DOTALL).findall(content2)
+                            # print("parsatv3 match =", match)
+                            # for url2 in match:
+                                # if url2.startswith('http'):
+                                    # url2 = url2.replace(' ','%20')
+                                    # print('matchh ', url2)
+                                    # e.write(url2 +'\n')
 
-        if os.path.exists(xxxname):
-            print('permantly remove file ', xxxname)
-            os.remove(xxxname)
-        with open(xxxname, 'w') as e:
-            e.write("#EXTM3U\n")
-            content = getUrl('https://www.parsatv.com/m/')
-            if six.PY3:
-                content = six.ensure_str(content)
-            n6 = content.find("<a></a></td>")
-            if str(n6) in content:
-                content.replace(str(n6),'<a></a></li></td>')
-                print('yes is n6')
-            else:
-                print('no, no n6 in content!')
-            #<td id="ukraine"><li>Ukraine<a></a></li></td>                
-            #<td id="ostani"><li>IRIB Ostani<a></a></li></td>    
-            #<td id="irib"><li>IRIB<a></a></td>
-            #regexvideo = '<tr>.*?<td id=".*?><li>(.*?)<a>.*?</td>.*?</tr>'
-            s1 = name + "<a></a>"                
-            # s1 = name + "<a></a></li></td>"
-            n1 = content.find(s1)
-            n2 = content.find("<td id=", n1)
-            content2 = content[n1:n2]
-            print("showContent22 content2=", content2)
-            #<li><a href="https://www.parsatv.com/m/name=Abadan#ostani"><button class="myButton">Abadan</button></a></li>
-            regexvideo = '<li><a href="(.*?)".*?"myButton">(.*?)</button></a></li>'
-            match = re.compile(regexvideo,re.DOTALL).findall(content2)
-            print("showContent22 match =", match)
-            for url, name in match:
-                url = url
-                name = name
-
-                e.write('#EXTINF:-1,' + name +'\n')
-                e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
-                e.write(url+'\n')
-
-                item = name + "###" + url
-                items.append(item)
+            #save m3u end
             items.sort()
             for item in items:
                 name = item.split("###")[0]
                 url = item.split("###")[1]
-
                 self.names.append(name)
                 self.urls.append(url)
-                e.close()
-        self['info'].setText(_('Please select ...'))
-        showlistpars(self.names, self['text'])
+            # e.close()
+            self['info'].setText(_('Please select ...'))
+            showlistpars(self.names, self['text'])
+            print('-------------parsatv-------------')
 
-    def make_m3u(self):
-        namex = self.name
-        url = ''
-        device = downloadparsa
-        xxxname = device + namex + '.m3u'
-        # if os.path.exists(xxxname2):
-            # print('permantly remove file ', xxxname2)
-            # os.remove(xxxname2)
-        xxxname2 = device + namex + '_conv.m3u'
-        print('path device file ', xxxname)
-        if not os.path.exists(xxxname):
-            return
-        with open(xxxname2, 'w') as e:
-            e.write("#EXTM3U\n")
-            file_read = open(xxxname).readlines()
-            for line in file_read:
-                if line.startswith('#EXTINF'):
-                    name = '%s' % line.split(',')[-1]
-                    name1 = name.replace('%20', ' ').rstrip ('\n')
-                elif line.startswith("http"):
-                    url = line
-                    content = getUrl(url)
-                    if six.PY3:
-                        content = six.ensure_str(content)
-                    n1 = content.find('<body>', 0)
-                    n2 = content.find("</body>", n1)
-                    content = content[n1:n2]
-                    regexvideo = '.*?file:.*?"(.*?)"'
-                    match = re.compile(regexvideo,re.DOTALL).findall(content)
-                    # print("getVideos match =", match)
-                    for url in match:
-                        url = url
-                        # url = url.replace('https','http')
-                    print("getVideos6 name =", name1)
-                    print("getVideos6 url =", url)
-                    e.write('#EXTINF:-1,' + name1 +'\n')
-                    e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
-                    e.write(url+'\n')
-            e.close()
-        convert_bouquet(namex)
+        except Exception as e:
+            print('errorc ', e)
 
     def okRun(self):
         idx = self["text"].getSelectionIndex()
@@ -537,19 +593,19 @@ class parsatv3(Screen):
         url = self.urls[idx]
         content = getUrl(url)
         if six.PY3:
-            content = six.ensure_str(content)
-        print("content B =", content)
+            content = content.decode("utf-8")
+        # content =convert_to_unicode(content)
+        print("parsatv3 B =", content)
         n1 = content.find('class="myButton" id=', 0)
         n2 = content.find("</button></a>", n1)
         content = content[n1:n2]
-        regexvideo = '<a href="(.*?)"><b'
+        regexvideo = '<a href="(.+?)"><b'
         match = re.compile(regexvideo,re.DOTALL).findall(content)
-        print("getVideos match =", match)
+        print("getVideos parsatv3 match =", match)
         for url in match:
             url = url
             name = name
         self.session.open(Playgo, name, url)
-
 
 class parsasport(Screen):
     def __init__(self, session):
@@ -563,7 +619,7 @@ class parsasport(Screen):
         self.list = []
         self.name = 'ParsaSport'
         # self.url = 'http://www.parsatv.com/m/name=Varzesh-TV#persian'
-        # self.url2 ='http://www.parsatv.com/streams/fetch/varzeshtv.php'
+        self.url2 ='http://www.parsatv.com/streams/fetch/varzeshtv.php'
         self.url ='http://www.parsatv.com/m/'
         self['text'] = OneSetList([])
         self['info'] = Label(_('Getting the list, please wait ...'))
@@ -574,11 +630,11 @@ class parsasport(Screen):
         # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
-        self.timer.start(1500, True)
         if os.path.exists('/var/lib/dpkg/status'):
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
+        self.timer.start(1500, True)
         self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
          'green': self.okRun,
@@ -588,119 +644,86 @@ class parsasport(Screen):
 
     def convert2(self, result):
         if result:
-            name= self.name
-            self.make_m3u()
+            namex = self.name.lower()
+            namex = namex.replace(' ','-')
+            namex = namex.strip()
+            if os.path.exists('/var/lib/dpkg/status'):
+                self.timer_conn = self.timer.timeout.connect(make_m3u2(namex))
+            else:
+                self.timer.callback.append(make_m3u2(namex))
+            self.timer.start(500, True)
 
     def convert(self):
-            self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% self.name, MessageBox.TYPE_YESNO, timeout = 15, default = True)
+        self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?\n\nAttention!! Wait more than 5 minutes!!! ")% self.name, MessageBox.TYPE_YESNO, timeout = 10, default = True)
+        #self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% self.name, MessageBox.TYPE_YESNO, timeout = 10, default = True)
 
     def _gotPageLoad(self):
         self.names = []
         self.urls = []
         items = []
         url = self.url
-        namex = self.name
-        device = downloadparsa
-        xxxname = device + namex +'.m3u'
-        print('path device file ', xxxname)
-        if os.path.exists(xxxname):
-            print('permantly remove file ', xxxname)
-            os.remove(xxxname)
-        # with open(xxxname, 'w') as e:
-            # e.write("#EXTM3U\n")
-            content = getUrl(url)
-            if six.PY3:
-                content = six.ensure_str(content)
-            # print("content B =", content)
-            n1 = content.find('channels">', 0)
-            n2 = content.find("</table>", n1)
-            content = content[n1:n2]
-            regexvideo = '<li><a href="(.*?)"><button.*?myButton">(.*?)</button'
-            match = re.compile(regexvideo,re.DOTALL).findall(content)
-            # print("getVideos match =", match)
-
-            with open(xxxname, 'w') as e:
-                e.write("#EXTM3U\n")
-
-            for url, name in match:
-                if 'sport' in str(url).lower():
-                    name1 = name.replace('%20', ' ')
-                    # print("getVideos15 name =", name1)
-                    # print("getVideos15 url =", url)
-                    item = name + "###" + url
-                    items.append(item)
-                    #save m3u
-                    e.write('#EXTINF:-1,' + name1 +'\n')
-                    e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
-                    content = getUrl(url)
-                    if six.PY3:
-                        content = six.ensure_str(content)
-                    # print("content B =", content)
-                    n1 = content.find('class="myButton" id=', 0)
-                    n2 = content.find("</button></a>", n1)
-                    content = content[n1:n2]
-                    regexvideo = '<a href="(.*?)"><b'
-                    match = re.compile(regexvideo,re.DOTALL).findall(content)
-                    # print("getVideos match =", match)
-                    for url2 in match:
-                        url2 = url2
-                        e.write(url2+'\n')
-                    #save m3u end
-                items.sort()
-                for item in items:
-                    name = item.split("###")[0]
-                    url = item.split("###")[1]
-                    self.names.append(name)
-                    self.urls.append(url)
-                e.close()
-            self['info'].setText(_('Please select ...'))
-            showlistpars(self.names, self['text'])
-
-    def make_m3u(self):
-        namex = self.name
-        name = 'sport'
-        url = ''
-        device = downloadparsa
-        xxxname = device + namex +'.m3u'
-        # if os.path.exists(xxxname2):
-            # print('permantly remove file ', xxxname2)
-            # os.remove(xxxname2)
-        xxxname2 = device + self.name + '_conv.m3u'
-        # print('path device file ', xxxname)
-        if not os.path.exists(xxxname):
-            return
-        with open(xxxname2, 'w') as e:
-            e.write("#EXTM3U\n")
-            file_read = open(xxxname).readlines()
-            for line in file_read:
-                if line.startswith('#EXTINF'):
-                    name = '%s' % line.split(',')[-1]
-                    name = name.replace('%20', ' ').rstrip ('\n')
-                elif line.startswith("http"):
-                    url =line
-                    e.write('#EXTINF:-1,' + name +'\n')
-                    e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
-                    e.write(url+'\n')
-        convert_bouquet(namex)
-
-    def okRun(self):
-        selection = str(self['text'].getCurrent())
-        idx = self["text"].getSelectionIndex()
-        name = self.names[idx]
-        url = self.urls[idx]
-        # print('name : ', name)
-        # print('url:  ', url)
+        namex = self.name.lower()
+        namex = namex.replace(' ','-')
+        namex = namex.strip()
+        if os.path.exists(downloadparsa):
+            xxxname = downloadparsa + namex + '_conv.m3u'
+        else:
+            xxxname = '/tmp/' + namex + '_conv.m3u'
         try:
             content = getUrl(url)
             if six.PY3:
                 content = six.ensure_str(content)
-            # print("content B =", content)
+            n1 = content.find('<td id="persian">', 0)
+            n2 = content.find("</ul></td>", n1)
+            content = content[n1:n2]
+            regexvideo = '<li><a href="(.+?)#.*?"><button.*?myButton">(.+?)</button'
+            match = re.compile(regexvideo,re.DOTALL).findall(content)
+            print("parsasport match =", match)
+            with open(xxxname, 'w') as e:
+                e.write("#EXTM3U\n")
+                for url, name in match:
+                    if url.startswith('http'):
+                        url = url.replace(' ','%20')
+                        if 'sport' in str(url).lower():
+                            name1 = name.replace('%20', ' ')
+                            # print("getVideos15 name =", name1)
+                            # print("getVideos15 url =", url)
+                            item = name1 + "###" + url
+                            items.append(item)
+                            #save m3u
+                            e.write('#EXTINF:-1,' + name1 +'\n')
+                            e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
+                            e.write(url +'\n')
+            items.sort()
+            for item in items:
+                name = item.split("###")[0]
+                url = item.split("###")[1]
+                self.names.append(name)
+                self.urls.append(url)
+            # e.close()
+            self['info'].setText(_('Please select ...'))
+            showlistpars(self.names, self['text'])
+            print('-------------sport-------------')
+
+        except Exception as e:
+            print('errorc ', e)
+
+    def okRun(self):
+        idx = self["text"].getSelectionIndex()
+        name = self.names[idx]
+        url = self.urls[idx]
+        try:
+            content = getUrl(url)
+            if six.PY3:
+                content = content.decode("utf-8")
+            # content =convert_to_unicode(content)
+            # print("parsasport content B =", content)
             n1 = content.find('class="myButton" id=', 0)
             n2 = content.find("</button></a>", n1)
             content = content[n1:n2]
-            regexvideo = '<a href="(.*?)"><b'
+            regexvideo = '<a href="(.+?)"><b'
             match = re.compile(regexvideo,re.DOTALL).findall(content)
-            # print("getVideos match =", match)
+            # print("parsasport match =", match)
             for url in match:
                 # url = url.replace('https','http')
                 name = name
@@ -729,15 +752,15 @@ class parsatv(Screen):
         self['key_green'] = Button(_('Play'))
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button(_('Convert'))
-        self["key_blue"] = Button(_(''))
         # self['key_yellow'].hide()
+        self["key_blue"] = Button(_(''))
         self['key_blue'].hide()
         self.timer = eTimer()
-        self.timer.start(1500, True)
         if os.path.exists('/var/lib/dpkg/status'):
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
+        self.timer.start(1500, True)
         self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
          'green': self.okRun,
@@ -747,137 +770,92 @@ class parsatv(Screen):
 
     def convert2(self, result):
         if result:
-            name= self.name
-            self.make_m3u()
+            namex = self.name.lower()
+            namex = namex.replace(' ','-')
+            namex = namex.strip()
+            if os.path.exists('/var/lib/dpkg/status'):
+                self.timer_conn = self.timer.timeout.connect(make_m3u2(namex))
+            else:
+                self.timer.callback.append(make_m3u2(namex))
+            self.timer.start(500, True)
 
     def convert(self):
-            self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?\n\nAttention!! Wait more than 5 minutes!!! ")% self.name, MessageBox.TYPE_YESNO, timeout = 15, default = True)
+        self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?\n\nAttention!! Wait more than 5 minutes!!! ")% self.name, MessageBox.TYPE_YESNO, timeout = 10, default = True)
 
     def _gotPageLoad(self):
         self.names = []
         self.urls = []
         items = []
-        device = downloadparsa
-        namex = self.name
-        xxxname = device + namex + '_conv.m3u'
-        print('path device file ', xxxname)
-        if os.path.exists(xxxname):
-            print('permantly remove file ', xxxname)
-            os.remove(xxxname)
-        with open(xxxname, 'w') as e:
-            e.write("#EXTM3U\n")
-            url = self.url
-            name = self.name
+        url = self.url
+        namex = self.name.lower()
+        namex = namex.replace(' ','-')
+        namex = namex.strip()
+        if os.path.exists(downloadparsa):
+            xxxname = downloadparsa + namex + '_conv.m3u'
+        else:
+            xxxname = '/tmp/' + namex + '_conv.m3u'
+        try:
             content = getUrl(url)
             if six.PY3:
                 content = six.ensure_str(content)
-            # print("content B =", content)
-            n1 = content.find('channels">', 0)
-            n2 = content.find("</table>", n1)
+            n1 = content.find('<td id="persian">', 0)
+            n2 = content.find("</ul></td>", n1)
             content = content[n1:n2]
-            regexvideo = '<li><a href="(.*?)"><button.*?myButton">(.*?)</button'
+            regexvideo = '<li><a href="(.+?)#.*?"><button.*?myButton">(.+?)</button'
             match = re.compile(regexvideo,re.DOTALL).findall(content)
-            # print("getVideos match =", match)
-            for url, name in match:
-                # url = url.replace('https','http')
-                name1 = name.replace('%20', ' ')
-                # print("getVideos15 name =", name1)
-                # print("getVideos15 url =", url)
-                item = name + "###" + url
-                items.append(item)
-                e.write('#EXTINF:-1,' + name1 +'\n')
-                e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
-                e.write(url+'\n')
+            print("parsatv t match =", match)
+            with open(xxxname, 'w') as e:
+                e.write("#EXTM3U\n")
+                for url, name in match:
+                    if url.startswith('http'):
+                        url = url.replace(' ','%20')
+                        name1 = name.replace('%20', ' ')
+                        # print("getVideos15 name =", name1)
+                        # print("getVideos15 url =", url)
+                        item = name1 + "###" + url
+                        items.append(item)
+                        #save m3u
+                        e.write('#EXTINF:-1,' + name1 +'\n')
+                        e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
+                        e.write(url +'\n')
+
+            #save m3u end
             items.sort()
             for item in items:
                 name = item.split("###")[0]
                 url = item.split("###")[1]
                 self.names.append(name)
                 self.urls.append(url)
+            # e.close()
             self['info'].setText(_('Please select ...'))
             showlistpars(self.names, self['text'])
+            print('-------------parsatv-------------')
+
+        except Exception as e:
+            print('errorc ', e)
 
     def okRun(self):
-        selection = str(self['text'].getCurrent())
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
-        # print('name : ', name)
-        # print('url:  ', url)
         try:
             content = getUrl(url)
             if six.PY3:
-                content = six.ensure_str(content)
-            # print("content B =", content)
+                content = content.decode("utf-8")
+            # content =convert_to_unicode(content)
+            # print("parsatv content B =", content)
             n1 = content.find('class="myButton" id=', 0)
             n2 = content.find("</button></a>", n1)
             content = content[n1:n2]
-            regexvideo = '<a href="(.*?)"><b'
+            regexvideo = '<a href="(.+?)"><b'
             match = re.compile(regexvideo,re.DOTALL).findall(content)
-            # print("getVideos match =", match)
+            # print("parsatv match =", match)
             for url in match:
-                # url = url.replace('https','http')
                 name = name
-                pic = ''
-                # print("getVideos15 name =", name)
-                # print("getVideos15 url =", url)
                 self.session.open(Playgo, name, url)
         except:
             print('error: ')
             pass
-
-    def make_m3u(self):
-        namex = self.name
-        device = downloadparsa
-        # xxxname2 = device + self.name + '.m3u'
-        # if os.path.exists(xxxname2):
-            # print('permantly remove file ', xxxname2)
-            # os.remove(xxxname2)
-        xxxname = device + namex + '_conv.m3u'
-        print('path device file ', xxxname)
-        if not os.path.exists(xxxname):
-            return
-        with open(xxxname, 'w') as e:
-            e.write("#EXTM3U\n")
-            file_read = open(xxxname).readlines()
-            for line in file_read:
-                if line.startswith('#EXTINF'):
-                    name = '%s' % line.split(',')[-1]
-                    name = name.replace('%20', ' ').rstrip ('\n')
-                elif line.startswith("http"):
-                    url =line
-                    content = getUrl(url)
-                    if six.PY3:
-                        content = six.ensure_str(content)
-                    # print("content B =", content)
-                    n1 = content.find('class="myButton" id=', 0)
-                    n2 = content.find("</button></a>", n1)
-                    content = content[n1:n2]
-                    regexvideo = '<a href="(.*?)"><b'
-                    match = re.compile(regexvideo,re.DOTALL).findall(content)
-                    # print("getVideos match =", match)
-                    for url in match:
-                        if url.startswith("http"):
-                            url=url
-                        else:
-                            url = 'http://www.parsatv.com' + url
-                            content = getUrl(url)
-                            if six.PY3:
-                                content = six.ensure_str(content)
-                            # print("content B =", content)
-                            n1 = content.find('class="myButton" id=', 0)
-                            n2 = content.find("</button></a>", n1)
-                            content = content[n1:n2]
-                            regexvideo = '<a href="(.*?)"><b'
-                            match = re.compile(regexvideo,re.DOTALL).findall(content)
-                            for url in match:
-                                url=url
-                    # print("getVideos5 name =", name)
-                    # print("getVideos5 url =", url)
-                    e.write('#EXTINF:-1,' + name +'\n')
-                    e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
-                    e.write(url+'\n')
-        convert_bouquet(namex)
 
 class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
 
@@ -908,21 +886,21 @@ class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications
     def openTest(self):
         url = self.url
         name = self.name
-        print("Here in Playvid name A =", name)
+        print("Here in Playgo name A =", name)
         name = name.replace(":", "-")
         name = name.replace("&", "-")
         name = name.replace(" ", "-")
         name = name.replace("/", "-")
         name = name.replace("›", "-")
         name = name.replace(",", "-")
-        print("Here in Playvid name B2 =", name)
+        print("Here in Playgo name B2 =", name)
         if url is not None:
             url = str(url)
             url = url.replace(":", "%3a")
             url = url.replace("\\", "/")
-            print("url final= ", url)
+            print("Playgo url final= ", url)
             ref = "4097:0:1:0:0:0:0:0:0:0:" + url
-            print("ref= ", ref)
+            print("Playgo ref= ", ref)
             sref = eServiceReference(ref)
             sref.setName(self.name)
             self.session.nav.stopService()
@@ -953,14 +931,64 @@ class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications
     def keyNumberGlobal(self, number):
         self['text'].number(number)
 
+
+def make_m3u2(namex):
+    if checkInternet():
+        if os.path.exists(downloadparsa):
+            xxxname = downloadparsa + str(namex) + '_conv.m3u'
+            xxxnamex = downloadparsa + str(namex) + '.m3u'
+        else:
+            xxxname = '/tmp/' + str(namex) + '_conv.m3u'
+            xxxnamex = '/tmp/' + str(namex) + '.m3u'
+        if not os.path.exists(xxxname):
+            return
+        try:
+            with open(xxxnamex, 'w') as e:
+                e.write("#EXTM3U\n")
+                file_read = open(xxxname, 'rb') #.readlines()
+                file_read = [x.decode('utf8').strip() for x in file_read.readlines()]
+                for line in file_read:
+                    line = line.replace(' ','%20')
+                    if line.startswith('#EXTINF'):
+                        name = '%s' % line.split(',')[-1]
+                        name = name.replace('%20', ' ').rstrip ('\n')
+                        e.write('#EXTINF:-1,' + name +'\n')
+                        e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
+                        # continue
+                    elif line.startswith("http"):
+                        if six.PY3:
+                            line = line.encode()
+
+                        content = getUrl(line)
+                        if six.PY3:
+                            content = six.ensure_text(content, "utf-8", "ignore")
+                        print("parsatv content c =", content)
+                        n1 = content.find('class="myButton" id=', 0)
+                        n2 = content.find("</button></a>", n1)
+                        content2 = content[n1:n2]
+                        if content2 != None:
+                            regexvideo = '<a href="(.+?)"><b'
+                            match = re.compile(regexvideo,re.DOTALL).findall(content2)
+                            print("parsatv match =", match)
+                            for url2 in match:
+                                if url2.startswith('http'):
+                                    url2 = url2.replace(' ','%20')
+                                    print('matchh ', url2)
+                                    e.write(url2 +'\n')
+                # e.close()
+            convert_bouquet(namex)
+        except Exception as e:
+            print('error: ', e)
+
 def convert_bouquet(namex):
-    device = downloadparsa
-    xxxname = device + namex + '_conv.m3u'
-    print('path device file ', xxxname)
-    name = namex.replace(' ','').lower()
-    if not os.path.exists(xxxname):
-        self.mbox = self.session.open(openMessageBox, _('Check %s.m3u') %xxxname, openMessageBox.TYPE_INFO, timeout=5)
+    if os.path.exists(downloadparsa):
+        xxxnamex = str(downloadparsa) + str(namex) + '.m3u'
+    else:
+        xxxnamex = '/tmp/' + str(namex) + '.m3u'
+    if not os.path.exists(xxxnamex):
         return
+    name = namex.replace(' ','-').lower()
+    name = namex.strip()
     parsabouquet = 'userbouquet.%s.tv' % name
     desk_tmp = ''
     in_bouquets = 0
@@ -968,7 +996,7 @@ def convert_bouquet(namex):
             os.remove('/etc/enigma2/%s' % parsabouquet)
     with open('/etc/enigma2/%s' % parsabouquet, 'w') as outfile:
         outfile.write('#NAME %s\r\n' % name.capitalize())
-        for line in open(xxxname ):
+        for line in open(xxxnamex):
             if line.startswith('http://') or line.startswith('https'):
                 outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s' % line.replace(':', '%3a'))
                 outfile.write('#DESCRIPTION %s' % desk_tmp)
@@ -983,8 +1011,8 @@ def convert_bouquet(namex):
                 else:
                     desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
         outfile.close()
-        message = (_("Wait please... "))
-        web_info(message)
+    message = (_("Wait please... "))
+    web_info(message)
     if os.path.isfile('/etc/enigma2/bouquets.tv'):
         for line in open('/etc/enigma2/bouquets.tv'):
             if parsabouquet in line:
@@ -996,7 +1024,7 @@ def convert_bouquet(namex):
                 with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
                     outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % parsabouquet)
                     outfile.close()
-    message = (_("Bouquet converted successful"))
+    message = (_("Bouquet successfully exported"))
     web_info(message)
     ReloadBouquet()
 
@@ -1131,5 +1159,5 @@ def decodeHtml(text):
 	text = text.replace('&percnt;','%')
 	text = text.replace('&commmat;',' ')
 	text = text.replace('&#58;',':')
-
 	return text
+
