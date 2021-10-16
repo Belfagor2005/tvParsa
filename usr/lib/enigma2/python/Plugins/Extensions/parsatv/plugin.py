@@ -490,7 +490,8 @@ class parsatv3(Screen):
             namex = namex.replace(' ','-')
             namex = namex.strip()
             if os.path.exists('/var/lib/dpkg/status'):
-                self.timer_conn = self.timer.timeout.connect(make_m3u2(namex))
+                from Tools.BoundFunction import boundFunction
+                self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2,namex))
             else:
                 self.timer.callback.append(make_m3u2(namex))
             self.timer.start(500, True)
@@ -648,7 +649,8 @@ class parsasport(Screen):
             namex = namex.replace(' ','-')
             namex = namex.strip()
             if os.path.exists('/var/lib/dpkg/status'):
-                self.timer_conn = self.timer.timeout.connect(make_m3u2(namex))
+                from Tools.BoundFunction import boundFunction
+                self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2,namex))
             else:
                 self.timer.callback.append(make_m3u2(namex))
             self.timer.start(500, True)
@@ -774,7 +776,8 @@ class parsatv(Screen):
             namex = namex.replace(' ','-')
             namex = namex.strip()
             if os.path.exists('/var/lib/dpkg/status'):
-                self.timer_conn = self.timer.timeout.connect(make_m3u2(namex))
+                from Tools.BoundFunction import boundFunction
+                self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2,namex))
             else:
                 self.timer.callback.append(make_m3u2(namex))
             self.timer.start(500, True)
