@@ -4,11 +4,11 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             10/09/2021               *
+*             10/11/2021               *
 *       Skin by MMark                  *
 ****************************************
 '''
-from __future__ import print_function#, unicode_literals
+from __future__ import print_function
 from . import _
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Button import Button
@@ -30,7 +30,8 @@ from Screens.InfoBarGenerics import *
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Tools.Directories import *
-from Tools.Directories import resolveFilename, SCOPE_LANGUAGE, fileExists
+from Tools.Directories import SCOPE_LANGUAGE, fileExists
+from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 from Tools.LoadPixmap import LoadPixmap
 from enigma import *
 from enigma import RT_HALIGN_LEFT, getDesktop, RT_HALIGN_RIGHT, RT_HALIGN_CENTER
@@ -46,73 +47,18 @@ import shutil
 import six
 import ssl
 import sys
-import socket
+from Plugins.Extensions.parsatv.Utils import *
+
 global pngs
+
 global downloadparsa
 downloadparsa = None
-try:
-    from enigma import eDVBDB
-except ImportError:
-    eDVBDB = None
-from random import choice
+
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.parse import quote_plus
 from six.moves.urllib.parse import quote
-ListAgent = [
-          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15',
-          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.14 (KHTML, like Gecko) Chrome/24.0.1292.0 Safari/537.14',
-          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-          'Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-          'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1284.0 Safari/537.13',
-          'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8',
-          'Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-          'Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-          'Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2',
-          'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.16) Gecko/20120427 Firefox/15.0a1',
-          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1',
-          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:15.0) Gecko/20120910144328 Firefox/15.0.2',
-          'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:15.0) Gecko/20100101 Firefox/15.0.1',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:9.0a2) Gecko/20111101 Firefox/9.0a2',
-          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2',
-          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110612 Firefox/6.0a2',
-          'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0',
-          'Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)',
-          'Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)',
-          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0;  it-IT)',
-          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)'
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/13.0.782.215)',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/11.0.696.57)',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0) chromeframe/10.0.648.205',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.1; SV1; .NET CLR 2.8.52393; WOW64; en-US)',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; chromeframe/11.0.696.57)',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/4.0; GTB7.4; InfoPath.3; SV1; .NET CLR 3.1.76908; WOW64; en-US)',
-          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.2; SV1; .NET CLR 3.3.69573; WOW64; en-US)',
-          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)',
-          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.8.36217; WOW64; en-US)',
-          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
-          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; it-IT)',
-          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)',
-          'Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02',
-          'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00',
-          'Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00',
-          'Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00',
-          'Opera/12.0(Windows NT 5.1;U;en)Presto/22.9.168 Version/12.00',
-          'Mozilla/5.0 (Windows NT 5.1) Gecko/20100101 Firefox/14.0 Opera/12.0',
-          'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10',
-          'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3'
-          ]
 
 try:
     from Components.UsageConfig import defaultMoviePath
@@ -126,15 +72,6 @@ if sys.version_info >= (2, 7, 9):
         sslContext = ssl._create_unverified_context()
     except:
         sslContext = None
-def ssl_urlopen(url):
-    if sslContext:
-        return urlopen(url, context=sslContext)
-    else:
-        return urlopen(url)
-try:
-    from enigma import eDVBDB
-except ImportError:
-    eDVBDB = None
 try:
     from OpenSSL import SSL
     from twisted.internet import ssl
@@ -153,64 +90,62 @@ if sslverify:
                 ClientTLSOptions(self.hostname, ctx)
             return ctx
 
-def RequestAgent():
-    RandomAgent = choice(ListAgent)
-    return RandomAgent
-
-def checkStr(txt):
-    if six.PY3:
-        if isinstance(txt, type(bytes())):
-            txt = txt.decode('utf-8')
+def ssl_urlopen(url):
+    if sslContext:
+        return urlopen(url, context=sslContext)
     else:
-        if isinstance(txt, type(six.text_type())):
-            txt = txt.encode('utf-8')
-    return txt
+        return urlopen(url)
 
-def convert_to_unicode(text):
-    """Converts `text` to Unicode (if it's not already), assuming utf-8 input."""
-    if six.PY3:
-        if isinstance(text, str):
-            return text
-        elif isinstance(text, bytes):
-            return six.ensure_text(text, "utf-8", "ignore")
-        else:
-            raise ValueError("Unsupported string type: %s" % (type(text)))
-    elif six.PY2:
-        if isinstance(text, str):
-            return six.ensure_text(text, "utf-8", "ignore")
-        elif isinstance(text, six.text_type):
-            return text
-        else:
-            raise ValueError("Unsupported string type: %s" % (type(text)))
-    else:
-        raise ValueError("Not running on Python2 or Python 3?")
+# def RequestAgent():
+    # RandomAgent = choice(ListAgent)
+    # return RandomAgent
 
-def checkInternet():
-    try:
-        socket.setdefaulttimeout(5.0)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", 53))
-        return True
-    except:
-        return False
+# def checkStr(txt):
+    # if six.PY3:
+        # if isinstance(txt, type(bytes())):
+            # txt = txt.decode('utf-8')
+    # else:
+        # if isinstance(txt, type(six.text_type())):
+            # txt = txt.encode('utf-8')
+    # return txt
 
-def getUrl(url):
-    link = []
-    url = checkStr(url)
-    print(  "Here in getUrl url =", url)
-    req = Request(url)
-    req.add_header('User-Agent',RequestAgent())
-    try:
-        response = urlopen(req)
-        link=response.read()
-        response.close()
-        return link
-    except:
-        import ssl
-        gcontext = ssl._create_unverified_context()
-        response = urlopen(req, context=gcontext)
-        link=response.read()
-        response.close()
-        return link
+# def convert_to_unicode(text):
+    # """Converts `text` to Unicode (if it's not already), assuming utf-8 input."""
+    # if six.PY3:
+        # if isinstance(text, str):
+            # return text
+        # elif isinstance(text, bytes):
+            # return six.ensure_text(text, "utf-8", "ignore")
+        # else:
+            # raise ValueError("Unsupported string type: %s" % (type(text)))
+    # elif six.PY2:
+        # if isinstance(text, str):
+            # return six.ensure_text(text, "utf-8", "ignore")
+        # elif isinstance(text, six.text_type):
+            # return text
+        # else:
+            # raise ValueError("Unsupported string type: %s" % (type(text)))
+    # else:
+        # raise ValueError("Not running on Python2 or Python 3?")
+
+# def ReadUrl(url):
+    # link = []
+    # url = checkStr(url)
+    # print(  "Here in ReadUrl url =", url)
+    # req = Request(url)
+    # req.add_header('User-Agent',RequestAgent())
+    # try:
+        # response = urlopen(req)
+        # link=response.read()
+        # response.close()
+        # return link
+    # except:
+        # import ssl
+        # gcontext = ssl._create_unverified_context()
+        # response = urlopen(req, context=gcontext)
+        # link=response.read()
+        # response.close()
+        # return link
 
 def remove_line(filename, what):
     if os.path.isfile(filename):
@@ -221,23 +156,17 @@ def remove_line(filename, what):
                 file_write.write(line)
         file_write.close()
 
-def web_info(message):
-    try:
-        message = quote_plus(message)
-        cmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
-        # debug(cmd, "CMD -> Console -> WEBIF")
-        os.popen(cmd)
-    except:
-        print("web_info ERROR")
+# def web_info(message):
+    # try:
+        # message = quote_plus(message)
+        # cmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
+        # # debug(cmd, "CMD -> Console -> WEBIF")
+        # os.popen(cmd)
+    # except:
+        # print("web_info ERROR")
 
-def ReloadBouquet():
-    try:
-        eDVBDB.getInstance().reloadServicelist()
-        eDVBDB.getInstance().reloadBouquets()
-    except:
-        os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
 
-DESKHEIGHT = getDesktop(0).size().height()
+
 currversion = '1.5'
 title_plug = 'Parsa TV '
 desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
@@ -245,12 +174,13 @@ plugin_path = os.path.dirname(sys.modules[__name__].__file__)
 res_plugin_path=plugin_path + '/res/'
 pngs=res_plugin_path + 'pics/setting.png'
 pluglogo=res_plugin_path + 'pics/logo.png'
-HD = getDesktop(0).size()
-if HD.width() > 1280:
+
+if isFHD():
     skin_path=res_plugin_path + 'skins/fhd/'
 else:
     skin_path=res_plugin_path + 'skins/hd/'
-if os.path.exists('/var/lib/dpkg/status'):
+# if os.path.exists('/var/lib/dpkg/status'):
+if DreamOS():
     skin_path=skin_path + 'dreamOs/'
 
 Panel_Dlist = [
@@ -272,14 +202,14 @@ class MainParsaList(MenuList):
         self.l.setFont(7, gFont('Regular', 34))
         self.l.setFont(8, gFont('Regular', 36))
         self.l.setFont(9, gFont('Regular', 40))
-        if HD.width() > 1280:
+        if isFHD():
             self.l.setItemHeight(50)
         else:
             self.l.setItemHeight(50)
 
 def DListEntry(name, idx):
     res = [name]
-    if HD.width() > 1280:
+    if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 12), size = (34, 25), png = loadPNG(pngs)))
         res.append(MultiContentEntryText(pos = (60, 0), size = (1900, 50), font = 7, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
@@ -290,7 +220,7 @@ def DListEntry(name, idx):
 class OneSetList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
-        if HD.width() > 1280:
+        if isFHD():
             self.l.setItemHeight(50)
             textfont = int(34)
             self.l.setFont(0, gFont('Regular', textfont))
@@ -301,7 +231,7 @@ class OneSetList(MenuList):
 
 def OneSetListEntry(name):
     res = [name]
-    if HD.width() > 1280:
+    if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 12), size = (34, 25), png = loadPNG(pngs)))
         res.append(MultiContentEntryText(pos = (60, 0), size = (1200, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
@@ -397,7 +327,8 @@ class parsatv2(Screen):
         self['key_blue'].hide()
         self.timer = eTimer()
 
-        if os.path.exists('/var/lib/dpkg/status'):
+        # if os.path.exists('/var/lib/dpkg/status'):
+        if DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
@@ -416,7 +347,7 @@ class parsatv2(Screen):
         self.urls = []
         items = []
         try:
-            content = getUrl(url)
+            content = ReadUrl(url)
             if six.PY3:
                 content = six.ensure_str(content)
             n6 = content.find("<a></a></td>")
@@ -472,7 +403,8 @@ class parsatv3(Screen):
         # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
-        if os.path.exists('/var/lib/dpkg/status'):
+        # if os.path.exists('/var/lib/dpkg/status'):
+        if DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
@@ -489,7 +421,8 @@ class parsatv3(Screen):
             namex = self.name.lower()
             namex = namex.replace(' ','-')
             namex = namex.strip()
-            if os.path.exists('/var/lib/dpkg/status'):
+            # if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 from Tools.BoundFunction import boundFunction
                 self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2,namex))
             else:
@@ -517,7 +450,7 @@ class parsatv3(Screen):
         try:
             with open(xxxname, 'w') as e:
                 e.write("#EXTM3U\n")
-                content = getUrl('https://www.parsatv.com/m/')
+                content = ReadUrl('https://www.parsatv.com/m/')
                 if six.PY3:
                     content = six.ensure_str(content)
                 n6 = content.find("<a></a></td>")
@@ -550,7 +483,7 @@ class parsatv3(Screen):
                         e.write('#EXTINF:-1,' + name1 +'\n')
                         e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                         e.write(url +'\n')
-                        # content = getUrl(url)
+                        # content = ReadUrl(url)
                         # if six.PY3:
                             # content = six.ensure_text(content, "utf-8", "ignore")
                         # # if six.PY3:
@@ -592,9 +525,9 @@ class parsatv3(Screen):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
-        content = getUrl(url)
+        content = ReadUrl(url)
         if six.PY3:
-            content = content.decode("utf-8")
+            content = six.ensure_str(content)
         # content =convert_to_unicode(content)
         print("parsatv3 B =", content)
         n1 = content.find('class="myButton" id=', 0)
@@ -631,7 +564,8 @@ class parsasport(Screen):
         # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
-        if os.path.exists('/var/lib/dpkg/status'):
+        # if os.path.exists('/var/lib/dpkg/status'):
+        if DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
@@ -648,7 +582,8 @@ class parsasport(Screen):
             namex = self.name.lower()
             namex = namex.replace(' ','-')
             namex = namex.strip()
-            if os.path.exists('/var/lib/dpkg/status'):
+            # if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 from Tools.BoundFunction import boundFunction
                 self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2,namex))
             else:
@@ -672,9 +607,9 @@ class parsasport(Screen):
         else:
             xxxname = '/tmp/' + namex + '_conv.m3u'
         try:
-            content = getUrl(url)
-            if six.PY3:
-                content = six.ensure_str(content)
+            content = ReadUrl(url)
+            # if six.PY3:
+                # content = six.ensure_str(content)
             n1 = content.find('<td id="persian">', 0)
             n2 = content.find("</ul></td>", n1)
             content = content[n1:n2]
@@ -715,9 +650,9 @@ class parsasport(Screen):
         name = self.names[idx]
         url = self.urls[idx]
         try:
-            content = getUrl(url)
+            content = ReadUrl(url)
             if six.PY3:
-                content = content.decode("utf-8")
+                content = six.ensure_str(content)
             # content =convert_to_unicode(content)
             # print("parsasport content B =", content)
             n1 = content.find('class="myButton" id=', 0)
@@ -758,7 +693,8 @@ class parsatv(Screen):
         self["key_blue"] = Button(_(''))
         self['key_blue'].hide()
         self.timer = eTimer()
-        if os.path.exists('/var/lib/dpkg/status'):
+        # if os.path.exists('/var/lib/dpkg/status'):
+        if DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
@@ -775,7 +711,8 @@ class parsatv(Screen):
             namex = self.name.lower()
             namex = namex.replace(' ','-')
             namex = namex.strip()
-            if os.path.exists('/var/lib/dpkg/status'):
+            # if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 from Tools.BoundFunction import boundFunction
                 self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2,namex))
             else:
@@ -798,7 +735,7 @@ class parsatv(Screen):
         else:
             xxxname = '/tmp/' + namex + '_conv.m3u'
         try:
-            content = getUrl(url)
+            content = ReadUrl(url)
             if six.PY3:
                 content = six.ensure_str(content)
             n1 = content.find('<td id="persian">', 0)
@@ -842,9 +779,9 @@ class parsatv(Screen):
         name = self.names[idx]
         url = self.urls[idx]
         try:
-            content = getUrl(url)
+            content = ReadUrl(url)
             if six.PY3:
-                content = content.decode("utf-8")
+                content = six.ensure_str(content)
             # content =convert_to_unicode(content)
             # print("parsatv content B =", content)
             n1 = content.find('class="myButton" id=', 0)
@@ -962,7 +899,7 @@ def make_m3u2(namex):
                         if six.PY3:
                             line = line.encode()
 
-                        content = getUrl(line)
+                        content = ReadUrl(line)
                         if six.PY3:
                             content = six.ensure_text(content, "utf-8", "ignore")
                         print("parsatv content c =", content)
@@ -1027,12 +964,17 @@ def convert_bouquet(namex):
                 with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
                     outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % parsabouquet)
                     outfile.close()
-    message = (_("Bouquet successfully exported"))
+    message = (_("Bouquet exported"))
     web_info(message)
     ReloadBouquet()
 
 def main(session, **kwargs):
     if checkInternet():
+        # try:
+            # from Plugins.Extensions.parsatv.Update import upd_done
+            # upd_done()
+        # except:
+            # pass    
         session.open(MainParsa)
     else:
         session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
@@ -1045,122 +987,12 @@ def StartSetup(menuid, **kwargs):
 
 def Plugins(**kwargs):
     ico_path = 'logo.png'
-    if not os.path.exists('/var/lib/dpkg/status'):
+    # if not os.path.exists('/var/lib/dpkg/status'):
+    if DreamOS():
         ico_path = plugin_path + '/res/pics/logo.png'
     extensions_menu = PluginDescriptor(name = title_plug, description = desc_plugin, where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main, needsRestart = True)
     result = [PluginDescriptor(name = title_plug, description = desc_plugin, where = PluginDescriptor.WHERE_PLUGINMENU, icon = ico_path, fnc = main)]
     result.append(extensions_menu)
     return result
 
-def decodeUrl(text):
-	text = text.replace('%20',' ')
-	text = text.replace('%21','!')
-	text = text.replace('%22','"')
-	text = text.replace('%23','&')
-	text = text.replace('%24','$')
-	text = text.replace('%25','%')
-	text = text.replace('%26','&')
-	text = text.replace('%2B','+')
-	text = text.replace('%2F','/')
-	text = text.replace('%3A',':')
-	text = text.replace('%3B',';')
-	text = text.replace('%3D','=')
-	text = text.replace('&#x3D;','=')
-	text = text.replace('%3F','?')
-	text = text.replace('%40','@')
-	return text
-
-def decodeHtml(text):
-	text = text.replace('&auml;','ä')
-	text = text.replace('\u00e4','ä')
-	text = text.replace('&#228;','ä')
-	text = text.replace('&oacute;','ó')
-	text = text.replace('&eacute;','e')
-	text = text.replace('&aacute;','a')
-	text = text.replace('&ntilde;','n')
-
-	text = text.replace('&Auml;','Ä')
-	text = text.replace('\u00c4','Ä')
-	text = text.replace('&#196;','Ä')
-
-	text = text.replace('&ouml;','ö')
-	text = text.replace('\u00f6','ö')
-	text = text.replace('&#246;','ö')
-
-	text = text.replace('&ouml;','Ö')
-	text = text.replace('\u00d6','Ö')
-	text = text.replace('&#214;','Ö')
-
-	text = text.replace('&uuml;','ü')
-	text = text.replace('\u00fc','ü')
-	text = text.replace('&#252;','ü')
-
-	text = text.replace('&Uuml;','Ü')
-	text = text.replace('\u00dc','Ü')
-	text = text.replace('&#220;','Ü')
-
-	text = text.replace('&szlig;','ß')
-	text = text.replace('\u00df','ß')
-	text = text.replace('&#223;','ß')
-
-	text = text.replace('&amp;','&')
-	text = text.replace('&quot;','\"')
-	text = text.replace('&quot_','\"')
-
-	text = text.replace('&gt;','>')
-	text = text.replace('&apos;',"'")
-	text = text.replace('&acute;','\'')
-	text = text.replace('&ndash;','-')
-	text = text.replace('&bdquo;','"')
-	text = text.replace('&rdquo;','"')
-	text = text.replace('&ldquo;','"')
-	text = text.replace('&lsquo;','\'')
-	text = text.replace('&rsquo;','\'')
-	text = text.replace('&#034;','\'')
-	text = text.replace('&#038;','&')
-	text = text.replace('&#039;','\'')
-	text = text.replace('&#39;','\'')
-	text = text.replace('&#160;',' ')
-	text = text.replace('\u00a0',' ')
-	text = text.replace('&#174;','')
-	text = text.replace('&#225;','a')
-	text = text.replace('&#233;','e')
-	text = text.replace('&#243;','o')
-	text = text.replace('&#8211;',"-")
-	text = text.replace('\u2013',"-")
-	text = text.replace('&#8216;',"'")
-	text = text.replace('&#8217;',"'")
-	text = text.replace('#8217;',"'")
-	text = text.replace('&#8220;',"'")
-	text = text.replace('&#8221;','"')
-	text = text.replace('&#8222;',',')
-	text = text.replace('&#x27;',"'")
-	text = text.replace('&#8230;','...')
-	text = text.replace('\u2026','...')
-	text = text.replace('&#41;',')')
-	text = text.replace('&lowbar;','_')
-	text = text.replace('&rsquo;','\'')
-	text = text.replace('&lpar;','(')
-	text = text.replace('&rpar;',')')
-	text = text.replace('&comma;',',')
-	text = text.replace('&period;','.')
-	text = text.replace('&plus;','+')
-	text = text.replace('&num;','#')
-	text = text.replace('&excl;','!')
-	text = text.replace('&#039','\'')
-	text = text.replace('&semi;','')
-	text = text.replace('&lbrack;','[')
-	text = text.replace('&rsqb;',']')
-	text = text.replace('&nbsp;','')
-	text = text.replace('&#133;','')
-	text = text.replace('&#4','')
-	text = text.replace('&#40;','')
-
-	text = text.replace('&atilde;',"'")
-	text = text.replace('&colon;',':')
-	text = text.replace('&sol;','/')
-	text = text.replace('&percnt;','%')
-	text = text.replace('&commmat;',' ')
-	text = text.replace('&#58;',':')
-	return text
 
