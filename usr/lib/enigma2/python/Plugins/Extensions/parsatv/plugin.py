@@ -526,8 +526,8 @@ class parsatv3(Screen):
         name = self.names[idx]
         url = self.urls[idx]
         content = ReadUrl(url)
-        if six.PY3:
-            content = six.ensure_str(content)
+        # if six.PY3:
+            # content = six.ensure_str(content)
         # content =convert_to_unicode(content)
         print("parsatv3 B =", content)
         n1 = content.find('class="myButton" id=', 0)
@@ -651,8 +651,8 @@ class parsasport(Screen):
         url = self.urls[idx]
         try:
             content = ReadUrl(url)
-            if six.PY3:
-                content = six.ensure_str(content)
+            # if six.PY3:
+                # content = six.ensure_str(content)
             # content =convert_to_unicode(content)
             # print("parsasport content B =", content)
             n1 = content.find('class="myButton" id=', 0)
@@ -780,8 +780,8 @@ class parsatv(Screen):
         url = self.urls[idx]
         try:
             content = ReadUrl(url)
-            if six.PY3:
-                content = six.ensure_str(content)
+            # if six.PY3:
+                # content = six.ensure_str(content)
             # content =convert_to_unicode(content)
             # print("parsatv content B =", content)
             n1 = content.find('class="myButton" id=', 0)
