@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             10/11/2021               *
+*             22/11/2021               *
 *       Skin by MMark                  *
 ****************************************
 '''
@@ -47,10 +47,11 @@ import shutil
 import six
 import ssl
 import sys
-from Plugins.Extensions.parsatv.Utils import *
-
+try:
+    from Plugins.Extensions.parsatv.Utils import *
+except:
+    from . import Utils
 global pngs
-
 global downloadparsa
 downloadparsa = None
 
@@ -96,57 +97,6 @@ def ssl_urlopen(url):
     else:
         return urlopen(url)
 
-# def RequestAgent():
-    # RandomAgent = choice(ListAgent)
-    # return RandomAgent
-
-# def checkStr(txt):
-    # if six.PY3:
-        # if isinstance(txt, type(bytes())):
-            # txt = txt.decode('utf-8')
-    # else:
-        # if isinstance(txt, type(six.text_type())):
-            # txt = txt.encode('utf-8')
-    # return txt
-
-# def convert_to_unicode(text):
-    # """Converts `text` to Unicode (if it's not already), assuming utf-8 input."""
-    # if six.PY3:
-        # if isinstance(text, str):
-            # return text
-        # elif isinstance(text, bytes):
-            # return six.ensure_text(text, "utf-8", "ignore")
-        # else:
-            # raise ValueError("Unsupported string type: %s" % (type(text)))
-    # elif six.PY2:
-        # if isinstance(text, str):
-            # return six.ensure_text(text, "utf-8", "ignore")
-        # elif isinstance(text, six.text_type):
-            # return text
-        # else:
-            # raise ValueError("Unsupported string type: %s" % (type(text)))
-    # else:
-        # raise ValueError("Not running on Python2 or Python 3?")
-
-# def ReadUrl(url):
-    # link = []
-    # url = checkStr(url)
-    # print(  "Here in ReadUrl url =", url)
-    # req = Request(url)
-    # req.add_header('User-Agent',RequestAgent())
-    # try:
-        # response = urlopen(req)
-        # link=response.read()
-        # response.close()
-        # return link
-    # except:
-        # import ssl
-        # gcontext = ssl._create_unverified_context()
-        # response = urlopen(req, context=gcontext)
-        # link=response.read()
-        # response.close()
-        # return link
-
 def remove_line(filename, what):
     if os.path.isfile(filename):
         file_read = open(filename).readlines()
@@ -155,17 +105,6 @@ def remove_line(filename, what):
             if what not in line:
                 file_write.write(line)
         file_write.close()
-
-# def web_info(message):
-    # try:
-        # message = quote_plus(message)
-        # cmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
-        # # debug(cmd, "CMD -> Console -> WEBIF")
-        # os.popen(cmd)
-    # except:
-        # print("web_info ERROR")
-
-
 
 currversion = '1.5'
 title_plug = 'Parsa TV '
