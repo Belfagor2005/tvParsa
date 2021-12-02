@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             22/11/2021               *
+*             01/12/2021               *
 *       Skin by MMark                  *
 ****************************************
 '''
@@ -57,7 +57,7 @@ downloadparsa = None
 
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
-from six.moves.urllib.error import HTTPError, URLError
+# from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.parse import quote_plus
 from six.moves.urllib.parse import quote
 
@@ -199,7 +199,7 @@ class MainParsa(Screen):
         self['text'] = MainParsaList([])
         self['title'] = Label(title_plug)
         self['info'] = Label('')
-        self['info'].setText(_('Please select ...'))
+        self['info'].setText(_('Loading data... Please wait'))
         self['key_yellow'] = Button(_(''))
         self['key_yellow'].hide()
         self['key_green'] = Button(_('Select'))
@@ -257,7 +257,7 @@ class parsatv2(Screen):
         # self.url = 'http://www.parsatv.com/name=Varzesh-TV#persian'
         self.url = 'https://www.parsatv.com/m/'
         self['text'] = OneSetList([])
-        self['info'] = Label(_('Getting the list, please wait ...'))
+        self['info'] = Label(_('Loading data... Please wait'))
         self['key_green'] = Button(_('Select'))
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button('')
@@ -334,7 +334,7 @@ class parsatv3(Screen):
         self.name = name
         self.url = url
         self['text'] = OneSetList([])
-        self['info'] = Label(_('Getting the list, please wait ...'))
+        self['info'] = Label(_('Loading data... Please wait'))
         self['key_green'] = Button(_('Play'))
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button(_('Convert'))
@@ -495,7 +495,7 @@ class parsasport(Screen):
         self.url2 ='http://www.parsatv.com/streams/fetch/varzeshtv.php'
         self.url ='http://www.parsatv.com/m/'
         self['text'] = OneSetList([])
-        self['info'] = Label(_('Getting the list, please wait ...'))
+        self['info'] = Label(_('Loading data... Please wait'))
         self['key_green'] = Button(_('Play'))
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button(_('Convert'))
@@ -624,7 +624,7 @@ class parsatv(Screen):
         self.name = 'ParsaTv'
         self.url = 'https://www.parsatv.com/m/'
         self['text'] = OneSetList([])
-        self['info'] = Label(_('Getting the list, please wait ...'))
+        self['info'] = Label(_('Loading data... Please wait'))
         self['key_green'] = Button(_('Play'))
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button(_('Convert'))
@@ -737,11 +737,16 @@ class parsatv(Screen):
             pass
 
 class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
-
+    STATE_IDLE = 0
+    STATE_PLAYING = 1
+    STATE_PAUSED = 2
+    ENABLE_RESUME_SUPPORT = True
+    ALLOW_SUSPEND = True
+    screen_timeout = 5000
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
         self.skinName = 'MoviePlayer'
-        title = 'Play'
+        title = name
         InfoBarMenu.__init__(self)
         InfoBarNotifications.__init__(self)
         InfoBarBase.__init__(self)
@@ -756,43 +761,69 @@ class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications
          'back': self.cancel}, -1)
         self.allowPiP = False
         InfoBarSeek.__init__(self, actionmap='MediaPlayerSeekActions')
-        url = url.replace(':', '%3a')
-        self.url = url
-        self.name = name
+        self.service = None
+        service = None
+        self.url = url.replace(':', '%3a').replace(' ','%20')
+        self.icount = 0
+        self.name = decodeHtml(name)
+        self.state = self.STATE_PLAYING
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
         self.onLayoutFinish.append(self.openTest)
+        self.onClose.append(self.cancel)
 
     def openTest(self):
         url = self.url
         name = self.name
         print("Here in Playgo name A =", name)
-        name = name.replace(":", "-")
-        name = name.replace("&", "-")
-        name = name.replace(" ", "-")
-        name = name.replace("/", "-")
-        name = name.replace("›", "-")
-        name = name.replace(",", "-")
-        print("Here in Playgo name B2 =", name)
+        name = name.replace(":", "-").replace("&", "-").replace("›", "-")
+        name = name.replace(" ", "-").replace("/", "-").replace(",", "-")
         if url is not None:
-            url = str(url)
-            url = url.replace(":", "%3a")
-            url = url.replace("\\", "/")
-            print("Playgo url final= ", url)
-            ref = "4097:0:1:0:0:0:0:0:0:0:" + url
-            print("Playgo ref= ", ref)
+            ref = "4097:0:0:0:0:0:0:0:0:0:{0}:{1}".format(url.replace(":", "%3A"), name.replace(":", "%3A"))
+            print('final reference:   ', ref)
             sref = eServiceReference(ref)
-            sref.setName(self.name)
+            sref.setName(name)
             self.session.nav.stopService()
             self.session.nav.playService(sref)
         else:
-           return
+           return        
 
-    def openTestX(self):
-        ref = '4097:0:1:0:0:0:0:0:0:0:' + self.url
-        sref = eServiceReference(ref)
-        sref.setName(self.name)
-        self.session.nav.stopService()
-        self.session.nav.playService(sref)
+    # def openTest(self):
+        # url = self.url
+        # name = self.name
+        # print("Here in Playgo name A =", name)
+        # name = name.replace(":", "-").replace("&", "-").replace("›", "-")
+        # name = name.replace(" ", "-").replace("/", "-").replace(",", "-")
+
+        # print("Here in Playgo name B2 =", name)
+        # if url is not None:
+            # url = str(url)
+            # url = url.replace(":", "%3a")
+            # url = url.replace("\\", "/")
+            # print("Playgo url final= ", url)
+            # ref = "4097:0:1:0:0:0:0:0:0:0:" + url
+            # print("Playgo ref= ", ref)
+            # sref = eServiceReference(ref)
+            # sref.setName(self.name)
+            # self.session.nav.stopService()
+            # self.session.nav.playService(sref)
+        # else:
+           # return
+
+    def openTestx(self):
+        url = self.url
+        name = self.name
+        print("Here in Playgo name A =", name)
+        name = name.replace(":", "-").replace("&", "-").replace("›", "-")
+        name = name.replace(" ", "-").replace("/", "-").replace(",", "-")
+        if url is not None:
+            ref = "4097:0:0:0:0:0:0:0:0:0:{0}:{1}".format(url.replace(":", "%3A"), name.replace(":", "%3A"))
+            print('final reference:   ', ref)
+            sref = eServiceReference(ref)
+            sref.setName(name)
+            self.session.nav.stopService()
+            self.session.nav.playService(sref)
+        else:
+           return    
 
     def cancel(self):
         if os.path.exists('/tmp/hls.avi'):
@@ -800,14 +831,37 @@ class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications
         self.session.nav.stopService()
         self.session.nav.playService(self.srefOld)
         self.close()
+        
+    def up(self):
+        pass
 
-    def keyLeft(self):
-        self['text'].left()
+    def down(self):
+        # pass
+        self.up()
 
-    def keyRight(self):
-        self['text'].right()
+    def doEofInternal(self, playing):
+        self.close()
 
-    def keyNumberGlobal(self, number):
+    def __evEOF(self):
+        self.end = True
+
+    def showVideoInfo(self):
+        if self.shown:
+            self.hideInfobar()
+        if self.infoCallback != None:
+            self.infoCallback()
+        return
+
+    def showAfterSeek(self):
+        if isinstance(self, TvInfoBarShowHide):
+            self.doShow()
+    # def keyLeft(self):
+        # self['text'].left()
+
+    # def keyRight(self):
+        # self['text'].right()
+
+    # def keyNumberGlobal(self, number):
         self['text'].number(number)
 
 
@@ -909,11 +963,11 @@ def convert_bouquet(namex):
 
 def main(session, **kwargs):
     if checkInternet():
-        # try:
-            # from Plugins.Extensions.parsatv.Update import upd_done
-            # upd_done()
-        # except:
-            # pass    
+        try:
+            from Plugins.Extensions.parsatv.Update import upd_done
+            upd_done()
+        except:
+            pass    
         session.open(MainParsa)
     else:
         session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
