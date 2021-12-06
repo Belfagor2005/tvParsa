@@ -198,8 +198,7 @@ class MainParsa(Screen):
         self.setTitle(title_plug)
         self['text'] = MainParsaList([])
         self['title'] = Label(title_plug)
-        self['info'] = Label('')
-        self['info'].setText(_('Loading data... Please wait'))
+        self['info'] = Label(_('Loading data... Please wait'))
         self['key_yellow'] = Button(_(''))
         self['key_yellow'].hide()
         self['key_green'] = Button(_('Select'))
@@ -959,7 +958,7 @@ def convert_bouquet(namex):
                     outfile.close()
     message = (_("Bouquet exported"))
     web_info(message)
-    ReloadBouquet()
+    ReloadBouquets()
 
 def main(session, **kwargs):
     if checkInternet():
