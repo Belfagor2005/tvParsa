@@ -10,8 +10,11 @@
 '''
 from __future__ import print_function
 from . import _
-from Components.ActionMap import ActionMap, NumberActionMap
+from Components.ActionMap import ActionMap
+from Components.AVSwitch import AVSwitch
+from Components.ActionMap import ActionMap
 from Components.Button import Button
+from Components.config import *
 from Components.Console import Console as iConsole
 from Components.Label import Label
 from Components.MenuList import MenuList
@@ -26,15 +29,17 @@ from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
 from Screens.Console import Console
 from Screens.InfoBar import MoviePlayer, InfoBar
-from Screens.InfoBarGenerics import *
+# from Screens.InfoBarGenerics import *
+from Screens.InfoBarGenerics import InfoBarMenu, InfoBarSeek, InfoBarAudioSelection, InfoBarMoviePlayerSummarySupport, \
+    InfoBarSubtitleSupport, InfoBarSummarySupport, InfoBarServiceErrorPopupSupport, InfoBarNotifications
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Tools.Directories import *
+from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS, pathExists
 from Tools.Directories import SCOPE_LANGUAGE, fileExists
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 from Tools.LoadPixmap import LoadPixmap
 from enigma import *
-from enigma import RT_HALIGN_LEFT, getDesktop, RT_HALIGN_RIGHT, RT_HALIGN_CENTER
+from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER
 from enigma import eTimer, eListboxPythonMultiContent, eListbox, eConsoleAppContainer, gFont
 from os import path, listdir, remove, mkdir, chmod
 from twisted.web.client import downloadPage, getPage
@@ -57,7 +62,6 @@ downloadparsa = None
 
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
-# from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.parse import quote_plus
 from six.moves.urllib.parse import quote
 
@@ -97,16 +101,16 @@ def ssl_urlopen(url):
     else:
         return urlopen(url)
 
-def remove_line(filename, what):
-    if os.path.isfile(filename):
-        file_read = open(filename).readlines()
-        file_write = open(filename, 'w')
-        for line in file_read:
-            if what not in line:
-                file_write.write(line)
-        file_write.close()
+# def remove_line(filename, what):
+    # if os.path.isfile(filename):
+        # file_read = open(filename).readlines()
+        # file_write = open(filename, 'w')
+        # for line in file_read:
+            # if what not in line:
+                # file_write.write(line)
+        # file_write.close()
 
-currversion = '1.5'
+currversion = '1.6'
 title_plug = 'Parsa TV '
 desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
@@ -118,7 +122,6 @@ if isFHD():
     skin_path=res_plugin_path + 'skins/fhd/'
 else:
     skin_path=res_plugin_path + 'skins/hd/'
-# if os.path.exists('/var/lib/dpkg/status'):
 if DreamOS():
     skin_path=skin_path + 'dreamOs/'
 
@@ -149,11 +152,11 @@ class MainParsaList(MenuList):
 def DListEntry(name, idx):
     res = [name]
     if isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 12), size = (34, 25), png = loadPNG(pngs)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 10), size = (34, 25), png = loadPNG(pngs)))
         res.append(MultiContentEntryText(pos = (60, 0), size = (1900, 50), font = 7, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(pngs)))
-        res.append(MultiContentEntryText(pos = (60, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 10), size=(34, 25), png=loadPNG(pngs)))
+        res.append(MultiContentEntryText(pos = (60, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 class OneSetList(MenuList):
@@ -171,11 +174,11 @@ class OneSetList(MenuList):
 def OneSetListEntry(name):
     res = [name]
     if isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 12), size = (34, 25), png = loadPNG(pngs)))
-        res.append(MultiContentEntryText(pos = (60, 0), size = (1200, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 10), size = (34, 25), png = loadPNG(pngs)))
+        res.append(MultiContentEntryText(pos = (60, 0), size = (1200, 50), font = 7, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 6), size = (34, 25), png = loadPNG(pngs)))
-        res.append(MultiContentEntryText(pos = (60, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT))
+        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 10), size = (34, 25), png = loadPNG(pngs)))
+        res.append(MultiContentEntryText(pos = (60, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 def showlistpars(data, list):
@@ -205,7 +208,7 @@ class MainParsa(Screen):
         self['key_red'] = Button(_('Exit'))
         self["key_blue"] = Button(_(''))
         self['key_blue'].hide()
-        self['actions'] = NumberActionMap(['SetupActions', 'ColorActions', ], {'ok': self.okRun,
+        self['actions'] = ActionMap(['SetupActions', 'ColorActions', ], {'ok': self.okRun,
          'green': self.okRun,
          'back': self.closerm,
          'red': self.closerm,
@@ -264,8 +267,6 @@ class parsatv2(Screen):
         # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
-
-        # if os.path.exists('/var/lib/dpkg/status'):
         if DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
@@ -285,7 +286,7 @@ class parsatv2(Screen):
         self.urls = []
         items = []
         try:
-            content = ReadUrl(url)
+            content = ReadUrl2(url)
             if six.PY3:
                 content = six.ensure_str(content)
             n6 = content.find("<a></a></td>")
@@ -341,7 +342,6 @@ class parsatv3(Screen):
         # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
-        # if os.path.exists('/var/lib/dpkg/status'):
         if DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
@@ -359,7 +359,6 @@ class parsatv3(Screen):
             namex = self.name.lower()
             namex = namex.replace(' ','-')
             namex = namex.strip()
-            # if os.path.exists('/var/lib/dpkg/status'):
             if DreamOS():
                 from Tools.BoundFunction import boundFunction
                 self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2,namex))
@@ -369,7 +368,6 @@ class parsatv3(Screen):
             # make_m3u2(namex)
 
     def convert(self):
-        # self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% self.name, MessageBox.TYPE_YESNO, timeout = 10, default = True)
         self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?\n\nAttention!! Wait more than 5 minutes!!! ")% self.name, MessageBox.TYPE_YESNO, timeout = 10, default = True)
         
     def _gotPageLoad(self):
@@ -388,7 +386,7 @@ class parsatv3(Screen):
         try:
             with open(xxxname, 'w') as e:
                 e.write("#EXTM3U\n")
-                content = ReadUrl('https://www.parsatv.com/m/')
+                content = ReadUrl2('https://www.parsatv.com/m/')
                 if six.PY3:
                     content = six.ensure_str(content)
                 n6 = content.find("<a></a></td>")
@@ -403,9 +401,6 @@ class parsatv3(Screen):
                 n2 = content.find("<td id=", n1)
                 content2 = content[n1:n2]
                 print("showContent22 content2=", content2)
-                #<li><a href="https://www.parsatv.com/m/name=Abadan#ostani"><button class="myButton">Abadan</button></a></li>
-                #<li><a href="https://www.parsatv.com/m/name=Song-TV-Armenia#armenian"><button class="myButton">Song TV</button></a></li>
-                # regexvideo = '<li><a href="(.*?)".*?"myButton">(.*?)</button></a></li>'
                 regexvideo = '<li><a href="(.+?)#.*?"><button.*?myButton">(.+?)</button'
                 match = re.compile(regexvideo,re.DOTALL).findall(content2)
                 print("showContent22 match =", match)
@@ -421,7 +416,7 @@ class parsatv3(Screen):
                         e.write('#EXTINF:-1,' + name1 +'\n')
                         e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                         e.write(url +'\n')
-                        # content = ReadUrl(url)
+                        # content = ReadUrl2(url)
                         # if six.PY3:
                             # content = six.ensure_text(content, "utf-8", "ignore")
                         # # if six.PY3:
@@ -463,9 +458,9 @@ class parsatv3(Screen):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
-        content = ReadUrl(url)
-        # if six.PY3:
-            # content = six.ensure_str(content)
+        content = ReadUrl2(url)
+        if six.PY3:
+            content = six.ensure_str(content)
         # content =convert_to_unicode(content)
         print("parsatv3 B =", content)
         n1 = content.find('class="myButton" id=', 0)
@@ -490,7 +485,6 @@ class parsasport(Screen):
         self.setTitle(title_plug)
         self.list = []
         self.name = 'ParsaSport'
-        # self.url = 'http://www.parsatv.com/m/name=Varzesh-TV#persian'
         self.url2 ='http://www.parsatv.com/streams/fetch/varzeshtv.php'
         self.url ='http://www.parsatv.com/m/'
         self['text'] = OneSetList([])
@@ -502,7 +496,6 @@ class parsasport(Screen):
         # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
-        # if os.path.exists('/var/lib/dpkg/status'):
         if DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
@@ -520,7 +513,6 @@ class parsasport(Screen):
             namex = self.name.lower()
             namex = namex.replace(' ','-')
             namex = namex.strip()
-            # if os.path.exists('/var/lib/dpkg/status'):
             if DreamOS():
                 from Tools.BoundFunction import boundFunction
                 self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2,namex))
@@ -530,7 +522,6 @@ class parsasport(Screen):
 
     def convert(self):
         self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?\n\nAttention!! Wait more than 5 minutes!!! ")% self.name, MessageBox.TYPE_YESNO, timeout = 10, default = True)
-        #self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% self.name, MessageBox.TYPE_YESNO, timeout = 10, default = True)
 
     def _gotPageLoad(self):
         self.names = []
@@ -545,9 +536,9 @@ class parsasport(Screen):
         else:
             xxxname = '/tmp/' + namex + '_conv.m3u'
         try:
-            content = ReadUrl(url)
-            # if six.PY3:
-                # content = six.ensure_str(content)
+            content = ReadUrl2(url)
+            if six.PY3:
+                content = six.ensure_str(content)
             n1 = content.find('<td id="persian">', 0)
             n2 = content.find("</ul></td>", n1)
             content = content[n1:n2]
@@ -588,9 +579,9 @@ class parsasport(Screen):
         name = self.names[idx]
         url = self.urls[idx]
         try:
-            content = ReadUrl(url)
-            # if six.PY3:
-                # content = six.ensure_str(content)
+            content = ReadUrl2(url)
+            if six.PY3:
+                content = six.ensure_str(content)
             # content =convert_to_unicode(content)
             # print("parsasport content B =", content)
             n1 = content.find('class="myButton" id=', 0)
@@ -631,7 +622,6 @@ class parsatv(Screen):
         self["key_blue"] = Button(_(''))
         self['key_blue'].hide()
         self.timer = eTimer()
-        # if os.path.exists('/var/lib/dpkg/status'):
         if DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
@@ -649,7 +639,6 @@ class parsatv(Screen):
             namex = self.name.lower()
             namex = namex.replace(' ','-')
             namex = namex.strip()
-            # if os.path.exists('/var/lib/dpkg/status'):
             if DreamOS():
                 from Tools.BoundFunction import boundFunction
                 self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2,namex))
@@ -673,7 +662,7 @@ class parsatv(Screen):
         else:
             xxxname = '/tmp/' + namex + '_conv.m3u'
         try:
-            content = ReadUrl(url)
+            content = ReadUrl2(url)
             if six.PY3:
                 content = six.ensure_str(content)
             n1 = content.find('<td id="persian">', 0)
@@ -717,9 +706,9 @@ class parsatv(Screen):
         name = self.names[idx]
         url = self.urls[idx]
         try:
-            content = ReadUrl(url)
-            # if six.PY3:
-                # content = six.ensure_str(content)
+            content = ReadUrl2(url)
+            if six.PY3:
+                content = six.ensure_str(content)
             # content =convert_to_unicode(content)
             # print("parsatv content B =", content)
             n1 = content.find('class="myButton" id=', 0)
@@ -735,7 +724,107 @@ class parsatv(Screen):
             print('error: ')
             pass
 
-class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
+class TvInfoBarShowHide():
+    """ InfoBar show/hide control, accepts toggleShow and hide actions, might start
+    fancy animations. """
+    STATE_HIDDEN = 0
+    STATE_HIDING = 1
+    STATE_SHOWING = 2
+    STATE_SHOWN = 3
+    skipToggleShow = False
+
+    def __init__(self):
+        self["ShowHideActions"] = ActionMap(["InfobarShowHideActions"], {"toggleShow": self.OkPressed,
+         "hide": self.hide}, 0)
+        self.__event_tracker = ServiceEventTracker(screen=self, eventmap={iPlayableService.evStart: self.serviceStarted})
+        self.__state = self.STATE_SHOWN
+        self.__locked = 0
+        self.hideTimer = eTimer()
+        try:
+            self.hideTimer_conn = self.hideTimer.timeout.connect(self.doTimerHide)
+        except:
+            self.hideTimer.callback.append(self.doTimerHide)
+        self.hideTimer.start(5000, True)
+        self.onShow.append(self.__onShow)
+        self.onHide.append(self.__onHide)
+
+    def OkPressed(self):
+        self.toggleShow()
+
+    def toggleShow(self):
+        if self.skipToggleShow:
+            self.skipToggleShow = False
+            return
+        if self.__state == self.STATE_HIDDEN:
+            self.show()
+            self.hideTimer.stop()
+        else:
+            self.hide()
+            self.startHideTimer()
+
+    def serviceStarted(self):
+        if self.execing:
+            if config.usage.show_infobar_on_zap.value:
+
+                self.doShow()
+
+    def __onShow(self):
+        self.__state = self.STATE_SHOWN
+        self.startHideTimer()
+
+    def startHideTimer(self):
+        if self.__state == self.STATE_SHOWN and not self.__locked:
+            self.hideTimer.stop()
+            idx = config.usage.infobar_timeout.index
+            if idx:
+                self.hideTimer.start(idx * 1500, True)
+
+    def __onHide(self):
+        self.__state = self.STATE_HIDDEN
+
+    def doShow(self):
+        self.hideTimer.stop()
+        self.show()
+        self.startHideTimer()
+
+    def doTimerHide(self):
+        self.hideTimer.stop()
+        if self.__state == self.STATE_SHOWN:
+            self.hide()
+    def lockShow(self):
+        try:
+            self.__locked += 1
+        except:
+            self.__locked = 0
+        if self.execing:
+            self.show()
+            self.hideTimer.stop()
+            self.skipToggleShow = False
+
+    def unlockShow(self):
+        try:
+            self.__locked -= 1
+        except:
+            self.__locked = 0
+        if self.__locked < 0:
+            self.__locked = 0
+        if self.execing:
+            self.startHideTimer()
+
+    def debug(obj, text = ""):
+        print(text + " %s\n" % obj)
+
+# class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
+class Playgo(
+    InfoBarBase,
+    InfoBarMenu,
+    InfoBarSeek,
+    InfoBarAudioSelection,
+    InfoBarSubtitleSupport,
+    InfoBarNotifications,
+    TvInfoBarShowHide,
+    Screen
+):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
@@ -743,99 +832,195 @@ class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications
     ALLOW_SUSPEND = True
     screen_timeout = 5000
     def __init__(self, session, name, url):
+        global SREF, streaml
         Screen.__init__(self, session)
+        self.session = session
+        global _session
+        _session = session
         self.skinName = 'MoviePlayer'
         title = name
-        InfoBarMenu.__init__(self)
-        InfoBarNotifications.__init__(self)
-        InfoBarBase.__init__(self)
-        InfoBarShowHide.__init__(self)
-        self['actions'] = ActionMap(['WizardActions',
-         'MoviePlayerActions',
+        streaml = False
+
+        for x in InfoBarBase, \
+                InfoBarMenu, \
+                InfoBarSeek, \
+                InfoBarAudioSelection, \
+                InfoBarSubtitleSupport, \
+                InfoBarNotifications, \
+                TvInfoBarShowHide:
+            x.__init__(self)
+        try:
+            self.init_aspect = int(self.getAspect())
+        except:
+            self.init_aspect = 0
+        self.new_aspect = self.init_aspect
+        self['actions'] = ActionMap(['MoviePlayerActions',
+         'MovieSelectionActions',
+         'MediaPlayerActions',
          'EPGSelectActions',
          'MediaPlayerSeekActions',
+         'SetupActions',
          'ColorActions',
          'InfobarShowHideActions',
-         'InfobarActions'], {'leavePlayer': self.cancel,
+         'InfobarActions',
+         'InfobarSeekActions'], {'leavePlayer': self.cancel,
+         'epg': self.showIMDB,
+         'info': self.showinfo,
+         # 'info': self.cicleStreamType,
+         'tv': self.cicleStreamType,
+         'stop': self.leavePlayer,
+         'cancel': self.cancel,
          'back': self.cancel}, -1)
         self.allowPiP = False
-        InfoBarSeek.__init__(self, actionmap='MediaPlayerSeekActions')
+        # InfoBarSeek.__init__(self, ActionMap='InfobarSeekActions')
         self.service = None
         service = None
-        self.url = url.replace(':', '%3a').replace(' ','%20')
-        self.icount = 0
+        self.url = url
+        self.pcip = 'None'
         self.name = decodeHtml(name)
         self.state = self.STATE_PLAYING
-        self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
-        self.onLayoutFinish.append(self.openTest)
+        SREF = self.session.nav.getCurrentlyPlayingServiceReference()
+        if '8088' in str(self.url):
+            # self.onLayoutFinish.append(self.slinkPlay)
+            self.onFirstExecBegin.append(self.slinkPlay)
+        else:
+            # self.onLayoutFinish.append(self.cicleStreamType)
+            self.onFirstExecBegin.append(self.cicleStreamType)
         self.onClose.append(self.cancel)
 
-    def openTest(self):
-        url = self.url
-        name = self.name
-        print("Here in Playgo name A =", name)
-        name = name.replace(":", "-").replace("&", "-").replace("›", "-")
-        name = name.replace(" ", "-").replace("/", "-").replace(",", "-")
-        if url is not None:
-            ref = "4097:0:0:0:0:0:0:0:0:0:{0}:{1}".format(url.replace(":", "%3A"), name.replace(":", "%3A"))
-            print('final reference:   ', ref)
-            sref = eServiceReference(ref)
-            sref.setName(name)
-            self.session.nav.stopService()
-            self.session.nav.playService(sref)
+    def getAspect(self):
+        return AVSwitch().getAspectRatioSetting()
+
+    def getAspectString(self, aspectnum):
+        return {0: _('4:3 Letterbox'),
+         1: _('4:3 PanScan'),
+         2: _('16:9'),
+         3: _('16:9 always'),
+         4: _('16:10 Letterbox'),
+         5: _('16:10 PanScan'),
+         6: _('16:9 Letterbox')}[aspectnum]
+
+    def setAspect(self, aspect):
+        map = {0: '4_3_letterbox',
+         1: '4_3_panscan',
+         2: '16_9',
+         3: '16_9_always',
+         4: '16_10_letterbox',
+         5: '16_10_panscan',
+         6: '16_9_letterbox'}
+        config.av.aspectratio.setValue(map[aspect])
+        try:
+            AVSwitch().setAspectRatio(aspect)
+        except:
+            pass
+
+    def av(self):
+        temp = int(self.getAspect())
+        temp = temp + 1
+        if temp > 6:
+            temp = 0
+        self.new_aspect = temp
+        self.setAspect(temp)
+
+    def showinfo(self):
+        debug = True
+        sTitle = ''
+        sServiceref = ''
+        try:
+            servicename, serviceurl = getserviceinfo(sref)
+            if servicename != None:
+                sTitle = servicename
+            else:
+                sTitle = ''
+            if serviceurl != None:
+                sServiceref = serviceurl
+            else:
+                sServiceref = ''
+            currPlay = self.session.nav.getCurrentService()
+            sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
+            sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
+            sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
+            message = 'stitle:' + str(sTitle) + '\n' + 'sServiceref:' + str(sServiceref) + '\n' + 'sTagCodec:' + str(sTagCodec) + '\n' + 'sTagVideoCodec:' + str(sTagVideoCodec) + '\n' + 'sTagAudioCodec : ' + str(sTagAudioCodec)
+            self.mbox = self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
+        except:
+            pass
+        return
+
+    def showIMDB(self):
+        TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
+        IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
+        if os.path.exists(TMDB):
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text_clear = self.name
+            text = charRemove(text_clear)
+            self.session.open(TMBD, text, False)
+        elif os.path.exists(IMDb):
+            from Plugins.Extensions.IMDb.plugin import IMDB
+            text_clear = self.name
+            text = charRemove(text_clear)
+            HHHHH = text
+            self.session.open(IMDB, HHHHH)
+
         else:
-           return        
+            text_clear = self.name
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
-    # def openTest(self):
-        # url = self.url
-        # name = self.name
-        # print("Here in Playgo name A =", name)
-        # name = name.replace(":", "-").replace("&", "-").replace("›", "-")
-        # name = name.replace(" ", "-").replace("/", "-").replace(",", "-")
-
-        # print("Here in Playgo name B2 =", name)
-        # if url is not None:
-            # url = str(url)
-            # url = url.replace(":", "%3a")
-            # url = url.replace("\\", "/")
-            # print("Playgo url final= ", url)
-            # ref = "4097:0:1:0:0:0:0:0:0:0:" + url
-            # print("Playgo ref= ", ref)
-            # sref = eServiceReference(ref)
-            # sref.setName(self.name)
-            # self.session.nav.stopService()
-            # self.session.nav.playService(sref)
-        # else:
-           # return
-
-    def openTestx(self):
-        url = self.url
+    def slinkPlay(self, url):
         name = self.name
-        print("Here in Playgo name A =", name)
-        name = name.replace(":", "-").replace("&", "-").replace("›", "-")
-        name = name.replace(" ", "-").replace("/", "-").replace(",", "-")
-        if url is not None:
-            ref = "4097:0:0:0:0:0:0:0:0:0:{0}:{1}".format(url.replace(":", "%3A"), name.replace(":", "%3A"))
-            print('final reference:   ', ref)
-            sref = eServiceReference(ref)
-            sref.setName(name)
-            self.session.nav.stopService()
-            self.session.nav.playService(sref)
-        else:
-           return    
-
-    def cancel(self):
-        if os.path.exists('/tmp/hls.avi'):
-            os.remove('/tmp/hls.avi')
+        ref = "{0}:{1}".format(url.replace(":", "%3A"), name.replace(":", "%3A"))
+        print('final reference:   ', ref)
+        sref = eServiceReference(ref)
+        sref.setName(name)
         self.session.nav.stopService()
-        self.session.nav.playService(self.srefOld)
-        self.close()
-        
+        self.session.nav.playService(sref)
+
+    def openTest(self, servicetype, url):
+        name = self.name
+        ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
+        print('reference:   ', ref)
+        if streaml == True:
+            url = 'http://127.0.0.1:8088/' + str(url)
+            ref = "{0}:0:1:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
+            print('streaml reference:   ', ref)
+        print('final reference:   ', ref)
+        sref = eServiceReference(ref)
+        sref.setName(name)
+        self.session.nav.stopService()
+        self.session.nav.playService(sref)
+
+    def cicleStreamType(self):
+        global streml
+        streaml = False
+        from itertools import cycle, islice
+        self.servicetype = '4097'
+        print('servicetype1: ', self.servicetype)
+        url = str(self.url)
+        currentindex = 0
+        streamtypelist = ["4097"]
+        # if "youtube" in str(self.url):
+            # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
+            # return
+        if isStreamlinkAvailable():
+            streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+            streaml = True
+        if os.path.exists("/usr/bin/gstplayer"):
+            streamtypelist.append("5001")
+        if os.path.exists("/usr/bin/exteplayer3"):
+            streamtypelist.append("5002")
+        if os.path.exists("/usr/bin/apt-get"):
+            streamtypelist.append("8193")
+        for index, item in enumerate(streamtypelist, start=0):
+            if str(item) == str(self.servicetype):
+                currentindex = index
+                break
+        nextStreamType = islice(cycle(streamtypelist), currentindex + 1, None)
+        self.servicetype = str(next(nextStreamType))
+        print('servicetype2: ', self.servicetype)
+        self.openTest(self.servicetype, url)
     def up(self):
         pass
 
     def down(self):
-        # pass
         self.up()
 
     def doEofInternal(self, playing):
@@ -854,16 +1039,22 @@ class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications
     def showAfterSeek(self):
         if isinstance(self, TvInfoBarShowHide):
             self.doShow()
-    # def keyLeft(self):
-        # self['text'].left()
 
-    # def keyRight(self):
-        # self['text'].right()
+    def cancel(self):
+        if os.path.isfile('/tmp/hls.avi'):
+            os.remove('/tmp/hls.avi')
+        self.session.nav.stopService()
+        self.session.nav.playService(SREF)
+        if not self.new_aspect == self.init_aspect:
+            try:
+                self.setAspect(self.init_aspect)
+            except:
+                pass
+        streaml = False
+        self.close()
 
-    # def keyNumberGlobal(self, number):
-        self['text'].number(number)
-
-
+    def leavePlayer(self):
+        self.close()
 def make_m3u2(namex):
     if checkInternet():
         if os.path.exists(downloadparsa):
@@ -887,13 +1078,29 @@ def make_m3u2(namex):
                         e.write('#EXTINF:-1,' + name +'\n')
                         e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                         # continue
-                    elif line.startswith("http"):
-                        if six.PY3:
-                            line = line.encode()
-
-                        content = ReadUrl(line)
-                        if six.PY3:
-                            content = six.ensure_text(content, "utf-8", "ignore")
+                    if line.startswith("http"):
+                        # if six.PY3:
+                            # line = line.encode()
+                        # content = ReadUrl2(line)
+                        # if six.PY3:
+                            # content = six.ensure_text(content, "utf-8", "ignore")
+                            
+                        if sys.version_info.major == 3:
+                             import urllib.request as urllib2
+                        elif sys.version_info.major == 2:
+                             import urllib2
+                        req = urllib2.Request(line)                      
+                        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+                        r = urllib2.urlopen(req,None,15)
+                        link = r.read()
+                        r.close()
+                        content = link
+                        if str(type(content)).find('bytes') != -1:
+                            try:
+                                content = content.decode("utf-8")                
+                            except Exception as e:                   
+                                   print("Error: %s." % e)                               
+                            
                         print("parsatv content c =", content)
                         n1 = content.find('class="myButton" id=', 0)
                         n2 = content.find("</button></a>", n1)
@@ -907,7 +1114,7 @@ def make_m3u2(namex):
                                     url2 = url2.replace(' ','%20')
                                     print('matchh ', url2)
                                     e.write(url2 +'\n')
-                # e.close()
+                e.close()
             convert_bouquet(namex)
         except Exception as e:
             print('error: ', e)
@@ -959,14 +1166,21 @@ def convert_bouquet(namex):
     message = (_("Bouquet exported"))
     web_info(message)
     ReloadBouquets()
+def checks():
+    from Plugins.Extensions.parsatv.Utils import checkInternet
+    checkInternet()
+    chekin= False
+    if checkInternet():
+        chekin = True
+    return chekin
 
 def main(session, **kwargs):
-    if checkInternet():
+    if checks:
         try:
             from Plugins.Extensions.parsatv.Update import upd_done
             upd_done()
         except:
-            pass    
+            pass
         session.open(MainParsa)
     else:
         session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
@@ -979,8 +1193,7 @@ def StartSetup(menuid, **kwargs):
 
 def Plugins(**kwargs):
     ico_path = 'logo.png'
-    # if not os.path.exists('/var/lib/dpkg/status'):
-    if DreamOS():
+    if not os.path.exists('/var/lib/dpkg/status'):
         ico_path = plugin_path + '/res/pics/logo.png'
     extensions_menu = PluginDescriptor(name = title_plug, description = desc_plugin, where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main, needsRestart = True)
     result = [PluginDescriptor(name = title_plug, description = desc_plugin, where = PluginDescriptor.WHERE_PLUGINMENU, icon = ico_path, fnc = main)]

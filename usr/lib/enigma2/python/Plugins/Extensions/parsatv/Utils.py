@@ -12,27 +12,21 @@ import base64
 # pythonVer = sys.version_info.major
 # PY3 = version_info[0] == 3
 PY3 = sys.version_info.major >= 3
-if PY3:
-    # Python 3
-    PY3 = True; unicode = str; unichr = chr; long = int
-    # str = unicode = basestring = str
-    unichr = chr; long = int
-    from urllib.parse import quote
-    from urllib.request import urlopen
-    from urllib.request import Request
-    from urllib.error import HTTPError, URLError
     
-else:
-    # Python 2
-    _str = str
-    str = unicode
-    range = xrange
-    unicode = unicode
-    basestring = basestring
-    from urllib import quote
-    from urllib2 import urlopen
-    from urllib2 import Request
-    from urllib2 import HTTPError, URLError
+# from urllib.parse import urlparse, urlencode
+# from urllib.request import urlopen, Request
+# from urllib.error import HTTPError
+try:
+    from urllib.parse import urlparse, urlencode
+    from urllib.request import urlopen, Request
+    from urllib.error import HTTPError
+    from urllib.error import URLError
+    # PY3 = True
+except ImportError:
+    from urlparse import urlparse
+    from urllib import urlencode
+    from urllib2 import urlopen, Request, HTTPError, URLError
+    
 
 def getDesktopSize():
     from enigma import getDesktop
@@ -130,6 +124,8 @@ def checkInternet():
 
 def check(url):
     import socket
+    from urllib.error import HTTPError
+    from urllib.error import URLError
     try:
         response = checkStr(urlopen(url, None, 5))
         response.close()
