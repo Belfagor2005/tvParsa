@@ -4,18 +4,16 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             01/12/2021               *
+*             14/12/2021               *
 *       Skin by MMark                  *
 ****************************************
 '''
 from __future__ import print_function
 from . import _
-from Components.ActionMap import ActionMap
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.Button import Button
 from Components.config import *
-from Components.Console import Console as iConsole
 from Components.Label import Label
 from Components.MenuList import MenuList
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
@@ -30,17 +28,18 @@ from Plugins.Plugin import PluginDescriptor
 from Screens.Console import Console
 from Screens.InfoBar import MoviePlayer, InfoBar
 # from Screens.InfoBarGenerics import *
-from Screens.InfoBarGenerics import InfoBarMenu, InfoBarSeek, InfoBarAudioSelection, InfoBarMoviePlayerSummarySupport, \
-    InfoBarSubtitleSupport, InfoBarSummarySupport, InfoBarServiceErrorPopupSupport, InfoBarNotifications
+from Screens.InfoBarGenerics import InfoBarShowHide, InfoBarSubtitleSupport, InfoBarSummarySupport, \
+	InfoBarNumberZap, InfoBarMenu, InfoBarEPG, InfoBarSeek, InfoBarMoviePlayerSummarySupport, \
+	InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS, pathExists
-from Tools.Directories import SCOPE_LANGUAGE, fileExists
+from Tools.Directories import fileExists, pathExists
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 from Tools.LoadPixmap import LoadPixmap
 from enigma import *
 from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER
 from enigma import eTimer, eListboxPythonMultiContent, eListbox, eConsoleAppContainer, gFont
+from enigma import eServiceReference, iPlayableService
 from os import path, listdir, remove, mkdir, chmod
 from twisted.web.client import downloadPage, getPage
 from xml.dom import Node, minidom
@@ -101,29 +100,21 @@ def ssl_urlopen(url):
     else:
         return urlopen(url)
 
-# def remove_line(filename, what):
-    # if os.path.isfile(filename):
-        # file_read = open(filename).readlines()
-        # file_write = open(filename, 'w')
-        # for line in file_read:
-            # if what not in line:
-                # file_write.write(line)
-        # file_write.close()
-
 currversion = '1.6'
 title_plug = 'Parsa TV '
 desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
-plugin_path = os.path.dirname(sys.modules[__name__].__file__)
-res_plugin_path=plugin_path + '/res/'
-pngs=res_plugin_path + 'pics/setting.png'
-pluglogo=res_plugin_path + 'pics/logo.png'
-
+plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('parsatv'))
+pluglogo = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/logo.png".format('parsatv'))
+global path_skin
 if isFHD():
-    skin_path=res_plugin_path + 'skins/fhd/'
+    path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('parsatv'))
+    # path_skin = plugin_path + '/res/skins/fhd/'
 else:
-    skin_path=res_plugin_path + 'skins/hd/'
+    path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('parsatv'))
+    # path_skin = plugin_path + '/res/skins/hd/'
 if DreamOS():
-    skin_path=skin_path + 'dreamOs/'
+    path_skin=path_skin + 'dreamOs/'
+print('parsa path_skin: ', path_skin)
 
 Panel_Dlist = [
  ('PARSA ALL TV'),
@@ -151,6 +142,7 @@ class MainParsaList(MenuList):
 
 def DListEntry(name, idx):
     res = [name]
+    pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting.png".format('parsatv'))
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 10), size = (34, 25), png = loadPNG(pngs)))
         res.append(MultiContentEntryText(pos = (60, 0), size = (1900, 50), font = 7, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
@@ -173,6 +165,7 @@ class OneSetList(MenuList):
 
 def OneSetListEntry(name):
     res = [name]
+    pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting.png".format('parsatv'))
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 10), size = (34, 25), png = loadPNG(pngs)))
         res.append(MultiContentEntryText(pos = (60, 0), size = (1200, 50), font = 7, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
@@ -193,7 +186,7 @@ def showlistpars(data, list):
 class MainParsa(Screen):
     def __init__(self, session):
         self.session = session
-        skin = skin_path + 'settings.xml'
+        skin = path_skin + 'settings.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('MainParsa')
@@ -248,7 +241,7 @@ class MainParsa(Screen):
 class parsatv2(Screen):
     def __init__(self, session):
         self.session = session
-        skin = skin_path + 'settings.xml'
+        skin = path_skin + 'settings.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('ParsaTV')
@@ -324,7 +317,7 @@ class parsatv2(Screen):
 class parsatv3(Screen):
     def __init__(self, session, name, url):
         self.session = session
-        skin = skin_path + 'settings.xml'
+        skin = path_skin + 'settings.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('Parsa TV')
@@ -477,7 +470,7 @@ class parsatv3(Screen):
 class parsasport(Screen):
     def __init__(self, session):
         self.session = session
-        skin = skin_path + 'settings.xml'
+        skin = path_skin + 'settings.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('Parsa TV')
@@ -604,7 +597,7 @@ class parsasport(Screen):
 class parsatv(Screen):
     def __init__(self, session):
         self.session = session
-        skin = skin_path + 'settings.xml'
+        skin = path_skin + 'settings.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('Parsa TV')
