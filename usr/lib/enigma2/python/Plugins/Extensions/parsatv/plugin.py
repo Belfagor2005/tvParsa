@@ -123,30 +123,13 @@ Panel_Dlist = [
  ('PARSA SPORT')
  ]
 
-class MainParsaList(MenuList):
-    def __init__(self, list):
-        MenuList.__init__(self, list, False, eListboxPythonMultiContent)
-        self.l.setFont(0, gFont('Regular', 20))
-        self.l.setFont(1, gFont('Regular', 22))
-        self.l.setFont(2, gFont('Regular', 24))
-        self.l.setFont(3, gFont('Regular', 26))
-        self.l.setFont(4, gFont('Regular', 28))
-        self.l.setFont(5, gFont('Regular', 30))
-        self.l.setFont(6, gFont('Regular', 32))
-        self.l.setFont(7, gFont('Regular', 34))
-        self.l.setFont(8, gFont('Regular', 36))
-        self.l.setFont(9, gFont('Regular', 40))
-        if isFHD():
-            self.l.setItemHeight(50)
-        else:
-            self.l.setItemHeight(50)
 
 def DListEntry(name, idx):
     res = [name]
     png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting.png".format('parsatv'))
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 10), size = (34, 25), png = loadPNG(png)))
-        res.append(MultiContentEntryText(pos = (60, 0), size = (1900, 50), font = 7, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryText(pos = (60, 0), size = (1900, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 10), size=(34, 25), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos = (60, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
@@ -161,7 +144,7 @@ class OneSetList(MenuList):
             self.l.setFont(0, gFont('Regular', textfont))
         else:
             self.l.setItemHeight(50)
-            textfont = int(22)
+            textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
 
 def OneSetListEntry(name):
@@ -169,7 +152,7 @@ def OneSetListEntry(name):
     png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting.png".format('parsatv'))
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 10), size = (34, 25), png = loadPNG(png)))
-        res.append(MultiContentEntryText(pos = (60, 0), size = (1200, 50), font = 7, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryText(pos = (60, 0), size = (1200, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 10), size = (34, 25), png = loadPNG(png)))
         res.append(MultiContentEntryText(pos = (60, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
@@ -193,7 +176,7 @@ class MainParsa(Screen):
         self.setup_title = ('MainParsa')
         Screen.__init__(self, session)
         self.setTitle(title_plug)
-        self['text'] = MainParsaList([])
+        self['text'] = OneSetList([])
         self['title'] = Label(title_plug)
         self['info'] = Label(_('Loading data... Please wait'))
         self['key_yellow'] = Button(_(''))
