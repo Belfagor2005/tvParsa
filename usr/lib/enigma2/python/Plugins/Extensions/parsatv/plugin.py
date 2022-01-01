@@ -33,7 +33,6 @@ from Screens.InfoBarGenerics import InfoBarShowHide, InfoBarSubtitleSupport, Inf
 	InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Tools.Directories import fileExists, pathExists
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 from Tools.LoadPixmap import LoadPixmap
 from enigma import *
@@ -59,11 +58,24 @@ global pngs
 global downloadparsa
 downloadparsa = None
 
-from six.moves.urllib.request import urlopen
-from six.moves.urllib.request import Request
-from six.moves.urllib.parse import quote_plus
-from six.moves.urllib.parse import quote
-
+PY3 = sys.version_info.major >= 3
+if PY3:
+        import http.client
+        from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
+        from urllib.error import URLError, HTTPError
+        from urllib.request import urlopen, Request
+        from urllib.parse import urlparse
+        from urllib.parse import parse_qs, urlencode
+        unicode = str; unichr = chr; long = int
+        PY3 = True
+else:
+# if os.path.exists('/usr/lib/python2.7'):
+        from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
+        from urllib2 import urlopen, Request, URLError, HTTPError
+        from urlparse import urlparse, parse_qs
+        from urllib import urlencode
+        import httplib
+        import six
 try:
     from Components.UsageConfig import defaultMoviePath
     downloadparsa = defaultMoviePath()
@@ -109,10 +121,8 @@ png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting.png".format
 global path_skin
 if isFHD():
     path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('parsatv'))
-    # path_skin = plugin_path + '/res/skins/fhd/'
 else:
     path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('parsatv'))
-    # path_skin = plugin_path + '/res/skins/hd/'
 if DreamOS():
     path_skin=path_skin + 'dreamOs/'
 print('parsa path_skin: ', path_skin)
@@ -122,18 +132,6 @@ Panel_Dlist = [
  ('PARSA TV CATEGORY'),
  ('PARSA SPORT')
  ]
-
-
-def DListEntry(name, idx):
-    res = [name]
-    png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting.png".format('parsatv'))
-    if isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 10), size = (34, 25), png = loadPNG(png)))
-        res.append(MultiContentEntryText(pos = (60, 0), size = (1900, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 10), size=(34, 25), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos = (60, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    return res
 
 class OneSetList(MenuList):
     def __init__(self, list):
@@ -146,6 +144,17 @@ class OneSetList(MenuList):
             self.l.setItemHeight(50)
             textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
+
+def DListEntry(name, idx):
+    res = [name]
+    png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting.png".format('parsatv'))
+    if isFHD():
+        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 10), size = (34, 25), png = loadPNG(png)))
+        res.append(MultiContentEntryText(pos = (60, 0), size = (1900, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    else:
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 10), size=(34, 25), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos = (60, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    return res
 
 def OneSetListEntry(name):
     res = [name]
@@ -233,7 +242,6 @@ class parsatv2(Screen):
         self.setTitle(title_plug)
         self.list = []
         self.name = 'Parsa Sport'
-        # self.url = 'http://www.parsatv.com/name=Varzesh-TV#persian'
         self.url = 'https://www.parsatv.com/m/'
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
@@ -393,29 +401,6 @@ class parsatv3(Screen):
                         e.write('#EXTINF:-1,' + name1 +'\n')
                         e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                         e.write(url +'\n')
-                        # content = ReadUrl2(url)
-                        # if six.PY3:
-                            # content = six.ensure_text(content, "utf-8", "ignore")
-                        # # if six.PY3:
-                            # # # content = six.ensure_binary(content)
-                            # # content = content.decode("utf-8")
-                        # # content =convert_to_unicode(content)
-                        # print("parsatv3 content B =", content)
-                        # n1 = content.find('class="myButton" id=', 0)
-                        # n2 = content.find("</button></a>", n1)
-                        # content2 = content[n1:n2]
-                        # # if six.PY3:
-                            # # content2 = content2.decode("utf-8")
-                        # if content2 != None:
-                            # regexvideo = '<a href="(.+?)"><b'
-                            # match = re.compile(regexvideo,re.DOTALL).findall(content2)
-                            # print("parsatv3 match =", match)
-                            # for url2 in match:
-                                # if url2.startswith('http'):
-                                    # url2 = url2.replace(' ','%20')
-                                    # print('matchh ', url2)
-                                    # e.write(url2 +'\n')
-
             #save m3u end
             items.sort()
             for item in items:
@@ -742,7 +727,6 @@ class TvInfoBarShowHide():
     def serviceStarted(self):
         if self.execing:
             if config.usage.show_infobar_on_zap.value:
-
                 self.doShow()
 
     def __onShow(self):
@@ -944,7 +928,7 @@ class Playgo(
 
     def slinkPlay(self, url):
         name = self.name
-        ref = "{0}:{1}".format(url.replace(":", "%3A"), name.replace(":", "%3A"))
+        ref = "{0}:{1}".format(url.replace(":", "%3a"), name.replace(":", "%3a"))
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(name)
@@ -953,11 +937,11 @@ class Playgo(
 
     def openTest(self, servicetype, url):
         name = self.name
-        ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
+        ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3a"), name.replace(":", "%3a"))
         print('reference:   ', ref)
         if streaml == True:
             url = 'http://127.0.0.1:8088/' + str(url)
-            ref = "{0}:0:1:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
+            ref = "{0}:0:1:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3a"), name.replace(":", "%3a"))
             print('streaml reference:   ', ref)
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
@@ -1032,6 +1016,7 @@ class Playgo(
 
     def leavePlayer(self):
         self.close()
+
 def make_m3u2(namex):
     if checkInternet():
         if os.path.exists(downloadparsa):
@@ -1061,7 +1046,6 @@ def make_m3u2(namex):
                         # content = ReadUrl2(line)
                         # if six.PY3:
                             # content = six.ensure_text(content, "utf-8", "ignore")
-                            
                         if sys.version_info.major == 3:
                              import urllib.request as urllib2
                         elif sys.version_info.major == 2:
@@ -1143,6 +1127,7 @@ def convert_bouquet(namex):
     message = (_("Bouquet exported"))
     web_info(message)
     ReloadBouquets()
+
 def checks():
     from Plugins.Extensions.parsatv.Utils import checkInternet
     checkInternet()
