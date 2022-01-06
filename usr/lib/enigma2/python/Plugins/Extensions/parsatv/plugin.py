@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             14/12/2021               *
+*             06/01/2022               *
 *       Skin by MMark                  *
 ****************************************
 '''
@@ -112,17 +112,18 @@ def ssl_urlopen(url):
     else:
         return urlopen(url)
 
+global path_skin
 currversion = '1.6'
 title_plug = 'Parsa TV '
 desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
 plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('parsatv'))
 pluglogo = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/logo.png".format('parsatv'))
 png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting.png".format('parsatv'))
-global path_skin
+path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('parsatv'))
 if isFHD():
     path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('parsatv'))
-else:
-    path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('parsatv'))
+# else:
+    # path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('parsatv'))
 if DreamOS():
     path_skin=path_skin + 'dreamOs/'
 print('parsa path_skin: ', path_skin)
@@ -130,8 +131,7 @@ print('parsa path_skin: ', path_skin)
 Panel_Dlist = [
  ('PARSA ALL TV'),
  ('PARSA TV CATEGORY'),
- ('PARSA SPORT')
- ]
+ ('PARSA SPORT'),]
 
 class OneSetList(MenuList):
     def __init__(self, list):
@@ -202,6 +202,7 @@ class MainParsa(Screen):
         self.onLayoutFinish.append(self.updateMenuList)
 
     def closerm(self):
+        deletetmp()
         self.close()
 
     def updateMenuList(self):
