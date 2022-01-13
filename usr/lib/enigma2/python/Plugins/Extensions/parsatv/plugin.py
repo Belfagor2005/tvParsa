@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             06/01/2022               *
+*             13/01/2022               *
 *       Skin by MMark                  *
 ****************************************
 '''
@@ -299,7 +299,7 @@ class parsatv2(Screen):
             self['info'].setText(_('Please select ...'))
             showlistpars(self.names, self['text'])
         except Exception as e:
-            print('error parsatv2', e)
+            print('error parsatv2', str(e))
 
     def okRun(self):
         idx = self["text"].getSelectionIndex()
@@ -415,7 +415,7 @@ class parsatv3(Screen):
             print('-------------parsatv-------------')
 
         except Exception as e:
-            print('errorc ', e)
+            print('error ', str(e))
 
     def okRun(self):
         idx = self["text"].getSelectionIndex()
@@ -535,7 +535,7 @@ class parsasport(Screen):
             print('-------------sport-------------')
 
         except Exception as e:
-            print('errorc ', e)
+            print('error ', str(e))
 
     def okRun(self):
         idx = self["text"].getSelectionIndex()
@@ -560,9 +560,8 @@ class parsasport(Screen):
                 print("getVideos15 name =", name)
                 print("getVideos15 url =", url)
                 self.session.open(Playgo, name, url)
-        except:
-            print('error: ')
-            pass
+        except Exception as e:
+            print('error ', str(e))
 
 class parsatv(Screen):
     def __init__(self, session):
@@ -662,7 +661,7 @@ class parsatv(Screen):
             print('-------------parsatv-------------')
 
         except Exception as e:
-            print('errorc ', e)
+            print('error ', str(e))
 
     def okRun(self):
         idx = self["text"].getSelectionIndex()
@@ -683,9 +682,8 @@ class parsatv(Screen):
             for url in match:
                 name = name
                 self.session.open(Playgo, name, url)
-        except:
-            print('error: ')
-            pass
+        except Exception as e:
+            print('error ', str(e))
 
 class TvInfoBarShowHide():
     """ InfoBar show/hide control, accepts toggleShow and hide actions, might start
@@ -1061,7 +1059,7 @@ def make_m3u2(namex):
                             try:
                                 content = content.decode("utf-8")                
                             except Exception as e:                   
-                                   print("Error: %s." % e)                               
+                                   print("Error: ", str(e))                               
                             
                         print("parsatv content c =", content)
                         n1 = content.find('class="myButton" id=', 0)
@@ -1079,7 +1077,7 @@ def make_m3u2(namex):
                 e.close()
             convert_bouquet(namex)
         except Exception as e:
-            print('error: ', e)
+            print('error ', str(e))
 
 def convert_bouquet(namex):
     if os.path.exists(downloadparsa):
