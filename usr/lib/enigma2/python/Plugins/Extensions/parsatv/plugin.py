@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             13/01/2022               *
+*             14/01/2022               *
 *       Skin by MMark                  *
 ****************************************
 '''
@@ -122,8 +122,6 @@ png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting.png".format
 path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('parsatv'))
 if isFHD():
     path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('parsatv'))
-# else:
-    # path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('parsatv'))
 if DreamOS():
     path_skin=path_skin + 'dreamOs/'
 print('parsa path_skin: ', path_skin)
