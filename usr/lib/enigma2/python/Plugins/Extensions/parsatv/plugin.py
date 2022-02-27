@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             25/01/2022               *
+*             05/02/2022               *
 *       Skin by MMark                  *
 ****************************************
 '''
@@ -118,7 +118,7 @@ title_plug = 'Parsa TV '
 desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
 plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('parsatv'))
 pluglogo = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/logo.png".format('parsatv'))
-png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting.png".format('parsatv'))
+png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
 path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('parsatv'))
 if isFHD():
     path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('parsatv'))
@@ -134,32 +134,59 @@ Panel_Dlist = [
 class OneSetList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
-        self.l.setItemHeight(50)
-        textfont = int(24)
-        self.l.setFont(0, gFont('Regular', textfont))        
+
         if isFHD():
             self.l.setItemHeight(50)
             textfont = int(34)
             self.l.setFont(0, gFont('Regular', textfont))
+        else:
+            self.l.setItemHeight(50)
+            textfont = int(24)
+            self.l.setFont(0, gFont('Regular', textfont))                
 
 def DListEntry(name, idx):
     res = [name]
-    png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting.png".format('parsatv'))
-    res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
-    res.append(MultiContentEntryText(pos = (60, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
+    # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))  
+    
+    if 'radio' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('parsatv'))
+    elif 'webcam' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('parsatv'))
+    elif 'music' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('parsatv'))
+    elif 'sport' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('parsatv'))
+    else:
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
+        
     if isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 12), size = (34, 25), png = loadPNG(png)))
-        res.append(MultiContentEntryText(pos = (60, 0), size = (1900, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 7), size = (50, 37), png = loadPNG(png)))
+        res.append(MultiContentEntryText(pos = (70, 0), size = (1900, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    else:    
+
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 37), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos = (70, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))  
     return res
 
 def OneSetListEntry(name):
     res = [name]
-    png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting.png".format('parsatv'))
-    res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 12), size = (34, 25), png = loadPNG(png)))
-    res.append(MultiContentEntryText(pos = (60, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
+    # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
+    if 'radio' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('parsatv'))
+    elif 'webcam' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('parsatv'))
+    elif 'music' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('parsatv'))
+    elif 'sport' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('parsatv'))
+    else:
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
     if isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 12), size = (34, 25), png = loadPNG(png)))
-        res.append(MultiContentEntryText(pos = (60, 0), size = (1200, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 7), size = (50, 37), png = loadPNG(png)))
+        res.append(MultiContentEntryText(pos = (70, 0), size = (1200, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    else:    
+        res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 7), size = (50, 37), png = loadPNG(png)))
+        res.append(MultiContentEntryText(pos = (70, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))        
     return res
 
 def showlistpars(data, list):
@@ -239,6 +266,7 @@ class parsatv2(Screen):
         self.list = []
         self.name = 'Parsa Sport'
         self.url = 'https://www.parsatv.com/m/'
+        self['title'] = Label(title_plug)        
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self['key_green'] = Button(_('Select'))
@@ -253,7 +281,6 @@ class parsatv2(Screen):
         else:
             self.timer.callback.append(self._gotPageLoad)
         self.timer.start(1500, True)
-        self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
          'green': self.okRun,
          'red': self.close,
@@ -314,6 +341,7 @@ class parsatv3(Screen):
         self.list = []
         self.name = name
         self.url = url
+        self['title'] = Label(title_plug)        
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self['key_green'] = Button(_('Play'))
@@ -328,7 +356,6 @@ class parsatv3(Screen):
         else:
             self.timer.callback.append(self._gotPageLoad)
         self.timer.start(1500, True)
-        self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
          'green': self.okRun,
          'red': self.close,
@@ -795,7 +822,14 @@ class Playgo(
         self.skinName = 'MoviePlayer'
         title = name
         streaml = False
-
+        self.allowPiP = False
+        # InfoBarSeek.__init__(self, ActionMap='InfobarSeekActions')
+        self.service = None
+        service = None
+        self.url = url
+        self.pcip = 'None'
+        self.name = decodeHtml(name)
+        self.state = self.STATE_PLAYING
         for x in InfoBarBase, \
                 InfoBarMenu, \
                 InfoBarSeek, \
@@ -809,6 +843,7 @@ class Playgo(
         except:
             self.init_aspect = 0
         self.new_aspect = self.init_aspect
+        SREF = self.session.nav.getCurrentlyPlayingServiceReference()        
         self['actions'] = ActionMap(['MoviePlayerActions',
          'MovieSelectionActions',
          'MediaPlayerActions',
@@ -826,15 +861,8 @@ class Playgo(
          'stop': self.leavePlayer,
          'cancel': self.cancel,
          'back': self.cancel}, -1)
-        self.allowPiP = False
-        # InfoBarSeek.__init__(self, ActionMap='InfobarSeekActions')
-        self.service = None
-        service = None
-        self.url = url
-        self.pcip = 'None'
-        self.name = decodeHtml(name)
-        self.state = self.STATE_PLAYING
-        SREF = self.session.nav.getCurrentlyPlayingServiceReference()
+
+
         if '8088' in str(self.url):
             # self.onLayoutFinish.append(self.slinkPlay)
             self.onFirstExecBegin.append(self.slinkPlay)
