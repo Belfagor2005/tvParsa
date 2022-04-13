@@ -324,6 +324,10 @@ class parsatv2(Screen):
             print('error parsatv2', str(e))
 
     def okRun(self):
+        i = len(self.names)
+        print('iiiiii= ',i)
+        if i < 1:
+            return
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
@@ -440,6 +444,10 @@ class parsatv3(Screen):
             print('error ', str(e))
 
     def okRun(self):
+        i = len(self.names)
+        print('iiiiii= ',i)
+        if i < 1:
+            return
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
@@ -560,6 +568,10 @@ class parsasport(Screen):
             print('error ', str(e))
 
     def okRun(self):
+        i = len(self.names)
+        print('iiiiii= ',i)
+        if i < 1:
+            return
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
@@ -686,6 +698,10 @@ class parsatv(Screen):
             print('error ', str(e))
 
     def okRun(self):
+        i = len(self.names)
+        print('iiiiii= ',i)
+        if i < 1:
+            return
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
