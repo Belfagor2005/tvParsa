@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             05/02/2022               *
+*             25/04/2022               *
 *       Skin by MMark                  *
 ****************************************
 '''
@@ -50,10 +50,8 @@ import shutil
 import six
 import ssl
 import sys
-try:
-    from Plugins.Extensions.parsatv.Utils import *
-except:
-    from . import Utils
+
+from . import Utils
 global pngs
 global downloadparsa
 downloadparsa = None
@@ -120,9 +118,9 @@ plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('parsatv'))
 pluglogo = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/logo.png".format('parsatv'))
 png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
 path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('parsatv'))
-if isFHD():
+if Utils.isFHD():
     path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('parsatv'))
-if DreamOS():
+if Utils.DreamOS():
     path_skin=path_skin + 'dreamOs/'
 print('parsa path_skin: ', path_skin)
 
@@ -134,8 +132,7 @@ Panel_Dlist = [
 class OneSetList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
-
-        if isFHD():
+        if Utils.isFHD():
             self.l.setItemHeight(50)
             textfont = int(34)
             self.l.setFont(0, gFont('Regular', textfont))
@@ -147,23 +144,20 @@ class OneSetList(MenuList):
 def DListEntry(name, idx):
     res = [name]
     # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))  
-    
     if 'radio' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('parsatv'))
     elif 'webcam' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('parsatv'))
     elif 'music' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('parsatv'))
-    elif 'sport' in name.lower():
+    elif 'spor' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('parsatv'))
     else:
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
-        
-    if isFHD():
+    if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 7), size = (50, 37), png = loadPNG(png)))
         res.append(MultiContentEntryText(pos = (70, 0), size = (1900, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:    
-
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 37), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos = (70, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))  
     return res
@@ -181,7 +175,7 @@ def OneSetListEntry(name):
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('parsatv'))
     else:
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
-    if isFHD():
+    if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 7), size = (50, 37), png = loadPNG(png)))
         res.append(MultiContentEntryText(pos = (70, 0), size = (1200, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:    
@@ -210,6 +204,7 @@ class MainParsa(Screen):
         self['text'] = OneSetList([])
         self['title'] = Label(title_plug)
         self['info'] = Label(_('Loading data... Please wait'))
+        self["paypal"] = Label()
         self['key_yellow'] = Button(_(''))
         self['key_yellow'].hide()
         self['key_green'] = Button(_('Select'))
@@ -222,9 +217,21 @@ class MainParsa(Screen):
          'red': self.closerm,
          'cancel': self.closerm}, -1)
         self.onLayoutFinish.append(self.updateMenuList)
+        self.onLayoutFinish.append(self.layoutFinished)
 
+    def paypal2(self):
+        conthelp = "If you like what I do you\n"
+        conthelp += " can contribute with a coffee\n\n"
+        conthelp += "scan the qr code and donate € 1.00"
+        return conthelp
+    
+    def layoutFinished(self):
+        paypal = self.paypal2()
+        self["paypal"].setText(paypal)    
+        self.setTitle(self.setup_title) 
+        
     def closerm(self):
-        deletetmp()
+        Utils.deletetmp()
         self.close()
 
     def updateMenuList(self):
@@ -269,6 +276,7 @@ class parsatv2(Screen):
         self['title'] = Label(title_plug)        
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
+        self["paypal"] = Label()
         self['key_green'] = Button(_('Select'))
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button('')
@@ -276,7 +284,7 @@ class parsatv2(Screen):
         # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
-        if DreamOS():
+        if Utils.DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
@@ -286,7 +294,19 @@ class parsatv2(Screen):
          'red': self.close,
          # 'yellow': self.convert,
          'cancel': self.close}, -2)
+        self.onLayoutFinish.append(self.layoutFinished)
 
+    def paypal2(self):
+        conthelp = "If you like what I do you\n"
+        conthelp += " can contribute with a coffee\n\n"
+        conthelp += "scan the qr code and donate € 1.00"
+        return conthelp
+    
+    def layoutFinished(self):
+        paypal = self.paypal2()
+        self["paypal"].setText(paypal)    
+        self.setTitle(self.setup_title)
+        
     def _gotPageLoad(self):
         url = self.url
         name = self.name
@@ -294,7 +314,7 @@ class parsatv2(Screen):
         self.urls = []
         items = []
         try:
-            content = ReadUrl2(url)
+            content = Utils.ReadUrl2(url)
             if six.PY3:
                 content = six.ensure_str(content)
             n6 = content.find("<a></a></td>")
@@ -348,6 +368,7 @@ class parsatv3(Screen):
         self['title'] = Label(title_plug)        
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
+        self["paypal"] = Label()
         self['key_green'] = Button(_('Play'))
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button(_('Convert'))
@@ -355,7 +376,7 @@ class parsatv3(Screen):
         # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
-        if DreamOS():
+        if Utils.DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
@@ -365,13 +386,25 @@ class parsatv3(Screen):
          'red': self.close,
          'yellow': self.convert,
          'cancel': self.close}, -2)
+        self.onLayoutFinish.append(self.layoutFinished)
 
+    def paypal2(self):
+        conthelp = "If you like what I do you\n"
+        conthelp += " can contribute with a coffee\n\n"
+        conthelp += "scan the qr code and donate € 1.00"
+        return conthelp
+    
+    def layoutFinished(self):
+        paypal = self.paypal2()
+        self["paypal"].setText(paypal)    
+        self.setTitle(self.setup_title)
+        
     def convert2(self, result):
         if result:
             namex = self.name.lower()
             namex = namex.replace(' ','-')
             namex = namex.strip()
-            if DreamOS():
+            if Utils.DreamOS():
                 from Tools.BoundFunction import boundFunction
                 self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2,namex))
             else:
@@ -398,7 +431,7 @@ class parsatv3(Screen):
         try:
             with open(xxxname, 'w') as e:
                 e.write("#EXTM3U\n")
-                content = ReadUrl2('https://www.parsatv.com/m/')
+                content = Utils.ReadUrl2('https://www.parsatv.com/m/')
                 if six.PY3:
                     content = six.ensure_str(content)
                 n6 = content.find("<a></a></td>")
@@ -451,7 +484,7 @@ class parsatv3(Screen):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
-        content = ReadUrl2(url)
+        content = Utils.ReadUrl2(url)
         if six.PY3:
             content = six.ensure_str(content)
         # content =convert_to_unicode(content)
@@ -482,6 +515,7 @@ class parsasport(Screen):
         self.url ='http://www.parsatv.com/m/'
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
+        self["paypal"] = Label()
         self['key_green'] = Button(_('Play'))
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button(_('Convert'))
@@ -489,7 +523,7 @@ class parsasport(Screen):
         # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
-        if DreamOS():
+        if Utils.DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
@@ -500,13 +534,25 @@ class parsasport(Screen):
          'red': self.close,
          'yellow': self.convert,
          'cancel': self.close}, -2)
+        self.onLayoutFinish.append(self.layoutFinished)
 
+    def paypal2(self):
+        conthelp = "If you like what I do you\n"
+        conthelp += " can contribute with a coffee\n\n"
+        conthelp += "scan the qr code and donate € 1.00"
+        return conthelp
+    
+    def layoutFinished(self):
+        paypal = self.paypal2()
+        self["paypal"].setText(paypal)    
+        self.setTitle(self.setup_title)
+        
     def convert2(self, result):
         if result:
             namex = self.name.lower()
             namex = namex.replace(' ','-')
             namex = namex.strip()
-            if DreamOS():
+            if Utils.DreamOS():
                 from Tools.BoundFunction import boundFunction
                 self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2,namex))
             else:
@@ -529,7 +575,7 @@ class parsasport(Screen):
         else:
             xxxname = '/tmp/' + namex + '_conv.m3u'
         try:
-            content = ReadUrl2(url)
+            content = Utils.ReadUrl2(url)
             if six.PY3:
                 content = six.ensure_str(content)
             n1 = content.find('<td id="persian">', 0)
@@ -576,7 +622,7 @@ class parsasport(Screen):
         name = self.names[idx]
         url = self.urls[idx]
         try:
-            content = ReadUrl2(url)
+            content = Utils.ReadUrl2(url)
             if six.PY3:
                 content = six.ensure_str(content)
             # content =convert_to_unicode(content)
@@ -611,6 +657,7 @@ class parsatv(Screen):
         self.url = 'https://www.parsatv.com/m/'
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
+        self["paypal"] = Label()
         self['key_green'] = Button(_('Play'))
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button(_('Convert'))
@@ -618,7 +665,7 @@ class parsatv(Screen):
         self["key_blue"] = Button(_(''))
         self['key_blue'].hide()
         self.timer = eTimer()
-        if DreamOS():
+        if Utils.DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
         else:
             self.timer.callback.append(self._gotPageLoad)
@@ -629,13 +676,25 @@ class parsatv(Screen):
          'red': self.close,
          'yellow': self.convert,
          'cancel': self.close}, -2)
+        self.onLayoutFinish.append(self.layoutFinished)
 
+    def paypal2(self):
+        conthelp = "If you like what I do you\n"
+        conthelp += " can contribute with a coffee\n\n"
+        conthelp += "scan the qr code and donate € 1.00"
+        return conthelp
+    
+    def layoutFinished(self):
+        paypal = self.paypal2()
+        self["paypal"].setText(paypal)    
+        self.setTitle(self.setup_title)
+        
     def convert2(self, result):
         if result:
             namex = self.name.lower()
             namex = namex.replace(' ','-')
             namex = namex.strip()
-            if DreamOS():
+            if Utils.DreamOS():
                 from Tools.BoundFunction import boundFunction
                 self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2,namex))
             else:
@@ -658,7 +717,7 @@ class parsatv(Screen):
         else:
             xxxname = '/tmp/' + namex + '_conv.m3u'
         try:
-            content = ReadUrl2(url)
+            content = Utils.ReadUrl2(url)
             if six.PY3:
                 content = six.ensure_str(content)
             n1 = content.find('<td id="persian">', 0)
@@ -706,7 +765,7 @@ class parsatv(Screen):
         name = self.names[idx]
         url = self.urls[idx]
         try:
-            content = ReadUrl2(url)
+            content = Utils.ReadUrl2(url)
             if six.PY3:
                 content = six.ensure_str(content)
             # content =convert_to_unicode(content)
@@ -844,7 +903,7 @@ class Playgo(
         service = None
         self.url = url
         self.pcip = 'None'
-        self.name = decodeHtml(name)
+        self.name = Utils.decodeHtml(name)
         self.state = self.STATE_PLAYING
         for x in InfoBarBase, \
                 InfoBarMenu, \
@@ -951,14 +1010,13 @@ class Playgo(
         if os.path.exists(TMDB):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = self.name
-            text = charRemove(text_clear)
+            text = Utils.charRemove(text_clear)
             self.session.open(TMBD, text, False)
         elif os.path.exists(IMDb):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = self.name
-            text = charRemove(text_clear)
-            HHHHH = text
-            self.session.open(IMDB, HHHHH)
+            text = Utils.charRemove(text_clear)
+            self.session.open(IMDB, text)
 
         else:
             text_clear = self.name
@@ -999,7 +1057,7 @@ class Playgo(
         # if "youtube" in str(self.url):
             # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             # return
-        if isStreamlinkAvailable():
+        if Utils.isStreamlinkAvailable():
             streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
             streaml = True
         if os.path.exists("/usr/bin/gstplayer"):
@@ -1081,7 +1139,7 @@ def make_m3u2(namex):
                     if line.startswith("http"):
                         # if six.PY3:
                             # line = line.encode()
-                        # content = ReadUrl2(line)
+                        # content = Utils.ReadUrl2(line)
                         # if six.PY3:
                             # content = six.ensure_text(content, "utf-8", "ignore")
                         if sys.version_info.major == 3:
@@ -1150,7 +1208,7 @@ def convert_bouquet(namex):
                     desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
         outfile.close()
     message = (_("Wait please... "))
-    web_info(message)
+    Update.web_info(message)
     if os.path.isfile('/etc/enigma2/bouquets.tv'):
         for line in open('/etc/enigma2/bouquets.tv'):
             if parsabouquet in line:
@@ -1163,22 +1221,21 @@ def convert_bouquet(namex):
                     outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % parsabouquet)
                     outfile.close()
     message = (_("Bouquet exported"))
-    web_info(message)
-    ReloadBouquets()
+    Update.web_info(message)
+    Update.ReloadBouquets()
 
 def checks():
-    from Plugins.Extensions.parsatv.Utils import checkInternet
-    checkInternet()
+    from . import Utils
     chekin= False
-    if checkInternet():
+    if Utils.checkInternet():
         chekin = True
     return chekin
 
 def main(session, **kwargs):
     if checks:
         try:
-            from Plugins.Extensions.parsatv.Update import upd_done
-            upd_done()
+            from . import Update
+            Update.upd_done()
         except:
             pass
         session.open(MainParsa)
