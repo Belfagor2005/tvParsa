@@ -1114,7 +1114,8 @@ class Playgo(
         self.close()
 
 def make_m3u2(namex):
-    if checkInternet():
+    from . import Utils
+    if Utils.checkInternet():
         if os.path.exists(downloadparsa):
             xxxname = downloadparsa + str(namex) + '_conv.m3u'
             xxxnamex = downloadparsa + str(namex) + '.m3u'
@@ -1177,6 +1178,7 @@ def make_m3u2(namex):
             print('error ', str(e))
 
 def convert_bouquet(namex):
+    from . import Utils
     if os.path.exists(downloadparsa):
         xxxnamex = str(downloadparsa) + str(namex) + '.m3u'
     else:
@@ -1208,7 +1210,7 @@ def convert_bouquet(namex):
                     desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
         outfile.close()
     message = (_("Wait please... "))
-    Update.web_info(message)
+    Utils.web_info(message)
     if os.path.isfile('/etc/enigma2/bouquets.tv'):
         for line in open('/etc/enigma2/bouquets.tv'):
             if parsabouquet in line:
@@ -1221,18 +1223,13 @@ def convert_bouquet(namex):
                     outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % parsabouquet)
                     outfile.close()
     message = (_("Bouquet exported"))
-    Update.web_info(message)
-    Update.ReloadBouquets()
+    Utils.web_info(message)
+    Utils.ReloadBouquets()
 
-def checks():
-    from . import Utils
-    chekin= False
-    if Utils.checkInternet():
-        chekin = True
-    return chekin
 
 def main(session, **kwargs):
-    if checks:
+    from . import Utils
+    if Utils.checkInternet():
         try:
             from . import Update
             Update.upd_done()
