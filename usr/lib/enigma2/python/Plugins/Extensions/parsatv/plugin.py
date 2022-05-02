@@ -211,6 +211,7 @@ class MainParsa(Screen):
         self['key_red'] = Button(_('Exit'))
         self["key_blue"] = Button(_(''))
         self['key_blue'].hide()
+        self["key_green"].hide()
         self['actions'] = ActionMap(['SetupActions', 'ColorActions', ], {'ok': self.okRun,
          'green': self.okRun,
          'back': self.closerm,
@@ -245,6 +246,7 @@ class MainParsa(Screen):
             self.menu_list.append(x)
             idx += 1
         self['text'].setList(list)
+        self["key_green"].show()
         self['info'].setText(_('Please select ...'))
 
     def okRun(self):
@@ -281,6 +283,7 @@ class parsatv2(Screen):
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button('')
         self["key_blue"] = Button('')
+        self["key_green"].hide()
         # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
@@ -339,6 +342,7 @@ class parsatv2(Screen):
                 self.names.append(name)
                 self.urls.append(url)
             self['info'].setText(_('Please select ...'))
+            self["key_green"].show()
             showlistpars(self.names, self['text'])
         except Exception as e:
             print('error parsatv2', str(e))
@@ -374,6 +378,7 @@ class parsatv3(Screen):
         self['key_yellow'] = Button(_('Convert'))
         self["key_blue"] = Button(_(''))
         # self['key_yellow'].hide()
+        self["key_green"].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
         if Utils.DreamOS():
@@ -470,6 +475,7 @@ class parsatv3(Screen):
                 self.urls.append(url)
             # e.close()
             self['info'].setText(_('Please select ...'))
+            self["key_green"].show()
             showlistpars(self.names, self['text'])
             print('-------------parsatv-------------')
 
@@ -521,6 +527,7 @@ class parsasport(Screen):
         self['key_yellow'] = Button(_('Convert'))
         self["key_blue"] = Button(_(''))
         # self['key_yellow'].hide()
+        self["key_green"].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
         if Utils.DreamOS():
@@ -607,6 +614,7 @@ class parsasport(Screen):
                 self.urls.append(url)
             # e.close()
             self['info'].setText(_('Please select ...'))
+            self["key_green"].show()
             showlistpars(self.names, self['text'])
             print('-------------sport-------------')
 
@@ -664,6 +672,7 @@ class parsatv(Screen):
         # self['key_yellow'].hide()
         self["key_blue"] = Button(_(''))
         self['key_blue'].hide()
+        self["key_green"].hide()
         self.timer = eTimer()
         if Utils.DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
@@ -750,6 +759,7 @@ class parsatv(Screen):
                 self.urls.append(url)
             # e.close()
             self['info'].setText(_('Please select ...'))
+            self["key_green"].show()
             showlistpars(self.names, self['text'])
             print('-------------parsatv-------------')
 
