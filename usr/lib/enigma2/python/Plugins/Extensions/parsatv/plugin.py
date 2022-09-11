@@ -1238,7 +1238,7 @@ def convert_bouquet(namex):
 
 def main(session, **kwargs):
     try:
-        if Utils.zCheckInternet(0):
+        if Utils.zCheckInternet(1):
                 from . import Update
                 Update.upd_done()
                 session.open(MainParsa)
@@ -1250,8 +1250,6 @@ def main(session, **kwargs):
         import traceback
         traceback.print_exc() 
         pass
-        
-
 
 def StartSetup(menuid, **kwargs):
     if menuid == 'mainmenu':
