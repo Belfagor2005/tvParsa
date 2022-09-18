@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 '''
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             25/08/2022               *
+*             10/09/2022               *
 *       Skin by MMark                  *
 ****************************************
 '''
@@ -29,8 +30,8 @@ from Screens.Console import Console
 from Screens.InfoBar import MoviePlayer, InfoBar
 # from Screens.InfoBarGenerics import *
 from Screens.InfoBarGenerics import InfoBarShowHide, InfoBarSubtitleSupport, InfoBarSummarySupport, \
-	InfoBarNumberZap, InfoBarMenu, InfoBarEPG, InfoBarSeek, InfoBarMoviePlayerSummarySupport, \
-	InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications
+    InfoBarNumberZap, InfoBarMenu, InfoBarEPG, InfoBarSeek, InfoBarMoviePlayerSummarySupport, \
+    InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
@@ -50,7 +51,6 @@ import shutil
 import six
 import ssl
 import sys
-
 from . import Utils
 global pngs
 global downloadparsa
@@ -139,11 +139,11 @@ class OneSetList(MenuList):
         else:
             self.l.setItemHeight(50)
             textfont = int(24)
-            self.l.setFont(0, gFont('Regular', textfont))                
+            self.l.setFont(0, gFont('Regular', textfont))
 
 def DListEntry(name, idx):
     res = [name]
-    # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))  
+    # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
     if 'radio' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('parsatv'))
     elif 'webcam' in name.lower():
@@ -157,9 +157,9 @@ def DListEntry(name, idx):
     if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 7), size = (50, 37), png = loadPNG(png)))
         res.append(MultiContentEntryText(pos = (70, 0), size = (1900, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    else:    
+    else:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 37), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos = (70, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))  
+        res.append(MultiContentEntryText(pos = (70, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 def OneSetListEntry(name):
@@ -178,9 +178,9 @@ def OneSetListEntry(name):
     if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 7), size = (50, 37), png = loadPNG(png)))
         res.append(MultiContentEntryText(pos = (70, 0), size = (1200, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    else:    
+    else:
         res.append(MultiContentEntryPixmapAlphaTest(pos = (10, 7), size = (50, 37), png = loadPNG(png)))
-        res.append(MultiContentEntryText(pos = (70, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))        
+        res.append(MultiContentEntryText(pos = (70, 0), size = (1000, 50), font = 0, text = name, color = 0xa6d1fe, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 def showlistpars(data, list):
@@ -225,12 +225,12 @@ class MainParsa(Screen):
         conthelp += " can contribute with a coffee\n\n"
         conthelp += "scan the qr code and donate € 1.00"
         return conthelp
-    
+
     def layoutFinished(self):
         paypal = self.paypal2()
-        self["paypal"].setText(paypal)    
-        self.setTitle(self.setup_title) 
-        
+        self["paypal"].setText(paypal)
+        self.setTitle(self.setup_title)
+
     def closerm(self):
         Utils.deletetmp()
         self.close()
@@ -275,7 +275,7 @@ class parsatv2(Screen):
         self.list = []
         self.name = 'Parsa Sport'
         self.url = 'https://www.parsatv.com/m/'
-        self['title'] = Label(title_plug)        
+        self['title'] = Label(title_plug)
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self["paypal"] = Label()
@@ -304,12 +304,12 @@ class parsatv2(Screen):
         conthelp += " can contribute with a coffee\n\n"
         conthelp += "scan the qr code and donate € 1.00"
         return conthelp
-    
+
     def layoutFinished(self):
         paypal = self.paypal2()
-        self["paypal"].setText(paypal)    
+        self["paypal"].setText(paypal)
         self.setTitle(self.setup_title)
-        
+
     def _gotPageLoad(self):
         url = self.url
         name = self.name
@@ -369,7 +369,7 @@ class parsatv3(Screen):
         self.list = []
         self.name = name
         self.url = url
-        self['title'] = Label(title_plug)        
+        self['title'] = Label(title_plug)
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self["paypal"] = Label()
@@ -398,12 +398,12 @@ class parsatv3(Screen):
         conthelp += " can contribute with a coffee\n\n"
         conthelp += "scan the qr code and donate € 1.00"
         return conthelp
-    
+
     def layoutFinished(self):
         paypal = self.paypal2()
-        self["paypal"].setText(paypal)    
+        self["paypal"].setText(paypal)
         self.setTitle(self.setup_title)
-        
+
     def convert2(self, result):
         if result:
             namex = self.name.lower()
@@ -419,7 +419,7 @@ class parsatv3(Screen):
 
     def convert(self):
         self.session.openWithCallback(self.convert2,MessageBox,_("Do you want to Convert %s to favorite .tv ?\n\nAttention!! Wait more than 5 minutes!!! ")% self.name, MessageBox.TYPE_YESNO, timeout = 10, default = True)
-        
+
     def _gotPageLoad(self):
         self.names = []
         self.urls = []
@@ -466,7 +466,7 @@ class parsatv3(Screen):
                         e.write('#EXTINF:-1,' + name1 +'\n')
                         e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                         e.write(url +'\n')
-            #save m3u end
+            # save m3u end
             items.sort()
             for item in items:
                 name = item.split("###")[0]
@@ -548,12 +548,12 @@ class parsasport(Screen):
         conthelp += " can contribute with a coffee\n\n"
         conthelp += "scan the qr code and donate € 1.00"
         return conthelp
-    
+
     def layoutFinished(self):
         paypal = self.paypal2()
-        self["paypal"].setText(paypal)    
+        self["paypal"].setText(paypal)
         self.setTitle(self.setup_title)
-        
+
     def convert2(self, result):
         if result:
             namex = self.name.lower()
@@ -692,12 +692,12 @@ class parsatv(Screen):
         conthelp += " can contribute with a coffee\n\n"
         conthelp += "scan the qr code and donate € 1.00"
         return conthelp
-    
+
     def layoutFinished(self):
         paypal = self.paypal2()
-        self["paypal"].setText(paypal)    
+        self["paypal"].setText(paypal)
         self.setTitle(self.setup_title)
-        
+
     def convert2(self, result):
         if result:
             namex = self.name.lower()
@@ -745,12 +745,12 @@ class parsatv(Screen):
                         # print("getVideos15 url =", url)
                         item = name1 + "###" + url
                         items.append(item)
-                        #save m3u
+                        # save m3u
                         e.write('#EXTINF:-1,' + name1 +'\n')
                         e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                         e.write(url +'\n')
 
-            #save m3u end
+            # save m3u end
             items.sort()
             for item in items:
                 name = item.split("###")[0]
@@ -881,7 +881,6 @@ class TvInfoBarShowHide():
     def debug(obj, text = ""):
         print(text + " %s\n" % obj)
 
-# class Playgo(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
 class Playgo(
     InfoBarBase,
     InfoBarMenu,
@@ -928,7 +927,7 @@ class Playgo(
         except:
             self.init_aspect = 0
         self.new_aspect = self.init_aspect
-        SREF = self.session.nav.getCurrentlyPlayingServiceReference()        
+        SREF = self.session.nav.getCurrentlyPlayingServiceReference()
         self['actions'] = ActionMap(['MoviePlayerActions',
          'MovieSelectionActions',
          'MediaPlayerActions',
@@ -946,7 +945,6 @@ class Playgo(
          'stop': self.leavePlayer,
          'cancel': self.cancel,
          'back': self.cancel}, -1)
-
 
         if '8088' in str(self.url):
             # self.onLayoutFinish.append(self.slinkPlay)
@@ -1157,7 +1155,7 @@ def make_m3u2(namex):
                              import urllib.request as urllib2
                         elif sys.version_info.major == 2:
                              import urllib2
-                        req = urllib2.Request(line)                      
+                        req = urllib2.Request(line)
                         req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                         r = urllib2.urlopen(req,None,15)
                         link = r.read()
@@ -1165,10 +1163,10 @@ def make_m3u2(namex):
                         content = link
                         if str(type(content)).find('bytes') != -1:
                             try:
-                                content = content.decode("utf-8")                
-                            except Exception as e:                   
-                                   print("Error: ", str(e))                               
-                            
+                                content = content.decode("utf-8")
+                            except Exception as e:
+                                   print("Error: ", str(e))
+
                         print("parsatv content c =", content)
                         n1 = content.find('class="myButton" id=', 0)
                         n2 = content.find("</button></a>", n1)
@@ -1245,10 +1243,10 @@ def main(session, **kwargs):
         else:
             from Screens.MessageBox import MessageBox
             from Tools.Notifications import AddPopup
-            AddPopup(_("Sorry but No Internet :("),MessageBox.TYPE_INFO, 10, 'Sorry')  
+            AddPopup(_("Sorry but No Internet :("),MessageBox.TYPE_INFO, 10, 'Sorry')
     except:
         import traceback
-        traceback.print_exc() 
+        traceback.print_exc()
         pass
 
 def StartSetup(menuid, **kwargs):
