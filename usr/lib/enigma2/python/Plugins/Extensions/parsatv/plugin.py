@@ -20,10 +20,7 @@ from Components.MenuList import MenuList
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
 from Components.Pixmap import Pixmap
 from Components.PluginComponent import plugins
-from Components.ScrollLabel import ScrollLabel
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
-from Components.Sources.List import List
-from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
 from Screens.InfoBar import MoviePlayer
 from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu, InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications
@@ -32,11 +29,9 @@ from Screens.Screen import Screen
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 from Tools.LoadPixmap import LoadPixmap
 from enigma import RT_HALIGN_LEFT, RT_VALIGN_CENTER
-from enigma import eTimer, eListboxPythonMultiContent, eListbox, eConsoleAppContainer, gFont
+from enigma import eTimer, eListboxPythonMultiContent, gFont
 from enigma import eServiceReference, iPlayableService
-from enigma import iServiceInformation
 from enigma import loadPNG
-import base64
 import os
 import re
 import six
@@ -70,7 +65,6 @@ if sys.version_info >= (2, 7, 9):
     except:
         sslContext = None
 try:
-    from OpenSSL import SSL
     from twisted.internet import ssl
     from twisted.internet._sslverify import ClientTLSOptions
     sslverify = True
@@ -202,10 +196,10 @@ class MainParsa(Screen):
         self['key_blue'].hide()
         self["key_green"].hide()
         self['actions'] = ActionMap(['SetupActions', 'ColorActions', ], {'ok': self.okRun,
-                                     'green': self.okRun,
-                                     'back': self.closerm,
-                                     'red': self.closerm,
-                                     'cancel': self.closerm}, -1)
+                                                                         'green': self.okRun,
+                                                                         'back': self.closerm,
+                                                                         'red': self.closerm,
+                                                                         'cancel': self.closerm}, -1)
         self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.layoutFinished)
 
@@ -283,10 +277,10 @@ class parsatv2(Screen):
             self.timer.callback.append(self._gotPageLoad)
         self.timer.start(1500, True)
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
-                                     'green': self.okRun,
-                                     'red': self.close,
-                                     # 'yellow': self.convert,
-                                     'cancel': self.close}, -2)
+                                                                       'green': self.okRun,
+                                                                       'red': self.close,
+                                                                       # 'yellow': self.convert,
+                                                                       'cancel': self.close}, -2)
         self.onLayoutFinish.append(self.layoutFinished)
 
     def paypal2(self):
@@ -378,10 +372,10 @@ class parsatv3(Screen):
             self.timer.callback.append(self._gotPageLoad)
         self.timer.start(1500, True)
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
-                                     'green': self.okRun,
-                                     'red': self.close,
-                                     'yellow': self.convert,
-                                     'cancel': self.close}, -2)
+                                                                       'green': self.okRun,
+                                                                       'red': self.close,
+                                                                       'yellow': self.convert,
+                                                                       'cancel': self.close}, -2)
         self.onLayoutFinish.append(self.layoutFinished)
 
     def paypal2(self):
@@ -456,7 +450,7 @@ class parsatv3(Screen):
                         # save m3u
                         e.write('#EXTINF:-1,' + name1 + '\n')
                         e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
-                        e.write(url +'\n')
+                        e.write(url + '\n')
             # save m3u end
             items.sort()
             for item in items:
@@ -529,10 +523,10 @@ class parsasport(Screen):
         self.timer.start(1500, True)
         self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
-                                     'green': self.okRun,
-                                     'red': self.close,
-                                     'yellow': self.convert,
-                                     'cancel': self.close}, -2)
+                                                                       'green': self.okRun,
+                                                                       'red': self.close,
+                                                                       'yellow': self.convert,
+                                                                       'cancel': self.close}, -2)
         self.onLayoutFinish.append(self.layoutFinished)
 
     def paypal2(self):
@@ -673,10 +667,10 @@ class parsatv(Screen):
         self.timer.start(1500, True)
         self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
-                                     'green': self.okRun,
-                                     'red': self.close,
-                                     'yellow': self.convert,
-                                     'cancel': self.close}, -2)
+                                                                       'green': self.okRun,
+                                                                       'red': self.close,
+                                                                       'yellow': self.convert,
+                                                                       'cancel': self.close}, -2)
         self.onLayoutFinish.append(self.layoutFinished)
 
     def paypal2(self):
@@ -795,8 +789,7 @@ class TvInfoBarShowHide():
     skipToggleShow = False
 
     def __init__(self):
-        self["ShowHideActions"] = ActionMap(["InfobarShowHideActions"], {"toggleShow": self.OkPressed,
-         "hide": self.hide}, 0)
+        self["ShowHideActions"] = ActionMap(["InfobarShowHideActions"], {"toggleShow": self.OkPressed, "hide": self.hide}, 0)
         self.__event_tracker = ServiceEventTracker(screen=self, eventmap={iPlayableService.evStart: self.serviceStarted})
         self.__state = self.STATE_SHOWN
         self.__locked = 0
@@ -923,22 +916,22 @@ class Playgo(
         self.new_aspect = self.init_aspect
         SREF = self.session.nav.getCurrentlyPlayingServiceReference()
         self['actions'] = ActionMap(['MoviePlayerActions',
-         'MovieSelectionActions',
-         'MediaPlayerActions',
-         'EPGSelectActions',
-         'MediaPlayerSeekActions',
-         'SetupActions',
-         'ColorActions',
-         'InfobarShowHideActions',
-         'InfobarActions',
-         'InfobarSeekActions'], {'leavePlayer': self.cancel,
-         'epg': self.showIMDB,
-         'info': self.showinfo,
-         # 'info': self.cicleStreamType,
-         'tv': self.cicleStreamType,
-         'stop': self.leavePlayer,
-         'cancel': self.cancel,
-         'back': self.cancel}, -1)
+                                     'MovieSelectionActions',
+                                     'MediaPlayerActions',
+                                     'EPGSelectActions',
+                                     'MediaPlayerSeekActions',
+                                     'SetupActions',
+                                     'ColorActions',
+                                     'InfobarShowHideActions',
+                                     'InfobarActions',
+                                     'InfobarSeekActions'], {'leavePlayer': self.cancel,
+                                                             'epg': self.showIMDB,
+                                                             'info': self.showinfo,
+                                                             # 'info': self.cicleStreamType,
+                                                             'tv': self.cicleStreamType,
+                                                             'stop': self.leavePlayer,
+                                                             'cancel': self.cancel,
+                                                             'back': self.cancel}, -1)
 
         if '8088' in str(self.url):
             # self.onLayoutFinish.append(self.slinkPlay)
@@ -953,21 +946,21 @@ class Playgo(
 
     def getAspectString(self, aspectnum):
         return {0: _('4:3 Letterbox'),
-         1: _('4:3 PanScan'),
-         2: _('16:9'),
-         3: _('16:9 always'),
-         4: _('16:10 Letterbox'),
-         5: _('16:10 PanScan'),
-         6: _('16:9 Letterbox')}[aspectnum]
+                1: _('4:3 PanScan'),
+                2: _('16:9'),
+                3: _('16:9 always'),
+                4: _('16:10 Letterbox'),
+                5: _('16:10 PanScan'),
+                6: _('16:9 Letterbox')}[aspectnum]
 
     def setAspect(self, aspect):
         map = {0: '4_3_letterbox',
-         1: '4_3_panscan',
-         2: '16_9',
-         3: '16_9_always',
-         4: '16_10_letterbox',
-         5: '16_10_panscan',
-         6: '16_9_letterbox'}
+               1: '4_3_panscan',
+               2: '16_9',
+               3: '16_9_always',
+               4: '16_10_letterbox',
+               5: '16_10_panscan',
+               6: '16_9_letterbox'}
         config.av.aspectratio.setValue(map[aspect])
         try:
             AVSwitch().setAspectRatio(aspect)
@@ -982,49 +975,26 @@ class Playgo(
         self.new_aspect = temp
         self.setAspect(temp)
 
-    def showinfo(self):
-        from ServiceReference import ServiceReference
-        sref = self.srefInit
-        p = ServiceReference(sref)
-        servicename = str(p.getServiceName())
-        serviceurl = str(p.getPath())
-        sTitle = ''
-        sServiceref = ''
-        try:
-            if servicename is not None:
-                sTitle = servicename
-            else:
-                sTitle = ''
-            if serviceurl is not None:
-                sServiceref = serviceurl
-            else:
-                sServiceref = ''
-            currPlay = self.session.nav.getCurrentService()
-            sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
-            sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
-            sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
-            message = 'stitle:' + str(sTitle) + '\n' + 'sServiceref:' + str(sServiceref) + '\n' + 'sTagCodec:' + str(sTagCodec) + '\n' + 'sTagVideoCodec:' + str(sTagVideoCodec) + '\n' + 'sTagAudioCodec : ' + str(sTagAudioCodec)
-            self.mbox = self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
-        except:
-            pass
-        return
-
     def showIMDB(self):
-        TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
-        IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
-        if os.path.exists(TMDB):
-            from Plugins.Extensions.TMBD.plugin import TMBD
-            text_clear = self.name
-            text = Utils.charRemove(text_clear)
-            self.session.open(TMBD, text, False)
-        elif os.path.exists(IMDb):
-            from Plugins.Extensions.IMDb.plugin import IMDB
-            text_clear = self.name
-            text = Utils.charRemove(text_clear)
-            self.session.open(IMDB, text)
-
+        text_clear = self.name
+        if Utils.is_tmdb:
+            try:
+                from Plugins.Extensions.TMBD.plugin import TMBD
+                text = Utils.badcar(text_clear)
+                text = Utils.charRemove(text_clear)
+                _session.open(TMBD.tmdbScreen, text, 0)
+            except Exception as ex:
+                print("[XCF] Tmdb: ", str(ex))
+        elif Utils.is_imdb:
+            try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
+                text = Utils.badcar(text_clear)
+                text = Utils.charRemove(text_clear)
+                imdb(_session, text)
+                # _session.open(imdb, text)
+            except Exception as ex:
+                print("[XCF] imdb: ", str(ex))
         else:
-            text_clear = self.name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
     def slinkPlay(self, url):
