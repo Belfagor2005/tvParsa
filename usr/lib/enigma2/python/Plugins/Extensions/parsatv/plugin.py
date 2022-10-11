@@ -17,13 +17,13 @@ from Components.Button import Button
 from Components.config import config
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
-from Components.Pixmap import Pixmap
-from Components.PluginComponent import plugins
+from Components.MultiContent import MultiContentEntryText
+from Components.MultiContent import MultiContentEntryPixmapAlphaTest
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Plugins.Plugin import PluginDescriptor
 from Screens.InfoBar import MoviePlayer
-from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu, InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications
+from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu, InfoBarSeek
+from Screens.InfoBarGenerics import InfoBarAudioSelection, InfoBarNotifications
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
@@ -400,7 +400,6 @@ class parsatv3(Screen):
             else:
                 self.timer.callback.append(make_m3u2(namex))
             self.timer.start(500, True)
-            # make_m3u2(namex)
 
     def convert(self):
         self.session.openWithCallback(self.convert2, MessageBox, _("Do you want to Convert %s to favorite .tv ?\n\nAttention!! Wait more than 5 minutes!!! ") % self.name, MessageBox.TYPE_YESNO, timeout=10, default=True)
