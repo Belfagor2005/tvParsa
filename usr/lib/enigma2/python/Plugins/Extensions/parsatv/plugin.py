@@ -96,6 +96,8 @@ plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('parsatv'))
 pluglogo = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/logo.png".format('parsatv'))
 png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
 path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('parsatv'))
+_firstStartptv = True
+
 if Utils.isFHD():
     path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('parsatv'))
 if Utils.DreamOS():
@@ -106,6 +108,19 @@ Panel_Dlist = [
  ('PARSA ALL TV'),
  ('PARSA TV CATEGORY'),
  ('PARSA SPORT')]
+
+def returnpng(name):
+    if 'radio' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('parsatv'))
+    elif 'webcam' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('parsatv'))
+    elif 'music' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('parsatv'))
+    elif 'sport' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('parsatv'))
+    else:
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
+    return(png)
 
 
 class OneSetList(MenuList):
@@ -123,17 +138,7 @@ class OneSetList(MenuList):
 
 def DListEntry(name, idx):
     res = [name]
-    # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
-    if 'radio' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('parsatv'))
-    elif 'webcam' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('parsatv'))
-    elif 'music' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('parsatv'))
-    elif 'spor' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('parsatv'))
-    else:
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
+    png = returnpng(name)
     if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 37), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1900, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
@@ -145,17 +150,7 @@ def DListEntry(name, idx):
 
 def OneSetListEntry(name):
     res = [name]
-    # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
-    if 'radio' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('parsatv'))
-    elif 'webcam' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('parsatv'))
-    elif 'music' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('parsatv'))
-    elif 'sport' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('parsatv'))
-    else:
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
+    png = returnpng(name)
     if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 37), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1200, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
@@ -173,6 +168,32 @@ def showlistpars(data, list):
         plist.append(OneSetListEntry(name))
         icount = icount+1
         list.setList(plist)
+
+
+def returnIMDB(text_clear):
+    TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
+    IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
+    if TMDB:
+        try:
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text = decodeHtml(text_clear)
+            _session.open(TMBD.tmdbScreen, text, 0)
+        except Exception as ex:
+            print("[XCF] Tmdb: ", str(ex))
+        return True
+    elif IMDb:
+        try:
+            from Plugins.Extensions.IMDb.plugin import main as imdb
+            text = decodeHtml(text_clear)
+            imdb(_session, text)
+        except Exception as ex:
+            print("[XCF] imdb: ", str(ex))
+        return True
+    else:
+        text_clear = decodeHtml(text_clear)
+        _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        return True
+    return
 
 
 class MainParsa(Screen):
@@ -925,7 +946,7 @@ class Playgo(
                                      'InfobarActions',
                                      'InfobarSeekActions'], {'leavePlayer': self.cancel,
                                                              'epg': self.showIMDB,
-                                                             'info': self.showinfo,
+                                                             'info': self.showIMDB,
                                                              # 'info': self.cicleStreamType,
                                                              'tv': self.cicleStreamType,
                                                              'stop': self.leavePlayer,
@@ -976,25 +997,8 @@ class Playgo(
 
     def showIMDB(self):
         text_clear = self.name
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-                # _session.open(imdb, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def slinkPlay(self, url):
         name = self.name
@@ -1204,27 +1208,56 @@ def convert_bouquet(namex):
     Utils.ReloadBouquets()
 
 
-def main(session, **kwargs):
-    try:
-        if Utils.zCheckInternet(1):
+class AutoStartTimerptv:
+
+    def __init__(self, session):
+        self.session = session
+        global _firstStartptv
+        print("*** running AutoStartTimerptv ***")
+        if _firstStartptv:
+            self.runUpdate()
+
+    def runUpdate(self):
+        print("*** running update ***")
+        try:
             from . import Update
             Update.upd_done()
-            session.open(MainParsa)
-        else:
-            from Screens.MessageBox import MessageBox
-            from Tools.Notifications import AddPopup
-            AddPopup(_("Sorry but No Internet :("), MessageBox.TYPE_INFO, 10, 'Sorry')
+            _firstStartptv = False
+        except Exception as e:
+            print('error Fxy', str(e))
+
+def autostart(reason, session=None, **kwargs):
+    print("*** running autostart ***")
+    global autoStartTimerptv
+    global _firstStartptv
+    if reason == 0:
+        if session is not None:
+            _firstStartptv = True
+            autoStartTimerptv = AutoStartTimerptv(session)
+    return
+
+
+def main(session, **kwargs):
+    try:
+        # if Utils.zCheckInternet(1):
+            # from . import Update
+            # Update.upd_done()
+        session.open(MainParsa)
+        # else:
+            # from Screens.MessageBox import MessageBox
+            # from Tools.Notifications import AddPopup
+            # AddPopup(_("Sorry but No Internet :("), MessageBox.TYPE_INFO, 10, 'Sorry')
     except:
         import traceback
         traceback.print_exc()
         pass
 
 
-def StartSetup(menuid, **kwargs):
-    if menuid == 'mainmenu':
-        return [(_('Parsa TV'), main, 'Parsa TV', 15)]
-    else:
-        return []
+# def StartSetup(menuid, **kwargs):
+    # if menuid == 'mainmenu':
+        # return [(_('Parsa TV'), main, 'Parsa TV', 15)]
+    # else:
+        # return []
 
 
 def Plugins(**kwargs):
@@ -1232,6 +1265,8 @@ def Plugins(**kwargs):
     if not os.path.exists('/var/lib/dpkg/status'):
         ico_path = plugin_path + '/res/pics/logo.png'
     extensions_menu = PluginDescriptor(name=title_plug, description=desc_plugin, where=PluginDescriptor.WHERE_EXTENSIONSMENU, fnc=main, needsRestart=True)
-    result = [PluginDescriptor(name=title_plug, description=desc_plugin, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]
+    # result = [PluginDescriptor(name=title_plug, description=desc_plugin, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]
+    result = [PluginDescriptor(name=title_plug, description=desc_plugin, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
+              PluginDescriptor(name=title_plug, description=desc_plugin, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]  
     result.append(extensions_menu)
     return result
