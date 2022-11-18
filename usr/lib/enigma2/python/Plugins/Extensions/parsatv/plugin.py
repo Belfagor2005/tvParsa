@@ -98,16 +98,19 @@ png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('par
 path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('parsatv'))
 _firstStartptv = True
 
+
 if Utils.isFHD():
     path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('parsatv'))
 if Utils.DreamOS():
     path_skin = path_skin + 'dreamOs/'
 print('parsa path_skin: ', path_skin)
 
+
 Panel_Dlist = [
  ('PARSA ALL TV'),
  ('PARSA TV CATEGORY'),
  ('PARSA SPORT')]
+
 
 def returnpng(name):
     if 'radio' in name.lower():
@@ -176,7 +179,7 @@ def returnIMDB(text_clear):
     if TMDB:
         try:
             from Plugins.Extensions.TMBD.plugin import TMBD
-            text = decodeHtml(text_clear)
+            text = Utils.decodeHtml(text_clear)
             _session.open(TMBD.tmdbScreen, text, 0)
         except Exception as ex:
             print("[XCF] Tmdb: ", str(ex))
@@ -184,13 +187,13 @@ def returnIMDB(text_clear):
     elif IMDb:
         try:
             from Plugins.Extensions.IMDb.plugin import main as imdb
-            text = decodeHtml(text_clear)
+            text = Utils.decodeHtml(text_clear)
             imdb(_session, text)
         except Exception as ex:
             print("[XCF] imdb: ", str(ex))
         return True
     else:
-        text_clear = decodeHtml(text_clear)
+        text_clear = Utils.decodeHtml(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
     return
@@ -1226,6 +1229,7 @@ class AutoStartTimerptv:
         except Exception as e:
             print('error Fxy', str(e))
 
+
 def autostart(reason, session=None, **kwargs):
     print("*** running autostart ***")
     global autoStartTimerptv
@@ -1239,25 +1243,11 @@ def autostart(reason, session=None, **kwargs):
 
 def main(session, **kwargs):
     try:
-        # if Utils.zCheckInternet(1):
-            # from . import Update
-            # Update.upd_done()
         session.open(MainParsa)
-        # else:
-            # from Screens.MessageBox import MessageBox
-            # from Tools.Notifications import AddPopup
-            # AddPopup(_("Sorry but No Internet :("), MessageBox.TYPE_INFO, 10, 'Sorry')
     except:
         import traceback
         traceback.print_exc()
         pass
-
-
-# def StartSetup(menuid, **kwargs):
-    # if menuid == 'mainmenu':
-        # return [(_('Parsa TV'), main, 'Parsa TV', 15)]
-    # else:
-        # return []
 
 
 def Plugins(**kwargs):
@@ -1265,8 +1255,7 @@ def Plugins(**kwargs):
     if not os.path.exists('/var/lib/dpkg/status'):
         ico_path = plugin_path + '/res/pics/logo.png'
     extensions_menu = PluginDescriptor(name=title_plug, description=desc_plugin, where=PluginDescriptor.WHERE_EXTENSIONSMENU, fnc=main, needsRestart=True)
-    # result = [PluginDescriptor(name=title_plug, description=desc_plugin, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]
     result = [PluginDescriptor(name=title_plug, description=desc_plugin, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
-              PluginDescriptor(name=title_plug, description=desc_plugin, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]  
+              PluginDescriptor(name=title_plug, description=desc_plugin, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]
     result.append(extensions_menu)
     return result
