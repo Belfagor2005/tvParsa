@@ -219,11 +219,13 @@ class MainParsa(Screen):
         self["key_blue"] = Button(_(''))
         self['key_blue'].hide()
         self["key_green"].hide()
-        self['actions'] = ActionMap(['SetupActions', 'ColorActions', ], {'ok': self.okRun,
-                                                                         'green': self.okRun,
-                                                                         'back': self.closerm,
-                                                                         'red': self.closerm,
-                                                                         'cancel': self.closerm}, -1)
+        self['actions'] = ActionMap(['OkCancelActions',
+                                     'ColorActions',
+                                     'DirectionActions'], {'ok': self.okRun,
+                                                           'green': self.okRun,
+                                                           'back': self.closerm,
+                                                           'red': self.closerm,
+                                                           'cancel': self.closerm}, -1)
         self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.layoutFinished)
 
@@ -300,11 +302,13 @@ class parsatv2(Screen):
         else:
             self.timer.callback.append(self._gotPageLoad)
         self.timer.start(1500, True)
-        self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
-                                                                       'green': self.okRun,
-                                                                       'red': self.close,
-                                                                       # 'yellow': self.convert,
-                                                                       'cancel': self.close}, -2)
+        self['actions'] = ActionMap(['OkCancelActions',
+                                     'ColorActions',
+                                     'DirectionActions'], {'ok': self.okRun,
+                                                           'green': self.okRun,
+                                                           'red': self.close,
+                                                           # 'yellow': self.convert,
+                                                           'cancel': self.close}, -2)
         self.onLayoutFinish.append(self.layoutFinished)
 
     def paypal2(self):
@@ -395,11 +399,13 @@ class parsatv3(Screen):
         else:
             self.timer.callback.append(self._gotPageLoad)
         self.timer.start(1500, True)
-        self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
-                                                                       'green': self.okRun,
-                                                                       'red': self.close,
-                                                                       'yellow': self.convert,
-                                                                       'cancel': self.close}, -2)
+        self['actions'] = ActionMap(['OkCancelActions',
+                                     'ColorActions',
+                                     'DirectionActions'], {'ok': self.okRun,
+                                                           'green': self.okRun,
+                                                           'red': self.close,
+                                                           'yellow': self.convert,
+                                                           'cancel': self.close}, -2)
         self.onLayoutFinish.append(self.layoutFinished)
 
     def paypal2(self):
@@ -545,11 +551,13 @@ class parsasport(Screen):
             self.timer.callback.append(self._gotPageLoad)
         self.timer.start(1500, True)
         self['title'] = Label(title_plug)
-        self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
-                                                                       'green': self.okRun,
-                                                                       'red': self.close,
-                                                                       'yellow': self.convert,
-                                                                       'cancel': self.close}, -2)
+        self['actions'] = ActionMap(['OkCancelActions',
+                                     'ColorActions',
+                                     'DirectionActions'], {'ok': self.okRun,
+                                                           'green': self.okRun,
+                                                           'red': self.close,
+                                                           'yellow': self.convert,
+                                                           'cancel': self.close}, -2)
         self.onLayoutFinish.append(self.layoutFinished)
 
     def paypal2(self):
@@ -689,11 +697,13 @@ class parsatv(Screen):
             self.timer.callback.append(self._gotPageLoad)
         self.timer.start(1500, True)
         self['title'] = Label(title_plug)
-        self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okRun,
-                                                                       'green': self.okRun,
-                                                                       'red': self.close,
-                                                                       'yellow': self.convert,
-                                                                       'cancel': self.close}, -2)
+        self['actions'] = ActionMap(['OkCancelActions',
+                                     'ColorActions',
+                                     'DirectionActions'], {'ok': self.okRun,
+                                                           'green': self.okRun,
+                                                           'red': self.close,
+                                                           'yellow': self.convert,
+                                                           'cancel': self.close}, -2)
         self.onLayoutFinish.append(self.layoutFinished)
 
     def paypal2(self):
@@ -943,7 +953,6 @@ class Playgo(
                                      'MediaPlayerActions',
                                      'EPGSelectActions',
                                      'MediaPlayerSeekActions',
-                                     'SetupActions',
                                      'ColorActions',
                                      'InfobarShowHideActions',
                                      'InfobarActions',
