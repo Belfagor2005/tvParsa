@@ -11,6 +11,8 @@
 '''
 from __future__ import print_function
 from . import _
+from . import html_conv
+from . import Utils
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.Button import Button
@@ -37,7 +39,6 @@ import re
 import six
 import ssl
 import sys
-from . import Utils
 
 global downloadparsa, path_skin, pngs
 downloadparsa = None
@@ -179,7 +180,7 @@ def returnIMDB(text_clear):
     if TMDB:
         try:
             from Plugins.Extensions.TMBD.plugin import TMBD
-            text = Utils.decodeHtml(text_clear)
+            text = html_conv.html_unescape(text_clear)
             _session.open(TMBD.tmdbScreen, text, 0)
         except Exception as ex:
             print("[XCF] Tmdb: ", str(ex))
@@ -187,13 +188,13 @@ def returnIMDB(text_clear):
     elif IMDb:
         try:
             from Plugins.Extensions.IMDb.plugin import main as imdb
-            text = Utils.decodeHtml(text_clear)
+            text = html_conv.html_unescape(text_clear)
             imdb(_session, text)
         except Exception as ex:
             print("[XCF] imdb: ", str(ex))
         return True
     else:
-        text_clear = Utils.decodeHtml(text_clear)
+        text_clear = html_conv.html_unescape(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
     return
@@ -221,6 +222,7 @@ class MainParsa(Screen):
         self["key_green"].hide()
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'green': self.okRun,
                                                            'back': self.closerm,
@@ -304,6 +306,7 @@ class parsatv2(Screen):
         self.timer.start(1500, True)
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'green': self.okRun,
                                                            'red': self.close,
@@ -401,6 +404,7 @@ class parsatv3(Screen):
         self.timer.start(1500, True)
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'green': self.okRun,
                                                            'red': self.close,
@@ -553,6 +557,7 @@ class parsasport(Screen):
         self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'green': self.okRun,
                                                            'red': self.close,
@@ -699,6 +704,7 @@ class parsatv(Screen):
         self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'green': self.okRun,
                                                            'red': self.close,
@@ -932,7 +938,7 @@ class Playgo(
         self.service = None
         self.url = url
         self.pcip = 'None'
-        self.name = Utils.decodeHtml(name)
+        self.name = html_conv.html_unescape(name)
         self.state = self.STATE_PLAYING
         for x in InfoBarBase, \
                 InfoBarMenu, \
@@ -954,6 +960,7 @@ class Playgo(
                                      'EPGSelectActions',
                                      'MediaPlayerSeekActions',
                                      'ColorActions',
+                                     'ButtonSetupActions',
                                      'InfobarShowHideActions',
                                      'InfobarActions',
                                      'InfobarSeekActions'], {'leavePlayer': self.cancel,
