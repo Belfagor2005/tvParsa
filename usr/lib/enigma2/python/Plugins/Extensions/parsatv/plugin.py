@@ -132,35 +132,35 @@ class OneSetList(MenuList):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
         if Utils.isFHD():
             self.l.setItemHeight(50)
-            textfont = int(34)
+            textfont = int(30)
             self.l.setFont(0, gFont('Regular', textfont))
         else:
-            self.l.setItemHeight(50)
+            self.l.setItemHeight(30)
             textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
 
 
-def DListEntry(name, idx):
+# def DListEntry(name, idx):
+    # res = [name]
+    # png = returnpng(name)
+    # if Utils.isFHD():
+        # res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(png)))
+        # res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    # else:
+        # res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(30, 30), png=loadPNG(png)))
+        # res.append(MultiContentEntryText(pos=(50, 0), size=(500, 30), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    # return res
+
+
+def OneSetListEntry(name, idx):
     res = [name]
     png = returnpng(name)
     if Utils.isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 37), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(70, 0), size=(1900, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 37), png=loadPNG(png)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    return res
-
-
-def OneSetListEntry(name):
-    res = [name]
-    png = returnpng(name)
-    if Utils.isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 37), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(70, 0), size=(1200, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 37), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(30, 30), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 30), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 
@@ -169,7 +169,7 @@ def showlistpars(data, list):
     plist = []
     for line in data:
         name = data[icount]
-        plist.append(OneSetListEntry(name))
+        plist.append(OneSetListEntry(name, icount))
         icount = icount+1
         list.setList(plist)
 
@@ -253,7 +253,7 @@ class MainParsa(Screen):
         list = []
         idx = 0
         for x in Panel_Dlist:
-            list.append(DListEntry(x, idx))
+            list.append(OneSetListEntry(x, idx))
             self.menu_list.append(x)
             idx += 1
         self['text'].setList(list)
@@ -960,7 +960,7 @@ class Playgo(
                                      'EPGSelectActions',
                                      'MediaPlayerSeekActions',
                                      'ColorActions',
-                                     'ButtonSetupActions',
+                                     'OkCancelActions',
                                      'InfobarShowHideActions',
                                      'InfobarActions',
                                      'InfobarSeekActions'], {'leavePlayer': self.cancel,
@@ -970,6 +970,8 @@ class Playgo(
                                                              'tv': self.cicleStreamType,
                                                              'stop': self.leavePlayer,
                                                              'cancel': self.cancel,
+                                                             'exit': self.leavePlayer,
+                                                             'down': self.av,
                                                              'back': self.cancel}, -1)
 
         if '8088' in str(self.url):
