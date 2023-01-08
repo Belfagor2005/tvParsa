@@ -140,18 +140,6 @@ class OneSetList(MenuList):
             self.l.setFont(0, gFont('Regular', textfont))
 
 
-# def DListEntry(name, idx):
-    # res = [name]
-    # png = returnpng(name)
-    # if Utils.isFHD():
-        # res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(png)))
-        # res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    # else:
-        # res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(30, 30), png=loadPNG(png)))
-        # res.append(MultiContentEntryText(pos=(50, 0), size=(500, 30), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    # return res
-
-
 def OneSetListEntry(name, idx):
     res = [name]
     png = returnpng(name)
@@ -159,7 +147,7 @@ def OneSetListEntry(name, idx):
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(30, 30), png=loadPNG(png)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 3), size=(30, 30), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(50, 0), size=(500, 30), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
@@ -537,6 +525,7 @@ class parsasport(Screen):
         self.list = []
         self.name = 'ParsaSport'
         self.url2 = 'http://www.parsatv.com/streams/fetch/varzeshtv.php'
+        self.url3 = 'http://www.parsatv.com/m/name=Varzesh-3'        
         self.url = 'http://www.parsatv.com/m/'
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
