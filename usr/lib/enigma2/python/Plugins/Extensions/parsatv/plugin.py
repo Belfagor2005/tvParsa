@@ -90,6 +90,13 @@ def ssl_urlopen(url):
         return urlopen(url)
 
 
+def paypal():
+    conthelp = "If you like what I do you\n"
+    conthelp += "can contribute with a coffee\n"
+    conthelp += "scan the qr code and donate € 1.00"
+    return conthelp
+
+
 currversion = '1.6'
 title_plug = 'Parsa TV '
 desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
@@ -113,7 +120,46 @@ Panel_Dlist = [
  ('PARSA SPORT')]
 
 
+# filter list assign png
+EXTRAD = "radio", "radyo", "mix", "fm", "kbit", "rap", "metal", "alternative"
+EXTXXX = "adult", "xxx"
+EXTCAM = "webcam", "webcams"
+EXTMUS = "music", "mtv", "deluxe", "djing", "fashion", "kiss", "mpeg", "sluhay", "stingray", "techno", "viva", "country", "vevo"
+EXTSPOR = "sport", "boxing", "racing", "fight", "golf", "knock", "harley", "futbool", "motor", "nba", "nfl", "bull", "poker", "billiar", "fite"
+EXTRLX = "relax", "nature", "escape"
+EXTMOV = "movie", "film"
+EXTWEA = "weather"
+EXTFAM = "family"
+EXTREL = "religious"
+EXTSHP = "shop"
+EXTTRV = "travel"
+
+
 def returnpng(name):
+    # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
+    # if any(s in name.lower() for s in EXTTRV):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/travel.png".format('parsatv'))
+    # elif any(s in name.lower() for s in EXTXXX):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/xxx.png".format('parsatv'))
+    # elif any(s in name.lower() for s in EXTCAM):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('parsatv'))
+    # elif any(s in name.lower() for s in EXTMUS):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('parsatv'))
+    # elif any(s in name.lower() for s in EXTSPOR):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('parsatv'))
+    # elif any(s in name.lower() for s in EXTRLX):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/relax.png".format('parsatv'))
+    # elif any(s in name.lower() for s in EXTMOV):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/movie.png".format('parsatv'))
+    # elif any(s in name.lower() for s in EXTWEA):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/weather.png".format('parsatv'))
+    # elif any(s in name.lower() for s in EXTFAM):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/family.png".format('parsatv'))
+    # elif any(s in name.lower() for s in EXTREL):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/religious.png".format('parsatv'))
+    # elif any(s in name.lower() for s in EXTSHP):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/shop.png".format('parsatv'))
+
     if 'radio' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('parsatv'))
     elif 'webcam' in name.lower():
@@ -122,9 +168,23 @@ def returnpng(name):
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('parsatv'))
     elif 'sport' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('parsatv'))
+    elif 'travel' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/travel.png".format('parsatv'))        
+    elif 'relax' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/relax.png".format('parsatv')) 
+    elif 'xxx' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/xxx.png".format('parsatv')) 
+    elif 'movie' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/movie.png".format('parsatv'))   
+    elif 'family' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/family.png".format('parsatv')) 
+    elif 'religious' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/religious.png".format('parsatv')) 
+    elif 'weather' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/weather.png".format('parsatv'))         
     else:
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
-    return(png)
+    return png
 
 
 class OneSetList(MenuList):
@@ -188,6 +248,13 @@ def returnIMDB(text_clear):
     return
 
 
+def paypal():
+    conthelp = "If you like what I do you\n"
+    conthelp += "can contribute with a coffee\n"
+    conthelp += "scan the qr code and donate € 1.00"
+    return conthelp
+
+
 class MainParsa(Screen):
     def __init__(self, session):
         self.session = session
@@ -219,17 +286,11 @@ class MainParsa(Screen):
         self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.layoutFinished)
 
-    def paypal2(self):
-        conthelp = "If you like what I do you\n"
-        conthelp += " can contribute with a coffee\n\n"
-        conthelp += "scan the qr code and donate € 1.00"
-        return conthelp
-
     def layoutFinished(self):
-        paypal = self.paypal2()
-        self["paypal"].setText(paypal)
+        payp = paypal()
+        self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
-
+        
     def closerm(self):
         Utils.deletetmp()
         self.close()
@@ -302,15 +363,9 @@ class parsatv2(Screen):
                                                            'cancel': self.close}, -2)
         self.onLayoutFinish.append(self.layoutFinished)
 
-    def paypal2(self):
-        conthelp = "If you like what I do you\n"
-        conthelp += " can contribute with a coffee\n\n"
-        conthelp += "scan the qr code and donate € 1.00"
-        return conthelp
-
     def layoutFinished(self):
-        paypal = self.paypal2()
-        self["paypal"].setText(paypal)
+        payp = paypal()
+        self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
 
     def _gotPageLoad(self):
@@ -400,15 +455,9 @@ class parsatv3(Screen):
                                                            'cancel': self.close}, -2)
         self.onLayoutFinish.append(self.layoutFinished)
 
-    def paypal2(self):
-        conthelp = "If you like what I do you\n"
-        conthelp += " can contribute with a coffee\n\n"
-        conthelp += "scan the qr code and donate € 1.00"
-        return conthelp
-
     def layoutFinished(self):
-        paypal = self.paypal2()
-        self["paypal"].setText(paypal)
+        payp = paypal()
+        self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
 
     def convert2(self, result):
@@ -554,15 +603,9 @@ class parsasport(Screen):
                                                            'cancel': self.close}, -2)
         self.onLayoutFinish.append(self.layoutFinished)
 
-    def paypal2(self):
-        conthelp = "If you like what I do you\n"
-        conthelp += " can contribute with a coffee\n\n"
-        conthelp += "scan the qr code and donate € 1.00"
-        return conthelp
-
     def layoutFinished(self):
-        paypal = self.paypal2()
-        self["paypal"].setText(paypal)
+        payp = paypal()
+        self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
 
     def convert2(self, result):
@@ -701,15 +744,9 @@ class parsatv(Screen):
                                                            'cancel': self.close}, -2)
         self.onLayoutFinish.append(self.layoutFinished)
 
-    def paypal2(self):
-        conthelp = "If you like what I do you\n"
-        conthelp += " can contribute with a coffee\n\n"
-        conthelp += "scan the qr code and donate € 1.00"
-        return conthelp
-
     def layoutFinished(self):
-        paypal = self.paypal2()
-        self["paypal"].setText(paypal)
+        payp = paypal()
+        self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
 
     def convert2(self, result):
