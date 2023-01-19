@@ -5,7 +5,7 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             10/09/2022               *
+*             10/01/2023               *
 *       Skin by MMark                  *
 ****************************************
 '''
@@ -71,6 +71,8 @@ try:
     sslverify = True
 except:
     sslverify = False
+
+
 if sslverify:
     class SNIFactory(ssl.ClientContextFactory):
         def __init__(self, hostname=None):
@@ -169,19 +171,19 @@ def returnpng(name):
     elif 'sport' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('parsatv'))
     elif 'travel' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/travel.png".format('parsatv'))        
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/travel.png".format('parsatv'))
     elif 'relax' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/relax.png".format('parsatv')) 
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/relax.png".format('parsatv'))
     elif 'xxx' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/xxx.png".format('parsatv')) 
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/xxx.png".format('parsatv'))
     elif 'movie' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/movie.png".format('parsatv'))   
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/movie.png".format('parsatv'))
     elif 'family' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/family.png".format('parsatv')) 
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/family.png".format('parsatv'))
     elif 'religious' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/religious.png".format('parsatv')) 
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/religious.png".format('parsatv'))
     elif 'weather' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/weather.png".format('parsatv'))         
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/weather.png".format('parsatv'))
     else:
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
     return png
@@ -290,7 +292,7 @@ class MainParsa(Screen):
         payp = paypal()
         self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
-        
+
     def closerm(self):
         Utils.deletetmp()
         self.close()
@@ -345,7 +347,6 @@ class parsatv2(Screen):
         self['key_yellow'] = Button('')
         self["key_blue"] = Button('')
         self["key_green"].hide()
-        # self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
         if Utils.DreamOS():
@@ -388,9 +389,6 @@ class parsatv2(Screen):
             match = re.compile(regexvideo, re.DOTALL).findall(content)
             for name in match:
                 url = url.replace(' ', '%20')
-                name = name
-                # print("parsatv2 name =", name)
-                # print("parsatv2 url =", url)
                 item = name + "###" + url
                 items.append(item)
             items.sort()
@@ -407,7 +405,6 @@ class parsatv2(Screen):
 
     def okRun(self):
         i = len(self.names)
-        print('iiiiii= ', i)
         if i < 1:
             return
         idx = self["text"].getSelectionIndex()
@@ -505,41 +502,34 @@ class parsatv3(Screen):
                 n1 = content.find(s1)
                 n2 = content.find("<td id=", n1)
                 content2 = content[n1:n2]
-                print("showContent22 content2=", content2)
                 regexvideo = '<li><a href="(.+?)#.*?"><button.*?myButton">(.+?)</button'
                 match = re.compile(regexvideo, re.DOTALL).findall(content2)
-                print("showContent22 match =", match)
                 for url, name in match:
                     if url.startswith('http'):
                         url = url.replace(' ', '%20')
                         name1 = name.replace('%20', ' ')
-                        # print("getVideos15 name =", name1)
-                        # print("getVideos15 url =", url)
                         item = name1 + "###" + url
                         items.append(item)
                         # save m3u
                         e.write('#EXTINF:-1,' + name1 + '\n')
                         e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                         e.write(url + '\n')
-            # save m3u end
+                        # save m3u end
             items.sort()
             for item in items:
                 name = item.split("###")[0]
                 url = item.split("###")[1]
                 self.names.append(name)
                 self.urls.append(url)
-            # e.close()
             self['info'].setText(_('Please select ...'))
             self["key_green"].show()
             showlistpars(self.names, self['text'])
             print('-------------parsatv-------------')
-
         except Exception as e:
             print('error ', str(e))
 
     def okRun(self):
         i = len(self.names)
-        print('iiiiii= ', i)
         if i < 1:
             return
         idx = self["text"].getSelectionIndex()
@@ -548,14 +538,11 @@ class parsatv3(Screen):
         content = Utils.ReadUrl2(url)
         if six.PY3:
             content = six.ensure_str(content)
-        # content =convert_to_unicode(content)
-        print("parsatv3 B =", content)
         n1 = content.find('class="myButton" id=', 0)
         n2 = content.find("</button></a>", n1)
         content = content[n1:n2]
         regexvideo = '<a href="(.+?)"><b'
         match = re.compile(regexvideo, re.DOTALL).findall(content)
-        print("getVideos parsatv3 match =", match)
         for url in match:
             url = url
             name = name
@@ -574,7 +561,7 @@ class parsasport(Screen):
         self.list = []
         self.name = 'ParsaSport'
         self.url2 = 'http://www.parsatv.com/streams/fetch/varzeshtv.php'
-        self.url3 = 'http://www.parsatv.com/m/name=Varzesh-3'        
+        self.url3 = 'http://www.parsatv.com/m/name=Varzesh-3'
         self.url = 'http://www.parsatv.com/m/'
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
@@ -583,7 +570,6 @@ class parsasport(Screen):
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button(_('Convert'))
         self["key_blue"] = Button(_(''))
-        # self['key_yellow'].hide()
         self["key_green"].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
@@ -644,7 +630,6 @@ class parsasport(Screen):
             content = content[n1:n2]
             regexvideo = '<li><a href="(.+?)#.*?"><button.*?myButton">(.+?)</button'
             match = re.compile(regexvideo, re.DOTALL).findall(content)
-            print("parsasport match =", match)
             with open(xxxname, 'w') as e:
                 e.write("#EXTM3U\n")
                 for url, name in match:
@@ -652,11 +637,8 @@ class parsasport(Screen):
                         url = url.replace(' ', '%20')
                         if 'sport' in str(url).lower():
                             name1 = name.replace('%20', ' ')
-                            # print("getVideos15 name =", name1)
-                            # print("getVideos15 url =", url)
                             item = name1 + "###" + url
                             items.append(item)
-                            # save m3u
                             e.write('#EXTINF:-1,' + name1 + '\n')
                             e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                             e.write(url + '\n')
@@ -666,7 +648,6 @@ class parsasport(Screen):
                 url = item.split("###")[1]
                 self.names.append(name)
                 self.urls.append(url)
-            # e.close()
             self['info'].setText(_('Please select ...'))
             self["key_green"].show()
             showlistpars(self.names, self['text'])
@@ -677,7 +658,6 @@ class parsasport(Screen):
 
     def okRun(self):
         i = len(self.names)
-        print('iiiiii= ', i)
         if i < 1:
             return
         idx = self["text"].getSelectionIndex()
@@ -687,19 +667,12 @@ class parsasport(Screen):
             content = Utils.ReadUrl2(url)
             if six.PY3:
                 content = six.ensure_str(content)
-            # content =convert_to_unicode(content)
-            # print("parsasport content B =", content)
             n1 = content.find('class="myButton" id=', 0)
             n2 = content.find("</button></a>", n1)
             content = content[n1:n2]
             regexvideo = '<a href="(.+?)"><b'
             match = re.compile(regexvideo, re.DOTALL).findall(content)
-            # print("parsasport match =", match)
             for url in match:
-                # url = url.replace('https','http')
-                name = name
-                print("getVideos15 name =", name)
-                print("getVideos15 url =", url)
                 self.session.open(Playgo, name, url)
         except Exception as e:
             print('error ', str(e))
@@ -723,7 +696,6 @@ class parsatv(Screen):
         self['key_green'] = Button(_('Play'))
         self['key_red'] = Button(_('Back'))
         self['key_yellow'] = Button(_('Convert'))
-        # self['key_yellow'].hide()
         self["key_blue"] = Button(_(''))
         self['key_blue'].hide()
         self["key_green"].hide()
@@ -785,30 +757,25 @@ class parsatv(Screen):
             content = content[n1:n2]
             regexvideo = '<li><a href="(.+?)#.*?"><button.*?myButton">(.+?)</button'
             match = re.compile(regexvideo, re.DOTALL).findall(content)
-            print("parsatv t match =", match)
             with open(xxxname, 'w') as e:
                 e.write("#EXTM3U\n")
                 for url, name in match:
                     if url.startswith('http'):
                         url = url.replace(' ', '%20')
                         name1 = name.replace('%20', ' ')
-                        # print("getVideos15 name =", name1)
-                        # print("getVideos15 url =", url)
                         item = name1 + "###" + url
                         items.append(item)
                         # save m3u
                         e.write('#EXTINF:-1,' + name1 + '\n')
                         e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                         e.write(url + '\n')
-
-            # save m3u end
+                        # save m3u end
             items.sort()
             for item in items:
                 name = item.split("###")[0]
                 url = item.split("###")[1]
                 self.names.append(name)
                 self.urls.append(url)
-            # e.close()
             self['info'].setText(_('Please select ...'))
             self["key_green"].show()
             showlistpars(self.names, self['text'])
@@ -819,7 +786,6 @@ class parsatv(Screen):
 
     def okRun(self):
         i = len(self.names)
-        print('iiiiii= ', i)
         if i < 1:
             return
         idx = self["text"].getSelectionIndex()
@@ -829,14 +795,11 @@ class parsatv(Screen):
             content = Utils.ReadUrl2(url)
             if six.PY3:
                 content = six.ensure_str(content)
-            # content =convert_to_unicode(content)
-            # print("parsatv content B =", content)
             n1 = content.find('class="myButton" id=', 0)
             n2 = content.find("</button></a>", n1)
             content = content[n1:n2]
             regexvideo = '<a href="(.+?)"><b'
             match = re.compile(regexvideo, re.DOTALL).findall(content)
-            # print("parsatv match =", match)
             for url in match:
                 name = name
                 self.session.open(Playgo, name, url)
@@ -1163,13 +1126,7 @@ def make_m3u2(namex):
                         name = name.replace('%20', ' ').rstrip('\n')
                         e.write('#EXTINF:-1,' + name + '\n')
                         e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
-                        # continue
                     if line.startswith("http"):
-                        # if six.PY3:
-                            # line = line.encode()
-                        # content = Utils.ReadUrl2(line)
-                        # if six.PY3:
-                            # content = six.ensure_text(content, "utf-8", "ignore")
                         if sys.version_info.major == 3:
                             import urllib.request as urllib2
                         elif sys.version_info.major == 2:
@@ -1185,19 +1142,18 @@ def make_m3u2(namex):
                                 content = content.decode("utf-8")
                             except Exception as e:
                                 print("Error: ", str(e))
-
-                        print("parsatv content c =", content)
+                        # print("parsatv content c =", content)
                         n1 = content.find('class="myButton" id=', 0)
                         n2 = content.find("</button></a>", n1)
                         content2 = content[n1:n2]
                         if content2 is not None:
                             regexvideo = '<a href="(.+?)"><b'
                             match = re.compile(regexvideo, re.DOTALL).findall(content2)
-                            print("parsatv match =", match)
+                            # print("parsatv match =", match)
                             for url2 in match:
                                 if url2.startswith('http'):
                                     url2 = url2.replace(' ', '%20')
-                                    print('matchh ', url2)
+                                    # print('matchh ', url2)
                                     e.write(url2 + '\n')
                 e.close()
             convert_bouquet(namex)
