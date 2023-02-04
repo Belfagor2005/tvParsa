@@ -101,16 +101,14 @@ def paypal():
 
 currversion = '1.6'
 title_plug = 'Parsa TV '
+_firstStartptv = True
 desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
 plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('parsatv'))
-pluglogo = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/logo.png".format('parsatv'))
-png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
-path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('parsatv'))
-_firstStartptv = True
-
-
+pluglogo = os.path.join(plugin_path, 'res/pics/logo.png')
+png = os.path.join(plugin_path, 'res/pics/tv.png')
+path_skin = os.path.join(plugin_path, 'res/skins/hd/')
 if Utils.isFHD():
-    path_skin = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('parsatv'))
+    path_skin = os.path.join(plugin_path, 'res/skins/fhd/')
 if Utils.DreamOS():
     path_skin = path_skin + 'dreamOs/'
 print('parsa path_skin: ', path_skin)
@@ -197,7 +195,7 @@ class OneSetList(MenuList):
             textfont = int(30)
             self.l.setFont(0, gFont('Regular', textfont))
         else:
-            self.l.setItemHeight(30)
+            self.l.setItemHeight(50)
             textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
 
@@ -209,8 +207,8 @@ def OneSetListEntry(name, idx):
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 3), size=(30, 30), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 30), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 10), size=(40, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 
@@ -260,7 +258,7 @@ def paypal():
 class MainParsa(Screen):
     def __init__(self, session):
         self.session = session
-        skin = path_skin + 'settings.xml'
+        skin = os.path.join(path_skin, 'settings.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('MainParsa')
@@ -329,7 +327,7 @@ class MainParsa(Screen):
 class parsatv2(Screen):
     def __init__(self, session):
         self.session = session
-        skin = path_skin + 'settings.xml'
+        skin = os.path.join(path_skin, 'settings.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('ParsaTV')
@@ -416,7 +414,7 @@ class parsatv2(Screen):
 class parsatv3(Screen):
     def __init__(self, session, name, url):
         self.session = session
-        skin = path_skin + 'settings.xml'
+        skin = os.path.join(path_skin, 'settings.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('Parsa TV')
@@ -552,7 +550,7 @@ class parsatv3(Screen):
 class parsasport(Screen):
     def __init__(self, session):
         self.session = session
-        skin = path_skin + 'settings.xml'
+        skin = os.path.join(path_skin, 'settings.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('Parsa TV')
@@ -681,7 +679,7 @@ class parsasport(Screen):
 class parsatv(Screen):
     def __init__(self, session):
         self.session = session
-        skin = path_skin + 'settings.xml'
+        skin = os.path.join(path_skin, 'settings.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('Parsa TV')
@@ -975,22 +973,26 @@ class Playgo(
         return AVSwitch().getAspectRatioSetting()
 
     def getAspectString(self, aspectnum):
-        return {0: _('4:3 Letterbox'),
-                1: _('4:3 PanScan'),
-                2: _('16:9'),
-                3: _('16:9 always'),
-                4: _('16:10 Letterbox'),
-                5: _('16:10 PanScan'),
-                6: _('16:9 Letterbox')}[aspectnum]
+        return {
+            0: '4:3 Letterbox',
+            1: '4:3 PanScan',
+            2: '16:9',
+            3: '16:9 always',
+            4: '16:10 Letterbox',
+            5: '16:10 PanScan',
+            6: '16:9 Letterbox'
+        }[aspectnum]
 
     def setAspect(self, aspect):
-        map = {0: '4_3_letterbox',
-               1: '4_3_panscan',
-               2: '16_9',
-               3: '16_9_always',
-               4: '16_10_letterbox',
-               5: '16_10_panscan',
-               6: '16_9_letterbox'}
+        map = {
+            0: '4_3_letterbox',
+            1: '4_3_panscan',
+            2: '16_9',
+            3: '16_9_always',
+            4: '16_10_letterbox',
+            5: '16_10_panscan',
+            6: '16_9_letterbox'
+        }
         config.av.aspectratio.setValue(map[aspect])
         try:
             AVSwitch().setAspectRatio(aspect)
