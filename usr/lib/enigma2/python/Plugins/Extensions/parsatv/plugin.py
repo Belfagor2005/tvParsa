@@ -39,7 +39,7 @@ import re
 import six
 import ssl
 import sys
-
+from os.path import splitext
 global downloadparsa, path_skin, pngs
 downloadparsa = None
 
@@ -106,13 +106,15 @@ desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
 plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('parsatv'))
 pluglogo = os.path.join(plugin_path, 'res/pics/logo.png')
 png = os.path.join(plugin_path, 'res/pics/tv.png')
-path_skin = os.path.join(plugin_path, 'res/skins/hd/')
 if Utils.isFHD():
     path_skin = os.path.join(plugin_path, 'res/skins/fhd/')
+else:
+    path_skin = os.path.join(plugin_path, 'res/skins/hd/')
+
 if Utils.DreamOS():
     path_skin = path_skin + 'dreamOs/'
 print('parsa path_skin: ', path_skin)
-
+referer = 'http://www.parsatv.com'
 
 Panel_Dlist = [
  ('PARSA ALL TV'),
@@ -133,6 +135,7 @@ EXTFAM = "family"
 EXTREL = "religious"
 EXTSHP = "shop"
 EXTTRV = "travel"
+
 
 
 def returnpng(name):
@@ -374,7 +377,7 @@ class parsatv2(Screen):
         self.urls = []
         items = []
         try:
-            content = Utils.ReadUrl2(url)
+            content = Utils.ReadUrl2(url, referer)
             if six.PY3:
                 content = six.ensure_str(content)
             n6 = content.find("<a></a></td>")
@@ -486,7 +489,7 @@ class parsatv3(Screen):
         try:
             with open(xxxname, 'w') as e:
                 e.write("#EXTM3U\n")
-                content = Utils.ReadUrl2('https://www.parsatv.com/m/')
+                content = Utils.ReadUrl2('https://www.parsatv.com/m/', referer)
                 if six.PY3:
                     content = six.ensure_str(content)
                 n6 = content.find("<a></a></td>")
@@ -533,7 +536,7 @@ class parsatv3(Screen):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
-        content = Utils.ReadUrl2(url)
+        content = Utils.ReadUrl2(url, referer)
         if six.PY3:
             content = six.ensure_str(content)
         n1 = content.find('class="myButton" id=', 0)
@@ -620,7 +623,7 @@ class parsasport(Screen):
         else:
             xxxname = '/tmp/' + namex + '_conv.m3u'
         try:
-            content = Utils.ReadUrl2(url)
+            content = Utils.ReadUrl2(url, referer)
             if six.PY3:
                 content = six.ensure_str(content)
             n1 = content.find('<td id="persian">', 0)
@@ -662,7 +665,7 @@ class parsasport(Screen):
         name = self.names[idx]
         url = self.urls[idx]
         try:
-            content = Utils.ReadUrl2(url)
+            content = Utils.ReadUrl2(url, referer)
             if six.PY3:
                 content = six.ensure_str(content)
             n1 = content.find('class="myButton" id=', 0)
@@ -747,7 +750,7 @@ class parsatv(Screen):
         else:
             xxxname = '/tmp/' + namex + '_conv.m3u'
         try:
-            content = Utils.ReadUrl2(url)
+            content = Utils.ReadUrl2(url, referer)
             if six.PY3:
                 content = six.ensure_str(content)
             n1 = content.find('<td id="persian">', 0)
@@ -790,7 +793,7 @@ class parsatv(Screen):
         name = self.names[idx]
         url = self.urls[idx]
         try:
-            content = Utils.ReadUrl2(url)
+            content = Utils.ReadUrl2(url, referer)
             if six.PY3:
                 content = six.ensure_str(content)
             n1 = content.find('class="myButton" id=', 0)
@@ -1042,18 +1045,20 @@ class Playgo(
         self.servicetype = '4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
-        currentindex = 0
+        # if str(splitext(url)[-1]) == ".m3u8":
+            # if self.servicetype == "1":
+                # self.servicetype = "4097"
         streamtypelist = ["4097"]
         # if "youtube" in str(self.url):
             # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             # return
-        if Utils.isStreamlinkAvailable():
-            streamtypelist.append("5002")  # ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
-            streaml = True
-        if os.path.exists("/usr/bin/gstplayer"):
-            streamtypelist.append("5001")
-        if os.path.exists("/usr/bin/exteplayer3"):
-            streamtypelist.append("5002")
+        # if Utils.isStreamlinkAvailable():
+            # streamtypelist.append("5002")  # ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+            # streaml = True
+        # if os.path.exists("/usr/bin/gstplayer"):
+            # streamtypelist.append("5001")
+        # if os.path.exists("/usr/bin/exteplayer3"):
+            # streamtypelist.append("5002")
         if os.path.exists("/usr/bin/apt-get"):
             streamtypelist.append("8193")
         for index, item in enumerate(streamtypelist, start=0):
