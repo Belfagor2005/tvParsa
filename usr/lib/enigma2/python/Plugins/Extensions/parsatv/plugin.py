@@ -164,29 +164,29 @@ def returnpng(name):
         # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/shop.png".format('parsatv'))
 
     if 'radio' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('parsatv'))
+        png = os.path.join(plugin_path, 'res/pics/radio.png')
     elif 'webcam' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('parsatv'))
+        png = os.path.join(plugin_path, 'res/pics/webcam.png')
     elif 'music' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('parsatv'))
+        png = os.path.join(plugin_path, 'res/pics/music.png')
     elif 'sport' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('parsatv'))
+        png = os.path.join(plugin_path, 'res/pics/sport.png')
     elif 'travel' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/travel.png".format('parsatv'))
+        png = os.path.join(plugin_path, 'res/pics/travel.png')
     elif 'relax' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/relax.png".format('parsatv'))
+        png = os.path.join(plugin_path, 'res/pics/relax.pngparsatv')
     elif 'xxx' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/xxx.png".format('parsatv'))
+        png = os.path.join(plugin_path, 'res/pics/xxx.png')
     elif 'movie' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/movie.png".format('parsatv'))
+        png = os.path.join(plugin_path, 'res/pics/movie.png')
     elif 'family' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/family.png".format('parsatv'))
+        png = os.path.join(plugin_path, 'res/pics/family.png')
     elif 'religious' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/religious.png".format('parsatv'))
+        png = os.path.join(plugin_path, 'res/pics/religious.png')
     elif 'weather' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/weather.png".format('parsatv'))
+        png = os.path.join(plugin_path, 'res/pics/weather.png')
     else:
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
+        png = os.path.join(plugin_path, 'res/pics/tv.png')
     return png
 
 
