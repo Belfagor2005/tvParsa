@@ -1168,53 +1168,94 @@ def make_m3u2(namex):
 
 
 def convert_bouquet(namex):
-    from . import Utils
-    if os.path.exists(downloadparsa):
-        xxxnamex = str(downloadparsa) + str(namex) + '.m3u'
-    else:
-        xxxnamex = '/tmp/' + str(namex) + '.m3u'
-    if not os.path.exists(xxxnamex):
-        return
-    name = namex.replace(' ', '-').lower()
-    name = namex.strip()
-    parsabouquet = 'userbouquet.%s.tv' % name
-    desk_tmp = ''
-    in_bouquets = 0
-    if os.path.isfile('/etc/enigma2/%s' % parsabouquet):
-        os.remove('/etc/enigma2/%s' % parsabouquet)
-    with open('/etc/enigma2/%s' % parsabouquet, 'w') as outfile:
-        outfile.write('#NAME %s\r\n' % name.capitalize())
-        for line in open(xxxnamex):
-            if line.startswith('http://') or line.startswith('https'):
-                outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s' % line.replace(':', '%3a'))
-                outfile.write('#DESCRIPTION %s' % desk_tmp)
-            elif line.startswith('#EXTINF'):
-                desk_tmp = '%s' % line.split(',')[-1]
-            elif '<stream_url><![CDATA' in line:
-                outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s\r\n' % line.split('[')[-1].split(']')[0].replace(':', '%3a'))
-                outfile.write('#DESCRIPTION %s\r\n' % desk_tmp)
-            elif '<title>' in line:
-                if '<![CDATA[' in line:
-                    desk_tmp = '%s\r\n' % line.split('[')[-1].split(']')[0]
-                else:
-                    desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
-        outfile.close()
-    message = (_("Wait please... "))
-    Utils.web_info(message)
-    if os.path.isfile('/etc/enigma2/bouquets.tv'):
-        for line in open('/etc/enigma2/bouquets.tv'):
-            if parsabouquet in line:
-                in_bouquets = 1
+    type = 'tv'
+    if "radio" in namex.lower():
+        type = "radio"
+    name_file = namex.replace('/', '_').replace(',', '').replace(' ', '-')
+    cleanName = re.sub(r'[\<\>\:\"\/\\\|\?\*]', '_', str(name_file))
+    cleanName = re.sub(r' ', '_', cleanName)
+    cleanName = re.sub(r'\d+:\d+:[\d.]+', '_', cleanName)
+    name_file = re.sub(r'_+', '_', cleanName)
+    bouquetname = 'userbouquet.%s.%s' % (name_file.lower(), type.lower())
+    tmpx = ''
+    namel = ''
+    tmplist = []
+    tmplist.append('#NAME %s (%s)' % (name_file, type))
+    tmplist.append('#SERVICE 1:64:0:0:0:0:0:0:0:0::%s CHANNELS' % name_file)
+    tmplist.append('#DESCRIPTION --- %s ---' % name_file)
+    print("Converting Bouquet %s" % name_file)
 
+    if os.path.exists(downloadparsa):
+        file = str(downloadparsa) + str(namex) + '.m3u'
+    else:
+        file = '/tmp/' + str(namex) + '.m3u'
+    if not os.path.exists(file):
+        return
+
+    if os.path.exists(file) and os.stat(file).st_size > 0:
+        for line in open(file):
+            if line.startswith('#EXTM3U'):
+                continue
+            if '#EXTM3U $BorpasFileFormat="1"' in line:  # force export bouquet ???
+                line = line.replace('$BorpasFileFormat="1"', '')
+                continue
+            if line == ' ':
+                continue
+            if line.startswith("#EXTINF"):
+                line = '%s' % line.split(',')[-1]
+                line = Utils.checkStr(line).rstrip('\r').rstrip('\n')
+                namel = '%s' % line.split(',')[-1]
+                tmpx = '#DESCRIPTION %s' % namel
+            else:
+                if type.upper() == 'TV':
+                    line = line.replace(':', '%3a')
+                    line = line.rstrip()
+                    if line.startswith('rtmp') or line.startswith('rtsp') or line.startswith('mms'):
+                        line = '#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s:%s' % (line, namel)
+                    if not line.startswith("#SERVICE 4097:0:1:0:0:0:0:0:0:0:rt"):
+                        if line.startswith('http%3a'):
+                            line = '#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s:%s' % (line, namel)
+                        if line.startswith('https%3a'):
+                            line = '#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s:%s' % (line, namel)
+                elif type.upper() == 'RADIO':
+                    line = line.replace(':', '%3a')
+                    line = line.rstrip()
+                    if line.startswith('rtmp') or line.startswith('rtsp') or line.startswith('mms'):
+                        line = '#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s:%s' % (line, namel)
+                    if not line.startswith("#SERVICE 4097:0:2:0:0:0:0:0:0:0:rt"):
+                        if line.startswith('http%3a'):
+                            line = '#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s:%s' % (line, namel)
+                        if line.startswith('https%3a'):
+                            line = '#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s:%s' % (line, namel)
+                else:
+                    print("UNKNOWN TYPE: %s" % type)
+            tmplist.append(line)
+            tmplist.append(tmpx)
+            print('lineee222: ', line)
+            print('tmpx222: ', tmpx)
+
+        path1 = '/etc/enigma2/' + str(bouquetname)
+        path2 = '/etc/enigma2/bouquets.' + str(type.lower())
+        # create userbouquet
+        with open(path1, 'w+') as f:
+            for item in tmplist:
+                f.write("%s\n" % item)
+        # write bouquet.tv file
+        in_bouquets = 0
+        for line in open('/etc/enigma2/bouquets.%s' % type.lower()):
+            if bouquetname in line:
+                in_bouquets = 1
+                break
         if in_bouquets == 0:
-            if os.path.isfile('/etc/enigma2/%s' % parsabouquet) and os.path.isfile('/etc/enigma2/bouquets.tv'):
-                Utils.remove_line('/etc/enigma2/bouquets.tv', parsabouquet)
-                with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
-                    outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % parsabouquet)
-                    outfile.close()
-    message = (_("Bouquet exported"))
-    Utils.web_info(message)
-    Utils.ReloadBouquets()
+            '''
+            Rename unlinked bouquet file /etc/enigma2/userbouquet.webcam.tv to /etc/enigma2/userbouquet.webcam.tv.del
+            '''
+            with open(path2, 'a+') as f:
+                bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + str(bouquetname) + '" ORDER BY bouquet\n'
+                f.write(str(bouquetTvString))
+        message = (_("Bouquet exported"))
+        Utils.web_info(message)
+        Utils.ReloadBouquets()
 
 
 class AutoStartTimerptv:
