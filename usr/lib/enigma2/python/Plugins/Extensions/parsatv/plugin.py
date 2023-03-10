@@ -139,30 +139,6 @@ EXTTRV = "travel"
 
 
 def returnpng(name):
-    # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('parsatv'))
-    # if any(s in name.lower() for s in EXTTRV):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/travel.png".format('parsatv'))
-    # elif any(s in name.lower() for s in EXTXXX):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/xxx.png".format('parsatv'))
-    # elif any(s in name.lower() for s in EXTCAM):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('parsatv'))
-    # elif any(s in name.lower() for s in EXTMUS):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('parsatv'))
-    # elif any(s in name.lower() for s in EXTSPOR):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('parsatv'))
-    # elif any(s in name.lower() for s in EXTRLX):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/relax.png".format('parsatv'))
-    # elif any(s in name.lower() for s in EXTMOV):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/movie.png".format('parsatv'))
-    # elif any(s in name.lower() for s in EXTWEA):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/weather.png".format('parsatv'))
-    # elif any(s in name.lower() for s in EXTFAM):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/family.png".format('parsatv'))
-    # elif any(s in name.lower() for s in EXTREL):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/religious.png".format('parsatv'))
-    # elif any(s in name.lower() for s in EXTSHP):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/shop.png".format('parsatv'))
-
     if 'radio' in name.lower():
         png = os.path.join(plugin_path, 'res/pics/radio.png')
     elif 'webcam' in name.lower():
@@ -429,12 +405,12 @@ class parsatv3(Screen):
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self["paypal"] = Label()
-        self['key_green'] = Button(_('Play'))
         self['key_red'] = Button(_('Back'))
+        self['key_green'] = Button(_('Play'))
         self['key_yellow'] = Button(_('Convert'))
         self["key_blue"] = Button(_(''))
-        # self['key_yellow'].hide()
         self["key_green"].hide()
+        self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
         if Utils.DreamOS():
@@ -512,7 +488,7 @@ class parsatv3(Screen):
                         items.append(item)
                         # save m3u
                         e.write('#EXTINF:-1,' + name1 + '\n')
-                        e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
+                        # e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                         e.write(url + '\n')
                         # save m3u end
             items.sort()
@@ -523,6 +499,7 @@ class parsatv3(Screen):
                 self.urls.append(url)
             self['info'].setText(_('Please select ...'))
             self["key_green"].show()
+            self['key_yellow'].show()
             showlistpars(self.names, self['text'])
             print('-------------parsatv-------------')
         except Exception as e:
@@ -566,11 +543,12 @@ class parsasport(Screen):
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self["paypal"] = Label()
-        self['key_green'] = Button(_('Play'))
         self['key_red'] = Button(_('Back'))
+        self['key_green'] = Button(_('Play'))
         self['key_yellow'] = Button(_('Convert'))
         self["key_blue"] = Button(_(''))
         self["key_green"].hide()
+        self['key_yellow'].hide()
         self['key_blue'].hide()
         self.timer = eTimer()
         if Utils.DreamOS():
@@ -640,7 +618,7 @@ class parsasport(Screen):
                             item = name1 + "###" + url
                             items.append(item)
                             e.write('#EXTINF:-1,' + name1 + '\n')
-                            e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
+                            # e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                             e.write(url + '\n')
             items.sort()
             for item in items:
@@ -650,6 +628,7 @@ class parsasport(Screen):
                 self.urls.append(url)
             self['info'].setText(_('Please select ...'))
             self["key_green"].show()
+            self['key_yellow'].show()
             showlistpars(self.names, self['text'])
             print('-------------sport-------------')
 
@@ -693,12 +672,13 @@ class parsatv(Screen):
         self['text'] = OneSetList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self["paypal"] = Label()
-        self['key_green'] = Button(_('Play'))
         self['key_red'] = Button(_('Back'))
+        self['key_green'] = Button(_('Play'))
         self['key_yellow'] = Button(_('Convert'))
         self["key_blue"] = Button(_(''))
-        self['key_blue'].hide()
         self["key_green"].hide()
+        self['key_yellow'].hide()
+        self['key_blue'].hide()
         self.timer = eTimer()
         if Utils.DreamOS():
             self.timer_conn = self.timer.timeout.connect(self._gotPageLoad)
@@ -767,7 +747,7 @@ class parsatv(Screen):
                         items.append(item)
                         # save m3u
                         e.write('#EXTINF:-1,' + name1 + '\n')
-                        e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
+                        # e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                         e.write(url + '\n')
                         # save m3u end
             items.sort()
@@ -778,6 +758,7 @@ class parsatv(Screen):
                 self.urls.append(url)
             self['info'].setText(_('Please select ...'))
             self["key_green"].show()
+            self['key_yellow'].show()
             showlistpars(self.names, self['text'])
             print('-------------parsatv-------------')
 
@@ -1131,7 +1112,7 @@ def make_m3u2(namex):
                         name = '%s' % line.split(',')[-1]
                         name = name.replace('%20', ' ').rstrip('\n')
                         e.write('#EXTINF:-1,' + name + '\n')
-                        e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
+                        # e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
                     if line.startswith("http"):
                         if sys.version_info.major == 3:
                             import urllib.request as urllib2
@@ -1177,12 +1158,6 @@ def convert_bouquet(namex):
     cleanName = re.sub(r'\d+:\d+:[\d.]+', '_', cleanName)
     name_file = re.sub(r'_+', '_', cleanName)
     bouquetname = 'userbouquet.%s.%s' % (name_file.lower(), type.lower())
-    tmpx = ''
-    namel = ''
-    tmplist = []
-    tmplist.append('#NAME %s (%s)' % (name_file, type))
-    tmplist.append('#SERVICE 1:64:0:0:0:0:0:0:0:0::%s CHANNELS' % name_file)
-    tmplist.append('#DESCRIPTION --- %s ---' % name_file)
     print("Converting Bouquet %s" % name_file)
 
     if os.path.exists(downloadparsa):
@@ -1192,70 +1167,61 @@ def convert_bouquet(namex):
     if not os.path.exists(file):
         return
 
-    if os.path.exists(file) and os.stat(file).st_size > 0:
-        for line in open(file):
-            if line.startswith('#EXTM3U'):
-                continue
-            if '#EXTM3U $BorpasFileFormat="1"' in line:  # force export bouquet ???
-                line = line.replace('$BorpasFileFormat="1"', '')
-                continue
-            if line == ' ':
-                continue
-            if line.startswith("#EXTINF"):
-                line = '%s' % line.split(',')[-1]
-                line = Utils.checkStr(line).rstrip('\r').rstrip('\n')
-                namel = '%s' % line.split(',')[-1]
-                tmpx = '#DESCRIPTION %s' % namel
-            else:
-                if type.upper() == 'TV':
-                    line = line.replace(':', '%3a')
-                    line = line.rstrip()
-                    if line.startswith('rtmp') or line.startswith('rtsp') or line.startswith('mms'):
-                        line = '#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s:%s' % (line, namel)
-                    if not line.startswith("#SERVICE 4097:0:1:0:0:0:0:0:0:0:rt"):
-                        if line.startswith('http%3a'):
-                            line = '#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s:%s' % (line, namel)
-                        if line.startswith('https%3a'):
-                            line = '#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s:%s' % (line, namel)
-                elif type.upper() == 'RADIO':
-                    line = line.replace(':', '%3a')
-                    line = line.rstrip()
-                    if line.startswith('rtmp') or line.startswith('rtsp') or line.startswith('mms'):
-                        line = '#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s:%s' % (line, namel)
-                    if not line.startswith("#SERVICE 4097:0:2:0:0:0:0:0:0:0:rt"):
-                        if line.startswith('http%3a'):
-                            line = '#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s:%s' % (line, namel)
-                        if line.startswith('https%3a'):
-                            line = '#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s:%s' % (line, namel)
-                else:
-                    print("UNKNOWN TYPE: %s" % type)
-            tmplist.append(line)
-            tmplist.append(tmpx)
-            print('lineee222: ', line)
-            print('tmpx222: ', tmpx)
+    path1 = '/etc/enigma2/' + str(bouquetname)
+    path2 = '/etc/enigma2/bouquets.' + str(type.lower())
 
-        path1 = '/etc/enigma2/' + str(bouquetname)
-        path2 = '/etc/enigma2/bouquets.' + str(type.lower())
-        # create userbouquet
-        with open(path1, 'w+') as f:
-            for item in tmplist:
-                f.write("%s\n" % item)
-        # write bouquet.tv file
-        in_bouquets = 0
-        for line in open('/etc/enigma2/bouquets.%s' % type.lower()):
-            if bouquetname in line:
-                in_bouquets = 1
-                break
-        if in_bouquets == 0:
-            '''
-            Rename unlinked bouquet file /etc/enigma2/userbouquet.webcam.tv to /etc/enigma2/userbouquet.webcam.tv.del
-            '''
-            with open(path2, 'a+') as f:
-                bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + str(bouquetname) + '" ORDER BY bouquet\n'
-                f.write(str(bouquetTvString))
-        message = (_("Bouquet exported"))
-        Utils.web_info(message)
-        Utils.ReloadBouquets()
+    if os.path.exists(file) and os.stat(file).st_size > 0:
+            tmplist = []
+            tmplist.append('#NAME %s (%s)' % (name_file.upper(), type.upper()))
+            tmplist.append('#SERVICE 1:64:0:0:0:0:0:0:0:0::%s CHANNELS' % name_file)
+            tmplist.append('#DESCRIPTION --- %s ---' % name_file)
+            namel = ' '
+            servicez = ' '
+            descriptionz = ' '
+            for line in open(file):
+
+                if line.startswith("#EXTINF"):
+                    namel = '%s' % line.split(',')[-1]
+                    descriptiona = '#DESCRIPTION %s' % namel
+                    descriptionz = descriptiona.rstrip('\r').rstrip('\n')
+
+                elif line.startswith('http'):
+
+                    if type.upper() == 'TV':
+                        servicea = ('#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s' % line.replace(':', '%3a')).rstrip('\r').rstrip('\n')
+                        servicez = servicea + ':' +  namel
+
+                    elif type.upper() == 'RADIO':
+                        servicea = ('#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s' % line.replace(':', '%3a')).rstrip('\r').rstrip('\n') 
+                        servicez = servicea + ':' +  namel
+
+                if servicez not in tmplist:
+                    tmplist.append(servicez)
+                    tmplist.append(descriptionz)
+
+            with open(path1, 'w+') as f:
+                for item in tmplist:
+                    if item not in f.read():
+                        f.write("%s\n" % item)
+                        print('item  -------- ', item)
+
+            in_bouquets = 0
+            for line in open('/etc/enigma2/bouquets.%s' % type.lower()):
+                if bouquetname in line:
+                    in_bouquets = 1
+            if in_bouquets == 0:
+                '''
+                Rename unlinked bouquet file /etc/enigma2/userbouquet.webcam.tv to /etc/enigma2/userbouquet.webcam.tv.del
+                '''
+                with open(path2, 'a+') as f:
+                    bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + str(bouquetname) + '" ORDER BY bouquet\n'
+                    f.write(str(bouquetTvString))
+
+            from enigma import eDVBDB
+            eDVBDB.getInstance().reloadServicelist()
+            eDVBDB.getInstance().reloadBouquets()
+            message = (_("Bouquet exported"))
+            Utils.web_info(message)
 
 
 class AutoStartTimerptv:
