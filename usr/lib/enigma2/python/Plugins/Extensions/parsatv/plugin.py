@@ -5,7 +5,7 @@
 ****************************************
 *        coded by Lululla & PCD        *
 *             skin by MMark            *
-*             10/02/2023               *
+*             12/03/2023               *
 *       Skin by MMark                  *
 ****************************************
 '''
@@ -29,7 +29,6 @@ from Screens.InfoBarGenerics import InfoBarAudioSelection, InfoBarNotifications
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
-from Tools.LoadPixmap import LoadPixmap
 from enigma import RT_HALIGN_LEFT, RT_VALIGN_CENTER
 from enigma import eTimer, eListboxPythonMultiContent, gFont
 from enigma import eServiceReference, iPlayableService
@@ -42,6 +41,8 @@ import sys
 from os.path import splitext
 global downloadparsa, path_skin, pngs
 downloadparsa = None
+
+_session = None
 
 PY3 = sys.version_info.major >= 3
 if PY3:
@@ -135,7 +136,6 @@ EXTFAM = "family"
 EXTREL = "religious"
 EXTSHP = "shop"
 EXTTRV = "travel"
-
 
 
 def returnpng(name):
@@ -236,6 +236,8 @@ def paypal():
 class MainParsa(Screen):
     def __init__(self, session):
         self.session = session
+        global _session
+        _session = session
         skin = os.path.join(path_skin, 'settings.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
@@ -305,6 +307,8 @@ class MainParsa(Screen):
 class parsatv2(Screen):
     def __init__(self, session):
         self.session = session
+        global _session
+        _session = session
         skin = os.path.join(path_skin, 'settings.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
@@ -392,6 +396,8 @@ class parsatv2(Screen):
 class parsatv3(Screen):
     def __init__(self, session, name, url):
         self.session = session
+        global _session
+        _session = session
         skin = os.path.join(path_skin, 'settings.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
@@ -433,20 +439,18 @@ class parsatv3(Screen):
         self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
 
-    def convert2(self, result):
-        if result:
+    def convert(self, answer=None):
+        if answer is None:
+            self.session.openWithCallback(self.convert, MessageBox, _('Do you want to Convert %s to favorite .tv ?\n\nAttention!! It may take some time depending\non the number of streams contained !!!'))
+        elif answer:
             namex = self.name.lower()
-            namex = namex.replace(' ', '-')
-            namex = namex.strip()
+            namex = namex.replace(' ', '-').strip()
             if Utils.DreamOS():
                 from Tools.BoundFunction import boundFunction
                 self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2, namex))
             else:
                 self.timer.callback.append(make_m3u2(namex))
             self.timer.start(500, True)
-
-    def convert(self):
-        self.session.openWithCallback(self.convert2, MessageBox, _("Do you want to Convert %s to favorite .tv ?\n\nAttention!! Wait more than 5 minutes!!! ") % self.name, MessageBox.TYPE_YESNO, timeout=10, default=True)
 
     def _gotPageLoad(self):
         self.names = []
@@ -529,6 +533,8 @@ class parsatv3(Screen):
 class parsasport(Screen):
     def __init__(self, session):
         self.session = session
+        global _session
+        _session = session
         skin = os.path.join(path_skin, 'settings.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
@@ -572,20 +578,18 @@ class parsasport(Screen):
         self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
 
-    def convert2(self, result):
-        if result:
+    def convert(self, answer=None):
+        if answer is None:
+            self.session.openWithCallback(self.convert, MessageBox, _('Do you want to Convert %s to favorite .tv ?\n\nAttention!! It may take some time depending\non the number of streams contained !!!'))
+        elif answer:
             namex = self.name.lower()
-            namex = namex.replace(' ', '-')
-            namex = namex.strip()
+            namex = namex.replace(' ', '-').strip()
             if Utils.DreamOS():
                 from Tools.BoundFunction import boundFunction
                 self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2, namex))
             else:
                 self.timer.callback.append(make_m3u2(namex))
             self.timer.start(500, True)
-
-    def convert(self):
-        self.session.openWithCallback(self.convert2, MessageBox, _("Do you want to Convert %s to favorite .tv ?\n\nAttention!! Wait more than 5 minutes!!! ") % self.name, MessageBox.TYPE_YESNO, timeout=10, default=True)
 
     def _gotPageLoad(self):
         self.names = []
@@ -660,6 +664,8 @@ class parsasport(Screen):
 class parsatv(Screen):
     def __init__(self, session):
         self.session = session
+        global _session
+        _session = session
         skin = os.path.join(path_skin, 'settings.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
@@ -701,20 +707,18 @@ class parsatv(Screen):
         self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
 
-    def convert2(self, result):
-        if result:
+    def convert(self, answer=None):
+        if answer is None:
+            self.session.openWithCallback(self.convert, MessageBox, _('Do you want to Convert to favorite .tv ?\n\nAttention!! It may take some time depending\non the number of streams contained !!!'))
+        elif answer:
             namex = self.name.lower()
-            namex = namex.replace(' ', '-')
-            namex = namex.strip()
+            namex = namex.replace(' ', '-').strip()
             if Utils.DreamOS():
                 from Tools.BoundFunction import boundFunction
                 self.timer_conn = self.timer.timeout.connect(boundFunction(make_m3u2, namex))
             else:
                 self.timer.callback.append(make_m3u2(namex))
             self.timer.start(500, True)
-
-    def convert(self):
-        self.session.openWithCallback(self.convert2, MessageBox, _("Do you want to Convert %s to favorite .tv ?\n\nAttention!! Wait more than 5 minutes!!! ") % self.name, MessageBox.TYPE_YESNO, timeout=10, default=True)
 
     def _gotPageLoad(self):
         self.names = []
@@ -1171,57 +1175,69 @@ def convert_bouquet(namex):
     path2 = '/etc/enigma2/bouquets.' + str(type.lower())
 
     if os.path.exists(file) and os.stat(file).st_size > 0:
-            tmplist = []
-            tmplist.append('#NAME %s (%s)' % (name_file.upper(), type.upper()))
-            tmplist.append('#SERVICE 1:64:0:0:0:0:0:0:0:0::%s CHANNELS' % name_file)
-            tmplist.append('#DESCRIPTION --- %s ---' % name_file)
-            namel = ' '
-            servicez = ' '
-            descriptionz = ' '
-            for line in open(file):
+        tmplist = []
+        tmplist.append('#NAME %s (%s)' % (name_file.upper(), type.upper()))
+        tmplist.append('#SERVICE 1:64:0:0:0:0:0:0:0:0::%s CHANNELS' % name_file)
+        tmplist.append('#DESCRIPTION --- %s ---' % name_file)
+        namel = ''
+        servicez = ''
+        descriptionz = ''
+        for line in open(file):
 
-                if line.startswith("#EXTINF"):
-                    namel = '%s' % line.split(',')[-1]
-                    descriptiona = '#DESCRIPTION %s' % namel
-                    descriptionz = descriptiona.rstrip('\r').rstrip('\n')
+            if line.startswith("#EXTINF"):
+                namel = '%s' % line.split(',')[-1]
+                descriptiona = ('#DESCRIPTION %s' % namel).splitlines()
+                descriptionz = ''.join(descriptiona)
 
-                elif line.startswith('http'):
+            elif line.startswith('http'):
+                tag = '1'
+                if type.upper() == 'RADIO':
+                    tag = '2'
 
-                    if type.upper() == 'TV':
-                        servicea = ('#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s' % line.replace(':', '%3a')).rstrip('\r').rstrip('\n')
-                        servicez = servicea + ':' +  namel
+                servicea = ('#SERVICE 4097:0:%s:0:0:0:0:0:0:0:%s' % (tag, line.replace(':', '%3a')))  # .rstrip('\r').rstrip('\n')
+                servicez = (servicea + ':' + namel).splitlines()
+                servicez = ''.join(servicez)
 
-                    elif type.upper() == 'RADIO':
-                        servicea = ('#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s' % line.replace(':', '%3a')).rstrip('\r').rstrip('\n') 
-                        servicez = servicea + ':' +  namel
+                # elif type.upper() == 'RADIO':
+                    # servicea = ('#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s' % line.replace(':', '%3a')).rstrip('\r').rstrip('\n')
+                    # servicez = (servicea + ':' +  namel).splitlines()
+                    # servicez = ''.join(servicez)
 
-                if servicez not in tmplist:
-                    tmplist.append(servicez)
-                    tmplist.append(descriptionz)
+            if servicez not in tmplist:
+                tmplist.append(servicez)
+                tmplist.append(descriptionz)
 
-            with open(path1, 'w+') as f:
-                for item in tmplist:
-                    if item not in f.read():
-                        f.write("%s\n" % item)
-                        print('item  -------- ', item)
+        with open(path1, 'w+') as f:
+            for item in tmplist:
+                if item not in f.read():
+                    f.write("%s\n" % item)
+                    print('item  -------- ', item)
 
-            in_bouquets = 0
-            for line in open('/etc/enigma2/bouquets.%s' % type.lower()):
-                if bouquetname in line:
-                    in_bouquets = 1
-            if in_bouquets == 0:
-                '''
-                Rename unlinked bouquet file /etc/enigma2/userbouquet.webcam.tv to /etc/enigma2/userbouquet.webcam.tv.del
-                '''
-                with open(path2, 'a+') as f:
-                    bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + str(bouquetname) + '" ORDER BY bouquet\n'
-                    f.write(str(bouquetTvString))
-
+        in_bouquets = 0
+        for line in open('/etc/enigma2/bouquets.%s' % type.lower()):
+            if bouquetname in line:
+                in_bouquets = 1
+        if in_bouquets == 0:
+            '''
+            Rename unlinked bouquet file /etc/enigma2/userbouquet.webcam.tv to /etc/enigma2/userbouquet.webcam.tv.del
+            '''
+            with open(path2, 'a+') as f:
+                bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + str(bouquetname) + '" ORDER BY bouquet\n'
+                f.write(str(bouquetTvString))
+        try:
             from enigma import eDVBDB
             eDVBDB.getInstance().reloadServicelist()
             eDVBDB.getInstance().reloadBouquets()
-            message = (_("Bouquet exported"))
-            Utils.web_info(message)
+            print('all bouquets reloaded...')
+        except:
+            eDVBDB = None
+            os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
+            print('bouquets reloaded...')
+
+        # import subprocess
+        # myCmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
+        # subprocess.Popen(myCmd, shell=True, executable='/bin/bash')
+        mbox = _session.open(MessageBox, _('bouquets reloaded..'), MessageBox.TYPE_INFO, timeout=5)
 
 
 class AutoStartTimerptv:
