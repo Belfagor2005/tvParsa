@@ -369,7 +369,7 @@ class parsatv2(Screen):
             match = re.compile(regexvideo, re.DOTALL).findall(content)
             for name in match:
                 url = url.replace(' ', '%20')
-                item = name + "###" + url
+                item = name + "###" + url + '\n'
                 items.append(item)
             items.sort()
             for item in items:
@@ -488,7 +488,7 @@ class parsatv3(Screen):
                     if url.startswith('http'):
                         url = url.replace(' ', '%20')
                         name1 = name.replace('%20', ' ')
-                        item = name1 + "###" + url
+                        item = name1 + "###" + url + '\n'
                         items.append(item)
                         # save m3u
                         e.write('#EXTINF:-1,' + name1 + '\n')
@@ -619,7 +619,7 @@ class parsasport(Screen):
                         url = url.replace(' ', '%20')
                         if 'sport' in str(url).lower():
                             name1 = name.replace('%20', ' ')
-                            item = name1 + "###" + url
+                            item = name1 + "###" + url + '\n'
                             items.append(item)
                             e.write('#EXTINF:-1,' + name1 + '\n')
                             # e.write("#EXTVLCOPT:http-user-agent=fake_UA\n")
@@ -747,7 +747,7 @@ class parsatv(Screen):
                     if url.startswith('http'):
                         url = url.replace(' ', '%20')
                         name1 = name.replace('%20', ' ')
-                        item = name1 + "###" + url
+                        item = name1 + "###" + url + '\n'
                         items.append(item)
                         # save m3u
                         e.write('#EXTINF:-1,' + name1 + '\n')
@@ -1010,7 +1010,7 @@ class Playgo(
 
     def openTest(self, servicetype, url):
         name = self.name
-        ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3a"), name.replace(":", "%3a"))
+        ref = "{0}:0:1:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3a"), name.replace(":", "%3a"))
         print('reference:   ', ref)
         if streaml is True:
             url = 'http://127.0.0.1:8088/' + str(url)
