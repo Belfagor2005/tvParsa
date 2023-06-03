@@ -10,7 +10,7 @@
 ****************************************
 '''
 from __future__ import print_function
-from . import _
+from . import _, paypal
 from . import html_conv
 from . import Utils
 from Components.AVSwitch import AVSwitch
@@ -91,13 +91,6 @@ def ssl_urlopen(url):
         return urlopen(url, context=sslContext)
     else:
         return urlopen(url)
-
-
-def paypal():
-    conthelp = "If you like what I do you\n"
-    conthelp += "can contribute with a coffee\n"
-    conthelp += "scan the qr code and donate € 1.00"
-    return conthelp
 
 
 currversion = '1.6'
@@ -224,13 +217,6 @@ def returnIMDB(text_clear):
         text_clear = html_conv.html_unescape(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
-
-
-def paypal():
-    conthelp = "If you like what I do you\n"
-    conthelp += "can contribute with a coffee\n"
-    conthelp += "scan the qr code and donate € 1.00"
-    return conthelp
 
 
 class MainParsa(Screen):
@@ -903,8 +889,6 @@ class Playgo(
         global SREF, streaml
         Screen.__init__(self, session)
         self.session = session
-        global _session
-        _session = session
         self.skinName = 'MoviePlayer'
         streaml = False
         self.allowPiP = False
@@ -1234,9 +1218,6 @@ def convert_bouquet(namex):
             os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
             print('bouquets reloaded...')
 
-        # import subprocess
-        # myCmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
-        # subprocess.Popen(myCmd, shell=True, executable='/bin/bash')
         mbox = _session.open(MessageBox, _('bouquets reloaded..'), MessageBox.TYPE_INFO, timeout=5)
 
 
