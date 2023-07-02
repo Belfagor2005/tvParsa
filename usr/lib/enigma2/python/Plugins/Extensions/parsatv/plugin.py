@@ -33,6 +33,7 @@ from enigma import RT_HALIGN_LEFT, RT_VALIGN_CENTER
 from enigma import eTimer, eListboxPythonMultiContent, gFont
 from enigma import eServiceReference, iPlayableService
 from enigma import loadPNG
+from enigma import getDesktop
 import os
 import re
 import six
@@ -100,10 +101,20 @@ desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
 plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('parsatv'))
 pluglogo = os.path.join(plugin_path, 'res/pics/logo.png')
 png = os.path.join(plugin_path, 'res/pics/tv.png')
-if Utils.isFHD():
-    path_skin = os.path.join(plugin_path, 'res/skins/fhd/')
+
+screenwidth = getDesktop(0).size()
+if screenwidth.width() == 2560:
+    path_skin = plugin_path + '/res/skins/uhd/'
+elif screenwidth.width() == 1920:
+    path_skin = plugin_path + '/res/skins/fhd/'
 else:
-    path_skin = os.path.join(plugin_path, 'res/skins/hd/')
+    path_skin = plugin_path + '/res/skins/hd/'
+    
+
+# if Utils.isFHD() or Utils.isUHD():
+    # path_skin = os.path.join(plugin_path, 'res/skins/fhd/')
+# else:
+    # path_skin = os.path.join(plugin_path, 'res/skins/hd/')
 
 if Utils.DreamOS():
     path_skin = path_skin + 'dreamOs/'
@@ -162,7 +173,11 @@ def returnpng(name):
 class OneSetList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
-        if Utils.isFHD():
+        if screenwidth.width() == 2560:
+            self.l.setItemHeight(60)
+            textfont = int(42)
+            self.l.setFont(0, gFont('Regular', textfont))        
+        elif screenwidth.width() == 1920:
             self.l.setItemHeight(50)
             textfont = int(30)
             self.l.setFont(0, gFont('Regular', textfont))
@@ -175,7 +190,10 @@ class OneSetList(MenuList):
 def OneSetListEntry(name, idx):
     res = [name]
     png = returnpng(name)
-    if Utils.isFHD():
+    if screenwidth.width() == 2560:
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(50, 50), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(90, 0), size=(1200, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
+    elif screenwidth.width() == 1920:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
