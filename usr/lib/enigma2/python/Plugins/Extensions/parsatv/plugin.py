@@ -109,12 +109,6 @@ elif screenwidth.width() == 1920:
     path_skin = plugin_path + '/res/skins/fhd/'
 else:
     path_skin = plugin_path + '/res/skins/hd/'
-    
-
-# if Utils.isFHD() or Utils.isUHD():
-    # path_skin = os.path.join(plugin_path, 'res/skins/fhd/')
-# else:
-    # path_skin = os.path.join(plugin_path, 'res/skins/hd/')
 
 if Utils.DreamOS():
     path_skin = path_skin + 'dreamOs/'
