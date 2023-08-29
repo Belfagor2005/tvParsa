@@ -14,9 +14,9 @@ from . import _, paypal
 from . import html_conv
 from . import Utils
 try:
-    from Components.AVSwitch import eAVSwitch
+    from Components.AVSwitch import eAVSwitch as AVSwitch
 except Exception:
-    from Components.AVSwitch import iAVSwitch as eAVSwitch
+    from Components.AVSwitch import iAVSwitch as AVSwitch
 from Components.ActionMap import ActionMap
 from Components.Button import Button
 from Components.config import config
@@ -191,7 +191,7 @@ def OneSetListEntry(name, idx):
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(50, 50), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(90, 0), size=(1200, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
     elif screenwidth.width() == 1920:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 7), size=(40, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 10), size=(40, 40), png=loadPNG(png)))
@@ -318,7 +318,7 @@ class parsatv2(Screen):
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
-        self.name = 'Parsa Sport'
+        self.name = 'Parsa Category'
         self.url = 'https://www.parsatv.com/m/'
         self['title'] = Label(title_plug)
         self['text'] = OneSetList([])
@@ -403,7 +403,7 @@ class parsatv3(Screen):
         skin = os.path.join(path_skin, 'settings.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
-        self.setup_title = ('Parsa TV')
+        self.setup_title = ('Parsa Category')
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
@@ -540,7 +540,7 @@ class parsasport(Screen):
         skin = os.path.join(path_skin, 'settings.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
-        self.setup_title = ('Parsa TV')
+        self.setup_title = ('Parsa Sport')
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
@@ -957,7 +957,7 @@ class Playgo(
         self.onClose.append(self.cancel)
 
     def getAspect(self):
-        return eAVSwitch().getAspectRatioSetting()
+        return AVSwitch().getAspectRatioSetting()
 
     def getAspectString(self, aspectnum):
         return {
@@ -982,7 +982,7 @@ class Playgo(
         }
         config.av.aspectratio.setValue(map[aspect])
         try:
-            eAVSwitch().setAspectRatio(aspect)
+            AVSwitch().setAspectRatio(aspect)
         except:
             pass
 
