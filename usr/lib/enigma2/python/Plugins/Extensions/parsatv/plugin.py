@@ -480,7 +480,6 @@ class parsatv3(Screen):
                 else:
                     print('no, not n6 in content!')
                 s1 = name + "<a></a>"
-                # s1 = name + "<a></a></li></td>"
                 n1 = content.find(s1)
                 n2 = content.find("<td id=", n1)
                 content2 = content[n1:n2]
