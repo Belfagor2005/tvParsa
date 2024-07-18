@@ -1,23 +1,20 @@
-<screen name="MainSetting" position="0,0" size="1280,720" title="..::parsatv::.." backgroundColor="#ff000000" flags="wfNoBorder">
-	<widget name="title" position="205,31" size="553,26" font="Regular;22" halign="center" valign="center" foregroundColor="#ffff00" backgroundColor="black" transparent="1" zPosition="5"/>
-	<widget name="info" position="146,86" size="646,33" font="Regular;20" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#202020" transparent="0" zPosition="5"/>
-	<ePixmap position="0,0" size="1280,720" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/main2hd.png" zPosition="1"/>
-	<ePixmap position="338,535" size="279,50" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/tvs.png" alphatest="blend" zPosition="5"/>
-	<ePixmap position="146,73" size="646,5" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/sep.png" zPosition="5"/>
-	<ePixmap position="146,613" size="646,5" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/sep.png" alphatest="blend" zPosition="5"/>
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/PayPal.png" position="1006,27" size="156,75" zPosition="2" alphatest="on"/>
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/qr-code.png" position="932,104" size="320,320" zPosition="2" alphatest="on"/>
-	<widget name="paypal" position="913,427" size="367,269" font="Regular;24" halign="center" foregroundColor="#ffffff" backgroundColor="#101010" transparent="1" zPosition="2"/>
-	<eLabel position="908,16" size="370,687" backgroundColor="#80000000" cornerRadius="20" zPosition="1"/>
+<!-- Skin Setting 15/08/2020 -->
+<screen name="MainParsa" position="0,0" size="1280,720" title="..::parsatv::.." flags="wfNoBorder">
+	<widget name="title" position="270,18" size="520,47" font="Regular;22" halign="left" valign="center" foregroundColor="#ffff00" backgroundColor="black" transparent="1" zPosition="5" />
+	<widget name="info" position="146,74" size="646,46" font="Regular;20" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#202020" transparent="1" zPosition="5" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/3.png" position="0,0" size="1280,720" scale="stretch" zPosition="0" alphatest="blend" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/logo.png" position="146,17" size="112,48" scale="stretch" zPosition="5" alphatest="blend" transparent="0" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/PayPal.png" position="1134,232" size="104,50" scale="stretch" zPosition="5" alphatest="on" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/qr-code.png" position="964,120" size="160,160" scale="stretch" zPosition="2" alphatest="on" />
+	<widget name="paypal" position="889,294" size="350,181" font="Regular;16" halign="center" foregroundColor="#ffffff" backgroundColor="#101010" transparent="1" zPosition="2" />
 	<!-- Menu List -->
-	<widget name="text" position="146,126" size="646,366" font="Regular;20" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#00a0a0a0" foregroundColorSelected="#ffffff" backgroundColor="#20000000" backgroundColorSelected="#0b2049" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/sliderb.png"/>
+	<widget name="text" position="146,126" size="646,465" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#00a0a0a0" foregroundColorSelected="#ffffff" backgroundColor="#20000000" backgroundColorSelected="#0b2049" />
 	<!-- Colors 1220 -->
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/key_red.png" position="146,636" size="20,20" alphatest="on" zPosition="5"/>
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/key_green.png" position="146,673" size="20,20" alphatest="on" zPosition="5"/>
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/key_yellow.png" position="770,636" size="20,20" alphatest="on" zPosition="5"/>
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/key_blue.png" position="770,673" size="20,20" alphatest="on" zPosition="5"/>
-	<widget name="key_red" position="180,633" size="200,26" font="Regular;20" halign="left" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1"/>
-	<widget name="key_green" position="180,670" size="200,26" font="Regular;20" halign="left" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1"/>
-	<widget name="key_yellow" position="556,633" size="200,26" font="Regular;20" halign="right" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1"/>
-	<widget name="key_blue" position="556,670" size="200,26" font="Regular;20" halign="right" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1"/>
+    <eLabel position="153,633" size="140,40" backgroundColor="#ff0033" zPosition="1" />       
+    <eLabel position="653,633" size="140,40" backgroundColor="#009900" zPosition="1" />
+    <eLabel position="407,633" size="140,40" backgroundColor="#ffff00" zPosition="1" />
+    <eLabel position="138,608" size="666,4" backgroundColor="#1edb76" zPosition="1" />
+	<widget name="key_red" position="152,633" size="142,42" font="Regular;20" halign="left" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
+	<widget name="key_green" position="653,632" size="140,42" font="Regular;20" halign="left" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
+	<widget name="key_yellow" position="406,633" size="140,40" font="Regular;20" halign="right" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
 </screen>

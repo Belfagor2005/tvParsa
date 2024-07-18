@@ -11,43 +11,54 @@
 '''
 from __future__ import print_function
 from . import _, paypal
-from . import html_conv
 from . import Utils
-import codecs
+from . import html_conv
+from .Console import Console as xConsole
+
 from Components.AVSwitch import AVSwitch
-try:
-    from enigma import eAVSwitch
-except Exception as e:
-    print(e)
 from Components.ActionMap import ActionMap
 from Components.Button import Button
 from Components.config import config
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryText
-from Components.MultiContent import MultiContentEntryPixmapAlphaTest
-from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
+from Components.MultiContent import (MultiContentEntryPixmapAlphaTest, MultiContentEntryText)
+from Components.ServiceEventTracker import (ServiceEventTracker, InfoBarBase)
 from Plugins.Plugin import PluginDescriptor
-from Screens.InfoBar import MoviePlayer
-from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu, InfoBarSeek
-from Screens.InfoBarGenerics import InfoBarAudioSelection, InfoBarNotifications
+from Screens.InfoBarGenerics import (
+    InfoBarSubtitleSupport,
+    InfoBarSeek,
+    InfoBarAudioSelection,
+    InfoBarMenu,
+    InfoBarNotifications,
+)
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Tools.Directories import SCOPE_PLUGINS, resolveFilename
-from enigma import RT_HALIGN_LEFT, RT_VALIGN_CENTER
-from enigma import eTimer, eListboxPythonMultiContent, gFont
-from enigma import eServiceReference, iPlayableService
-from enigma import loadPNG
-from enigma import getDesktop
+from Tools.Directories import (SCOPE_PLUGINS, resolveFilename)
+from enigma import (
+    RT_VALIGN_CENTER,
+    RT_HALIGN_LEFT,
+    eTimer,
+    eListboxPythonMultiContent,
+    eServiceReference,
+    iPlayableService,
+    gFont,
+    ePicLoad,
+    loadPNG,
+    getDesktop,
+)
+from datetime import datetime
+import codecs
+import json
 import os
 import re
 import six
 import ssl
 import sys
 from os.path import splitext
-global downloadparsa, path_skin, pngs
-downloadparsa = None
 
+global downloadparsa, path_skin, pngs
+
+downloadparsa = None
 _session = None
 
 PY3 = sys.version_info.major >= 3
@@ -99,14 +110,14 @@ def ssl_urlopen(url):
         return urlopen(url)
 
 
-currversion = '1.6'
+currversion = '1.7'
 title_plug = 'Parsa TV '
-_firstStartptv = True
 desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
 plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('parsatv'))
 pluglogo = os.path.join(plugin_path, 'res/pics/logo.png')
 png = os.path.join(plugin_path, 'res/pics/tv.png')
-
+installer_url = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0JlbGZhZ29yMjAwNS90dlBhcnNhL21haW4vaW5zdGFsbGVyLnNo'
+developer_url = 'aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9CZWxmYWdvcjIwMDUvdHZQYXJzYQ=='
 screenwidth = getDesktop(0).size()
 if screenwidth.width() == 2560:
     path_skin = plugin_path + '/res/skins/uhd/'
@@ -175,10 +186,10 @@ class OneSetList(MenuList):
         if screenwidth.width() == 2560:
             self.l.setItemHeight(60)
             textfont = int(42)
-            self.l.setFont(0, gFont('Regular', textfont))        
+            self.l.setFont(0, gFont('Regular', textfont))
         elif screenwidth.width() == 1920:
             self.l.setItemHeight(50)
-            textfont = int(30)
+            textfont = int(32)
             self.l.setFont(0, gFont('Regular', textfont))
         else:
             self.l.setItemHeight(50)
@@ -191,7 +202,7 @@ def OneSetListEntry(name, idx):
     png = returnpng(name)
     if screenwidth.width() == 2560:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(50, 50), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(90, 0), size=(1200, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
+        res.append(MultiContentEntryText(pos=(90, 0), size=(1200, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     elif screenwidth.width() == 1920:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 7), size=(40, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
@@ -207,7 +218,7 @@ def showlistpars(data, list):
     for line in data:
         name = data[icount]
         plist.append(OneSetListEntry(name, icount))
-        icount = icount+1
+        icount += 1
         list.setList(plist)
 
 
@@ -252,23 +263,93 @@ class MainParsa(Screen):
         self['title'] = Label(title_plug)
         self['info'] = Label(_('Loading data... Please wait'))
         self["paypal"] = Label()
-        self['key_yellow'] = Button(_(''))
+        self['key_yellow'] = Button(_('Update'))
         self['key_yellow'].hide()
         self['key_green'] = Button(_('Select'))
         self['key_red'] = Button(_('Exit'))
-        self["key_blue"] = Button(_(''))
+        self["key_blue"] = Button()
         self['key_blue'].hide()
         self["key_green"].hide()
+        self.Update = False
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
-                                     'ButtonSetupActions',
-                                     'DirectionActions'], {'ok': self.okRun,
+                                     'HotkeyActions',
+                                     'InfobarEPGActions',
+                                     'ChannelSelectBaseActions',
+                                     'DirectionActions'], {'yellow': self.update_me,  # update_me,
+                                                           'yellow_long': self.update_dev,
+                                                           'info_long': self.update_dev,
+                                                           'infolong': self.update_dev,
+                                                           'showEventInfoPlugin': self.update_dev,
+                                                           'ok': self.okRun,
                                                            'green': self.okRun,
-                                                           'back': self.closerm,
-                                                           'red': self.closerm,
-                                                           'cancel': self.closerm}, -1)
+                                                           'cancel': self.closerm,
+                                                           'red': self.closerm}, -1)
+        self.timer = eTimer()
+        if os.path.exists('/var/lib/dpkg/status'):
+            self.timer_conn = self.timer.timeout.connect(self.check_vers)
+        else:
+            self.timer.callback.append(self.check_vers)
+        self.timer.start(500, 1)
         self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.layoutFinished)
+
+    def check_vers(self):
+        remote_version = '0.0'
+        remote_changelog = ''
+        req = Utils.Request(Utils.b64decoder(installer_url), headers={'User-Agent': 'Mozilla/5.0'})
+        page = Utils.urlopen(req).read()
+        if PY3:
+            data = page.decode("utf-8")
+        else:
+            data = page.encode("utf-8")
+        if data:
+            lines = data.split("\n")
+            for line in lines:
+                if line.startswith("version"):
+                    remote_version = line.split("=")
+                    remote_version = line.split("'")[1]
+                if line.startswith("changelog"):
+                    remote_changelog = line.split("=")
+                    remote_changelog = line.split("'")[1]
+                    break
+        self.new_version = remote_version
+        self.new_changelog = remote_changelog
+        if currversion < remote_version:
+            self.Update = True
+            self['key_yellow'].show()
+            # self['key_green'].show()
+            self.session.open(MessageBox, _('New version %s is available\n\nChangelog: %s\n\nPress info_long or yellow_long button to start force updating.') % (self.new_version, self.new_changelog), MessageBox.TYPE_INFO, timeout=5)
+        # self.update_me()
+
+    def update_me(self):
+        if self.Update is True:
+            self.session.openWithCallback(self.install_update, MessageBox, _("New version %s is available.\n\nChangelog: %s \n\nDo you want to install it now?") % (self.new_version, self.new_changelog), MessageBox.TYPE_YESNO)
+        else:
+            self.session.open(MessageBox, _("Congrats! You already have the latest version..."),  MessageBox.TYPE_INFO, timeout=4)
+
+    def update_dev(self):
+        try:
+            req = Utils.Request(Utils.b64decoder(developer_url), headers={'User-Agent': 'Mozilla/5.0'})
+            page = Utils.urlopen(req).read()
+            data = json.loads(page)
+            remote_date = data['pushed_at']
+            strp_remote_date = datetime.strptime(remote_date, '%Y-%m-%dT%H:%M:%SZ')
+            remote_date = strp_remote_date.strftime('%Y-%m-%d')
+            self.session.openWithCallback(self.install_update, MessageBox, _("Do you want to install update ( %s ) now?") % (remote_date), MessageBox.TYPE_YESNO)
+        except Exception as e:
+            print('error xcons:', e)
+
+    def install_update(self, answer=False):
+        if answer:
+            cmd1 = 'wget -q "--no-check-certificate" ' + Utils.b64decoder(installer_url) + ' -O - | /bin/sh'
+            self.session.open(xConsole, 'Upgrading...', cmdlist=[cmd1], finishedCallback=self.myCallback, closeOnSuccess=False)
+        else:
+            self.session.open(MessageBox, _("Update Aborted!"),  MessageBox.TYPE_INFO, timeout=3)
+
+    def myCallback(self, result=None):
+        print('result:', result)
+        return
 
     def layoutFinished(self):
         payp = paypal()
@@ -418,7 +499,7 @@ class parsatv3(Screen):
         self['key_red'] = Button(_('Back'))
         self['key_green'] = Button(_('Play'))
         self['key_yellow'] = Button(_('Convert'))
-        self["key_blue"] = Button(_(''))
+        self["key_blue"] = Button()
         self["key_green"].hide()
         self['key_yellow'].hide()
         self['key_blue'].hide()
@@ -555,7 +636,7 @@ class parsasport(Screen):
         self['key_red'] = Button(_('Back'))
         self['key_green'] = Button(_('Play'))
         self['key_yellow'] = Button(_('Convert'))
-        self["key_blue"] = Button(_(''))
+        self["key_blue"] = Button()
         self["key_green"].hide()
         self['key_yellow'].hide()
         self['key_blue'].hide()
@@ -684,7 +765,7 @@ class parsatv(Screen):
         self['key_red'] = Button(_('Back'))
         self['key_green'] = Button(_('Play'))
         self['key_yellow'] = Button(_('Convert'))
-        self["key_blue"] = Button(_(''))
+        self["key_blue"] = Button()
         self["key_green"].hide()
         self['key_yellow'].hide()
         self['key_blue'].hide()
@@ -885,16 +966,14 @@ class TvInfoBarShowHide():
         print(text + " %s\n" % obj)
 
 
-class Playgo(
-    InfoBarBase,
-    InfoBarMenu,
-    InfoBarSeek,
-    InfoBarAudioSelection,
-    InfoBarSubtitleSupport,
-    InfoBarNotifications,
-    TvInfoBarShowHide,
-    Screen
-):
+class Playgo(InfoBarBase,
+             InfoBarMenu,
+             InfoBarSeek,
+             InfoBarAudioSelection,
+             InfoBarSubtitleSupport,
+             InfoBarNotifications,
+             TvInfoBarShowHide,
+             Screen):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
@@ -1231,37 +1310,7 @@ def convert_bouquet(namex):
             os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
             print('bouquets reloaded...')
 
-        mbox = _session.open(MessageBox, _('bouquets reloaded..'), MessageBox.TYPE_INFO, timeout=5)
-
-
-class AutoStartTimerptv:
-
-    def __init__(self, session):
-        self.session = session
-        global _firstStartptv
-        print("*** running AutoStartTimerptv ***")
-        if _firstStartptv:
-            self.runUpdate()
-
-    def runUpdate(self):
-        print("*** running update ***")
-        try:
-            from . import Update
-            Update.upd_done()
-            _firstStartptv = False
-        except Exception as e:
-            print('error Fxy', str(e))
-
-
-def autostart(reason, session=None, **kwargs):
-    print("*** running autostart ***")
-    global autoStartTimerptv
-    global _firstStartptv
-    if reason == 0:
-        if session is not None:
-            _firstStartptv = True
-            autoStartTimerptv = AutoStartTimerptv(session)
-    return
+        _session.open(MessageBox, _('bouquets reloaded..'), MessageBox.TYPE_INFO, timeout=5)
 
 
 def main(session, **kwargs):
@@ -1278,7 +1327,7 @@ def Plugins(**kwargs):
     if not os.path.exists('/var/lib/dpkg/status'):
         ico_path = plugin_path + '/res/pics/logo.png'
     extensions_menu = PluginDescriptor(name=title_plug, description=desc_plugin, where=PluginDescriptor.WHERE_EXTENSIONSMENU, fnc=main, needsRestart=True)
-    result = [PluginDescriptor(name=title_plug, description=desc_plugin, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
-              PluginDescriptor(name=title_plug, description=desc_plugin, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]
+    result = [PluginDescriptor(name=title_plug, description=desc_plugin, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]
     result.append(extensions_menu)
     return result
+    # PluginDescriptor(name=title_plug, description=desc_plugin, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
