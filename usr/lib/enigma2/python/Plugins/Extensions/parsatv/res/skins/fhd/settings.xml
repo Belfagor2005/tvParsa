@@ -10,7 +10,7 @@
 	<!-- Menu List -->
 	<widget name="text" position="220,190" size="970,698" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#00a0a0a0" foregroundColorSelected="#ffffff" backgroundColor="#20000000" backgroundColorSelected="#2d8659" />
 	<!-- Colors 1220 -->
-    <eLabel position="230,950" size="210,60" backgroundColor="#ff0033" zPosition="1" />       
+    <eLabel position="230,950" size="210,60" backgroundColor="#ff0033" zPosition="1" />
     <eLabel position="980,950" size="210,60" backgroundColor="#009900" zPosition="1" />
     <eLabel position="611,950" size="210,60" backgroundColor="#ffff00" zPosition="1" />
     <eLabel position="208,912" size="1000,6" backgroundColor="#1edb76" zPosition="1" />
