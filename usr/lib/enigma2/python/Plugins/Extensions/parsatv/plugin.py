@@ -272,7 +272,6 @@ class MainParsa(Screen):
         self["key_green"].hide()
         self.Update = False
         self['actions'] = ActionMap(['OkCancelActions',
-                                     'ColorActions',
                                      'HotkeyActions',
                                      'InfobarEPGActions',
                                      'ChannelSelectBaseActions',
