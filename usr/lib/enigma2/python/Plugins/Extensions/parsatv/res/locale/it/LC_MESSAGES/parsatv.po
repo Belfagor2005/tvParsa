@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: parsatv\n"
-"POT-Creation-Date: 2021-10-09 20:54+0200\n"
+"POT-Creation-Date: 2025-05-17 14:39+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -9,72 +9,135 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.7\n"
+"X-Generator: Poedit 3.6\n"
 "X-Poedit-Basepath: ../../../..\n"
 "X-Poedit-SearchPath-0: plugin.py\n"
 
-#: plugin.py:349 plugin.py:377 plugin.py:459 plugin.py:600 plugin.py:721
-#: plugin.py:847
-msgid "Please select ..."
-msgstr "Seleziona Prego ..."
+#: plugin.py:269 plugin.py:412 plugin.py:509 plugin.py:658 plugin.py:799
+msgid "Loading data... Please wait"
+msgstr "Caricamento dati in corso... Attendi"
 
-#: plugin.py:352
+#: plugin.py:271
+msgid "Update"
+msgstr ""
+
+#: plugin.py:273 plugin.py:414
 msgid "Select"
 msgstr "Seleziona"
 
-#: plugin.py:353
+#: plugin.py:274
 msgid "Exit"
 msgstr "Uscire"
 
-#: plugin.py:384
+#: plugin.py:326
+#, python-format
+msgid ""
+"New version %s is available\n"
+"\n"
+"Changelog: %s\n"
+"\n"
+"Press info_long or yellow_long button to start force updating."
+msgstr ""
+"Nuova versione %s disponibile\n"
+"\n"
+"Changelog: %s\n"
+"\n"
+"Premi il pulsante info_long o yellow_long per avviare l'aggiornamento forzato."
+
+#: plugin.py:331
+#, python-format
+msgid ""
+"New version %s is available.\n"
+"\n"
+"Changelog: %s \n"
+"\n"
+"Do you want to install it now?"
+msgstr ""
+"È disponibile la nuova versione %s.\n"
+"\n"
+"Changelog: %s\n"
+"\n"
+"Vuoi installarla ora?"
+
+#: plugin.py:333
+msgid "Congrats! You already have the latest version..."
+msgstr "Congratulazioni! Hai già l'ultima versione..."
+
+#: plugin.py:343
+#, python-format
+msgid "Do you want to install update ( %s ) now?"
+msgstr "Vuoi installare l'aggiornamento (%s) adesso?"
+
+#: plugin.py:352
+msgid "Update Aborted!"
+msgstr "Aggiornamento annullato!"
+
+#: plugin.py:379 plugin.py:473 plugin.py:606 plugin.py:746 plugin.py:887
+msgid "Please select ..."
+msgstr "Seleziona Prego ..."
+
+#: plugin.py:386
 msgid "PARSA SPORT"
 msgstr "PARSA SPORT"
 
-#: plugin.py:386
+#: plugin.py:388
 msgid "PARSA ALL TV"
 msgstr ""
 
-#: plugin.py:388
+#: plugin.py:390
 msgid "PARSA TV CATEGORY"
 msgstr ""
 
-#: plugin.py:407 plugin.py:483 plugin.py:642 plugin.py:768
-msgid "Getting the list, please wait ..."
-msgstr "Ricevo l'elenco , si prega di attendere ..."
-
-#: plugin.py:408 plugin.py:484 plugin.py:643 plugin.py:769
-msgid "Play"
-msgstr "Play"
-
-#: plugin.py:409 plugin.py:485 plugin.py:644 plugin.py:770
+#: plugin.py:415 plugin.py:511 plugin.py:660 plugin.py:801
 msgid "Back"
 msgstr "Indietro"
 
-#: plugin.py:486 plugin.py:645 plugin.py:771
+#: plugin.py:512 plugin.py:661 plugin.py:802
+msgid "Play"
+msgstr "Play"
+
+#: plugin.py:513 plugin.py:662 plugin.py:803
 msgid "Convert"
 msgstr "Esporta Bouquet"
 
-#: plugin.py:517 plugin.py:674 plugin.py:800
+#: plugin.py:541 plugin.py:691
 #, python-format
 msgid ""
 "Do you want to Convert %s to favorite .tv ?\n"
 "\n"
-"Attention!! Wait more than 5 minutes!!! "
+"Attention!! It may take some time depending\n"
+"on the number of streams contained !!!"
 msgstr ""
-"Vuoi convertire %s in .tv Preferiti?\n"
-"Attenzione!! Aspetta più di 5 minuti !!!"
+"Vuoi convertire %s in .tv preferito?\n"
+"\n"
+"Attenzione! Potrebbe volerci un po' di tempo a seconda del numero di stream contenuti!"
 
-#: plugin.py:1031
-msgid "Wait please... "
-msgstr "Aspetta per favore..."
+#: plugin.py:832
+msgid ""
+"Do you want to Convert to favorite .tv ?\n"
+"\n"
+"Attention!! It may take some time depending\n"
+"on the number of streams contained !!!"
+msgstr ""
+"Vuoi convertire in .tv preferito?\n"
+"\n"
+"Attenzione! Potrebbe volerci un po' di tempo a seconda del numero di stream contenuti!"
 
-#: plugin.py:1044
-msgid "Bouquet successfully exported"
-msgstr "Bouquet Esportato con Successo!"
+#: plugin.py:1322
+msgid "bouquets reloaded.."
+msgstr "bouquet ricaricati.."
 
-#: plugin.py:1056
-msgid "Parsa TV"
-msgstr "Parsa TV"
+#~ msgid "Getting the list, please wait ..."
+#~ msgstr "Ricevo l'elenco , si prega di attendere ..."
+
+#~ msgid "Wait please... "
+#~ msgstr "Aspetta per favore..."
+
+#~ msgid "Bouquet successfully exported"
+#~ msgstr "Bouquet Esportato con Successo!"
+
+#~ msgid "Parsa TV"
+#~ msgstr "Parsa TV"
 
 #~ msgid "PARSA TV"
 #~ msgstr "PARSA TV"

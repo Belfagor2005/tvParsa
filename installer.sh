@@ -3,8 +3,8 @@
 ## setup command=wget -q --no-check-certificate https://raw.githubusercontent.com/Belfagor2005/tvParsa/main/installer.sh -O - | /bin/sh
 
 ## Only This 2 lines to edit with new version ######
-version='1.7'
-changelog='\nAdd Live Upgrade\nFix screen'
+version='1.8'
+changelog='\nRecoded PEP8'
 ##############################################################
 TMPPATH=/tmp/tvParsa-main
 FILEPATH=/tmp/main.tar.gz
