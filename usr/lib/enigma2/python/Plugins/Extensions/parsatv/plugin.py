@@ -1104,7 +1104,6 @@ class Playgo(InfoBarBase,
 		self.session.nav.playService(sref)
 
 	def cicleStreamType(self):
-		global streml
 		from itertools import cycle, islice
 		self.servicetype = '4097'
 		print('servicetype1: ', self.servicetype)
