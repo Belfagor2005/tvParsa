@@ -1,3 +1,7 @@
+[![Python package](https://github.com/Belfagor2005/tvParsa/actions/workflows/pylint.yml/badge.svg)](https://github.com/Belfagor2005/tvParsa/actions/workflows/pylint.yml)
+
+![](https://komarev.com/ghpvc/?username=Belfagor2005)
+
 Tv Parsa
 
 Enigma2 project
