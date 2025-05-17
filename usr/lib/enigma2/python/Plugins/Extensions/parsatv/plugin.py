@@ -49,7 +49,6 @@ from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 
-# Six compatibility
 import six
 
 # Local imports (internal modules)
@@ -446,7 +445,7 @@ class parsatv2(Screen):
 		items = []
 		try:
 			content = Utils.ReadUrl2(url, referer)
-			if six.PY3:
+			if PY3:
 				content = six.ensure_str(content)
 
 			n6 = content.find("<a></a></td>")
@@ -568,7 +567,7 @@ class parsatv3(Screen):
 				e.write("#EXTM3U\n")
 
 				content = Utils.ReadUrl2("https://www.parsatv.com/m/", referer)
-				if six.PY3:
+				if PY3:
 					content = six.ensure_str(content)
 
 				if "<a></a></td>" in content:
@@ -622,7 +621,7 @@ class parsatv3(Screen):
 		url = self.urls[idx]
 
 		content = Utils.ReadUrl2(url, referer)
-		if six.PY3:
+		if PY3:
 			content = six.ensure_str(content)
 
 		n1 = content.find('class="myButton" id=', 0)
@@ -714,7 +713,7 @@ class parsasport(Screen):
 
 		try:
 			content = Utils.ReadUrl2(url, referer)
-			if six.PY3:
+			if PY3:
 				content = six.ensure_str(content)
 
 			n1 = content.find('<td id="persian">', 0)
@@ -764,7 +763,7 @@ class parsasport(Screen):
 
 		try:
 			content = Utils.ReadUrl2(url, referer)
-			if six.PY3:
+			if PY3:
 				content = six.ensure_str(content)
 
 			n1 = content.find('class="myButton" id=', 0)
@@ -854,7 +853,7 @@ class parsatv(Screen):
 
 		try:
 			content = Utils.ReadUrl2(url, referer)
-			if six.PY3:
+			if PY3:
 				content = six.ensure_str(content)
 
 			n1 = content.find('<td id="persian">', 0)
@@ -903,7 +902,7 @@ class parsatv(Screen):
 
 		try:
 			content = Utils.ReadUrl2(url, referer)
-			if six.PY3:
+			if PY3:
 				content = six.ensure_str(content)
 
 			n1 = content.find('class="myButton" id=', 0)
