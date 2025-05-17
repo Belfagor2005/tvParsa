@@ -15,6 +15,7 @@ import re
 import requests
 import ssl
 import sys
+import six
 
 requests.packages.urllib3.disable_warnings(
 	requests.packages.urllib3.exceptions.InsecureRequestWarning)
@@ -1276,7 +1277,6 @@ def normalize(title):
 def get_safe_filename(filename, fallback=''):
 	'''Convert filename to safe filename'''
 	import unicodedata
-	import six
 	import re
 	name = filename.replace(' ', '_').replace('/', '_')
 	if isinstance(name, six.text_type):
