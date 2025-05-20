@@ -10,6 +10,7 @@
 ****************************************
 '''
 from __future__ import print_function
+
 # Standard library
 import codecs
 from json import loads as json_loads
@@ -18,6 +19,7 @@ from sys import version_info
 from datetime import datetime
 from os.path import exists, join, isfile
 from os import remove, stat, system as os_system
+
 # Third-party (Enigma2 core + Tools)
 from enigma import (
 	RT_VALIGN_CENTER,
@@ -48,7 +50,6 @@ from Screens.InfoBarGenerics import (
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
-
 import six
 
 # Local imports (internal modules)
@@ -275,19 +276,28 @@ class MainParsa(Screen):
 		self['key_blue'].hide()
 		self["key_green"].hide()
 		self.Update = False
-		self['actions'] = ActionMap(['OkCancelActions',
-									 'HotkeyActions',
-									 'InfobarEPGActions',
-									 'ChannelSelectBaseActions',
-									 'DirectionActions'], {'yellow': self.update_me,  # update_me,
-														   'yellow_long': self.update_dev,
-														   'info_long': self.update_dev,
-														   'infolong': self.update_dev,
-														   'showEventInfoPlugin': self.update_dev,
-														   'ok': self.okRun,
-														   'green': self.okRun,
-														   'cancel': self.closerm,
-														   'red': self.closerm}, -1)
+		self["actions"] = ActionMap(
+			[
+				"OkCancelActions",
+				"HotkeyActions",
+				"InfobarEPGActions",
+				"ChannelSelectBaseActions",
+				"DirectionActions"
+			],
+			{
+				"yellow": self.update_me,               # update_me
+				"yellow_long": self.update_dev,
+				"info_long": self.update_dev,
+				"infolong": self.update_dev,
+				"showEventInfoPlugin": self.update_dev,
+				"ok": self.okRun,
+				"green": self.okRun,
+				"cancel": self.closerm,
+				"red": self.closerm
+			},
+			-1
+		)
+
 		self.timer = eTimer()
 		if exists('/var/lib/dpkg/status'):
 			self.timer_conn = self.timer.timeout.connect(self.check_vers)
@@ -322,14 +332,37 @@ class MainParsa(Screen):
 			self.Update = True
 			self['key_yellow'].show()
 			# self['key_green'].show()
-			self.session.open(MessageBox, _('New version %s is available\n\nChangelog: %s\n\nPress info_long or yellow_long button to start force updating.') % (self.new_version, self.new_changelog), MessageBox.TYPE_INFO, timeout=5)
+			self.session.open(
+				MessageBox,
+				_(
+					"New version %s is available\n\n"
+					"Changelog: %s\n\n"
+					"Press info_long or yellow_long button to start force updating."
+				) % (self.new_version, self.new_changelog),
+				MessageBox.TYPE_INFO,
+				timeout=5
+			)
 		# self.update_me()
 
 	def update_me(self):
 		if self.Update is True:
-			self.session.openWithCallback(self.install_update, MessageBox, _("New version %s is available.\n\nChangelog: %s \n\nDo you want to install it now?") % (self.new_version, self.new_changelog), MessageBox.TYPE_YESNO)
+			self.session.openWithCallback(
+				self.install_update,
+				MessageBox,
+				_(
+					"New version %s is available.\n\n"
+					"Changelog: %s\n\n"
+					"Do you want to install it now?"
+				) % (self.new_version, self.new_changelog),
+				MessageBox.TYPE_YESNO
+			)
 		else:
-			self.session.open(MessageBox, _("Congrats! You already have the latest version..."),  MessageBox.TYPE_INFO, timeout=4)
+			self.session.open(
+				MessageBox,
+				_("Congrats! You already have the latest version..."),
+				MessageBox.TYPE_INFO,
+				timeout=4
+			)
 
 	def update_dev(self):
 		try:
@@ -422,14 +455,23 @@ class parsatv2(Screen):
 		else:
 			self.timer.callback.append(self._gotPageLoad)
 		self.timer.start(1500, True)
-		self['actions'] = ActionMap(['OkCancelActions',
-									 'ColorActions',
-									 'ButtonSetupActions',
-									 'DirectionActions'], {'ok': self.okRun,
-														   'green': self.okRun,
-														   'red': self.close,
-														   # 'yellow': self.convert,
-														   'cancel': self.close}, -2)
+		self["actions"] = ActionMap(
+			[
+				"OkCancelActions",
+				"ColorActions",
+				"ButtonSetupActions",
+				"DirectionActions"
+			],
+			{
+				"ok": self.okRun,
+				"green": self.okRun,
+				"red": self.close,
+				# "yellow": self.convert,
+				"cancel": self.close
+			},
+			-2
+		)
+
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def layoutFinished(self):
@@ -445,7 +487,7 @@ class parsatv2(Screen):
 		items = []
 		try:
 			content = Utils.ReadUrl2(url, referer)
-			if PY3:
+			if six.PY3:
 				content = six.ensure_str(content)
 
 			n6 = content.find("<a></a></td>")
@@ -520,14 +562,23 @@ class parsatv3(Screen):
 		else:
 			self.timer.callback.append(self._gotPageLoad)
 		self.timer.start(1500, True)
-		self['actions'] = ActionMap(['OkCancelActions',
-									 'ColorActions',
-									 'ButtonSetupActions',
-									 'DirectionActions'], {'ok': self.okRun,
-														   'green': self.okRun,
-														   'red': self.close,
-														   'yellow': self.convert,
-														   'cancel': self.close}, -2)
+		self["actions"] = ActionMap(
+			[
+				"OkCancelActions",
+				"ColorActions",
+				"ButtonSetupActions",
+				"DirectionActions"
+			],
+			{
+				"ok": self.okRun,
+				"green": self.okRun,
+				"red": self.close,
+				"yellow": self.convert,
+				"cancel": self.close
+			},
+			-2
+		)
+
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def layoutFinished(self):
@@ -537,7 +588,15 @@ class parsatv3(Screen):
 
 	def convert(self, answer=None):
 		if answer is None:
-			self.session.openWithCallback(self.convert, MessageBox, _('Do you want to Convert %s to favorite .tv ?\n\nAttention!! It may take some time depending\non the number of streams contained !!!'))
+			self.session.openWithCallback(
+				self.convert,
+				MessageBox,
+				_(
+					"Do you want to Convert %s to favorite .tv?\n\n"
+					"Attention!! It may take some time depending\n"
+					"on the number of streams contained!!!"
+				)
+			)
 		elif answer:
 			namex = self.name.lower()
 			namex = namex.replace(' ', '-').strip()
@@ -567,7 +626,7 @@ class parsatv3(Screen):
 				e.write("#EXTM3U\n")
 
 				content = Utils.ReadUrl2("https://www.parsatv.com/m/", referer)
-				if PY3:
+				if six.PY3:
 					content = six.ensure_str(content)
 
 				if "<a></a></td>" in content:
@@ -621,7 +680,7 @@ class parsatv3(Screen):
 		url = self.urls[idx]
 
 		content = Utils.ReadUrl2(url, referer)
-		if PY3:
+		if six.PY3:
 			content = six.ensure_str(content)
 
 		n1 = content.find('class="myButton" id=', 0)
@@ -640,8 +699,6 @@ class parsatv3(Screen):
 class parsasport(Screen):
 	def __init__(self, session):
 		self.session = session
-		global _session
-		_session = session
 		skin = join(path_skin, 'settings.xml')
 		with codecs.open(skin, "r", encoding="utf-8") as f:
 			self.skin = f.read()
@@ -670,14 +727,23 @@ class parsasport(Screen):
 			self.timer.callback.append(self._gotPageLoad)
 		self.timer.start(1500, True)
 		self['title'] = Label(title_plug)
-		self['actions'] = ActionMap(['OkCancelActions',
-									 'ColorActions',
-									 'ButtonSetupActions',
-									 'DirectionActions'], {'ok': self.okRun,
-														   'green': self.okRun,
-														   'red': self.close,
-														   'yellow': self.convert,
-														   'cancel': self.close}, -2)
+		self["actions"] = ActionMap(
+			[
+				"OkCancelActions",
+				"ColorActions",
+				"ButtonSetupActions",
+				"DirectionActions"
+			],
+			{
+				"ok": self.okRun,
+				"green": self.okRun,
+				"red": self.close,
+				"yellow": self.convert,
+				"cancel": self.close
+			},
+			-2
+		)
+
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def layoutFinished(self):
@@ -687,7 +753,15 @@ class parsasport(Screen):
 
 	def convert(self, answer=None):
 		if answer is None:
-			self.session.openWithCallback(self.convert, MessageBox, _('Do you want to Convert %s to favorite .tv ?\n\nAttention!! It may take some time depending\non the number of streams contained !!!'))
+			self.session.openWithCallback(
+				self.convert,
+				MessageBox,
+				_(
+					"Do you want to Convert to favorite .tv?\n\n"
+					"Attention!! It may take some time depending\n"
+					"on the number of streams contained!!!"
+				)
+			)
 		elif answer:
 			namex = self.name.lower()
 			namex = namex.replace(' ', '-').strip()
@@ -713,7 +787,7 @@ class parsasport(Screen):
 
 		try:
 			content = Utils.ReadUrl2(url, referer)
-			if PY3:
+			if six.PY3:
 				content = six.ensure_str(content)
 
 			n1 = content.find('<td id="persian">', 0)
@@ -763,7 +837,7 @@ class parsasport(Screen):
 
 		try:
 			content = Utils.ReadUrl2(url, referer)
-			if PY3:
+			if six.PY3:
 				content = six.ensure_str(content)
 
 			n1 = content.find('class="myButton" id=', 0)
@@ -783,8 +857,6 @@ class parsasport(Screen):
 class parsatv(Screen):
 	def __init__(self, session):
 		self.session = session
-		global _session
-		_session = session
 		skin = join(path_skin, 'settings.xml')
 		with codecs.open(skin, "r", encoding="utf-8") as f:
 			self.skin = f.read()
@@ -811,14 +883,22 @@ class parsatv(Screen):
 			self.timer.callback.append(self._gotPageLoad)
 		self.timer.start(1500, True)
 		self['title'] = Label(title_plug)
-		self['actions'] = ActionMap(['OkCancelActions',
-									 'ColorActions',
-									 'ButtonSetupActions',
-									 'DirectionActions'], {'ok': self.okRun,
-														   'green': self.okRun,
-														   'red': self.close,
-														   'yellow': self.convert,
-														   'cancel': self.close}, -2)
+		self["actions"] = ActionMap(
+			[
+				"OkCancelActions",
+				"ColorActions",
+				"ButtonSetupActions",
+				"DirectionActions"
+			],
+			{
+				"ok": self.okRun,
+				"green": self.okRun,
+				"red": self.close,
+				"yellow": self.convert,
+				"cancel": self.close
+			},
+			-2
+		)
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def layoutFinished(self):
@@ -828,7 +908,15 @@ class parsatv(Screen):
 
 	def convert(self, answer=None):
 		if answer is None:
-			self.session.openWithCallback(self.convert, MessageBox, _('Do you want to Convert to favorite .tv ?\n\nAttention!! It may take some time depending\non the number of streams contained !!!'))
+			self.session.openWithCallback(
+				self.convert,
+				MessageBox,
+				_(
+					"Do you want to Convert to favorite .tv?\n\n"
+					"Attention!! It may take some time depending\n"
+					"on the number of streams contained!!!"
+				)
+			)
 		elif answer:
 			namex = self.name.lower()
 			namex = namex.replace(' ', '-').strip()
@@ -853,7 +941,7 @@ class parsatv(Screen):
 
 		try:
 			content = Utils.ReadUrl2(url, referer)
-			if PY3:
+			if six.PY3:
 				content = six.ensure_str(content)
 
 			n1 = content.find('<td id="persian">', 0)
@@ -902,7 +990,7 @@ class parsatv(Screen):
 
 		try:
 			content = Utils.ReadUrl2(url, referer)
-			if PY3:
+			if six.PY3:
 				content = six.ensure_str(content)
 
 			n1 = content.find('class="myButton" id=', 0)
@@ -1009,14 +1097,16 @@ class TvInfoBarShowHide():
 		print(text + " %s\n" % obj)
 
 
-class Playgo(InfoBarBase,
-			 InfoBarMenu,
-			 InfoBarSeek,
-			 InfoBarAudioSelection,
-			 InfoBarSubtitleSupport,
-			 InfoBarNotifications,
-			 TvInfoBarShowHide,
-			 Screen):
+class Playgo(
+	InfoBarBase,
+	InfoBarMenu,
+	InfoBarSeek,
+	InfoBarAudioSelection,
+	InfoBarSubtitleSupport,
+	InfoBarNotifications,
+	TvInfoBarShowHide,
+	Screen
+):
 	STATE_IDLE = 0
 	STATE_PLAYING = 1
 	STATE_PAUSED = 2
@@ -1037,34 +1127,45 @@ class Playgo(InfoBarBase,
 		self.pcip = 'None'
 		self.name = html_conv.html_unescape(name)
 		self.state = self.STATE_PLAYING
-		for x in InfoBarBase, \
-				InfoBarMenu, \
-				InfoBarSeek, \
-				InfoBarAudioSelection, \
-				InfoBarSubtitleSupport, \
-				InfoBarNotifications, \
-				TvInfoBarShowHide:
+		for x in (
+			InfoBarBase,
+			InfoBarMenu,
+			InfoBarSeek,
+			InfoBarAudioSelection,
+			InfoBarSubtitleSupport,
+			InfoBarNotifications,
+			TvInfoBarShowHide
+		):
 			x.__init__(self)
+
 		SREF = self.session.nav.getCurrentlyPlayingServiceReference()
-		self['actions'] = ActionMap(['MoviePlayerActions',
-									 'MovieSelectionActions',
-									 'MediaPlayerActions',
-									 'EPGSelectActions',
-									 'MediaPlayerSeekActions',
-									 'ColorActions',
-									 'OkCancelActions',
-									 'InfobarShowHideActions',
-									 'InfobarActions',
-									 'InfobarSeekActions'], {'leavePlayer': self.cancel,
-															 'epg': self.showIMDB,
-															 'info': self.showIMDB,
-															 # 'info': self.cicleStreamType,
-															 'tv': self.cicleStreamType,
-															 'stop': self.leavePlayer,
-															 'cancel': self.cancel,
-															 'exit': self.leavePlayer,
-															 # 'down': self.av,
-															 'back': self.cancel}, -1)
+		self["actions"] = ActionMap(
+			[
+				"MoviePlayerActions",
+				"MovieSelectionActions",
+				"MediaPlayerActions",
+				"EPGSelectActions",
+				"MediaPlayerSeekActions",
+				"ColorActions",
+				"OkCancelActions",
+				"InfobarShowHideActions",
+				"InfobarActions",
+				"InfobarSeekActions"
+			],
+			{
+				"leavePlayer": self.cancel,
+				"epg": self.showIMDB,
+				"info": self.showIMDB,
+				# "info": self.cicleStreamType,
+				"tv": self.cicleStreamType,
+				"stop": self.leavePlayer,
+				"cancel": self.cancel,
+				"exit": self.leavePlayer,
+				# "down": self.av,
+				"back": self.cancel
+			},
+			-1
+		)
 
 		if '8088' in str(self.url):
 			# self.onLayoutFinish.append(self.slinkPlay)
@@ -1103,6 +1204,7 @@ class Playgo(InfoBarBase,
 		self.session.nav.playService(sref)
 
 	def cicleStreamType(self):
+		global streml
 		from itertools import cycle, islice
 		self.servicetype = '4097'
 		print('servicetype1: ', self.servicetype)

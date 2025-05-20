@@ -1277,6 +1277,7 @@ def normalize(title):
 def get_safe_filename(filename, fallback=''):
 	'''Convert filename to safe filename'''
 	import unicodedata
+	import six
 	import re
 	name = filename.replace(' ', '_').replace('/', '_')
 	if isinstance(name, six.text_type):
@@ -1289,7 +1290,7 @@ def get_safe_filename(filename, fallback=''):
 
 
 def decodeHtml(text):
-    if six.PY2:
+    if PY2:
         from six.moves import html_parser
         h = html_parser.HTMLParser()
         text = h.unescape(text.decode("utf8")).encode("utf8")
