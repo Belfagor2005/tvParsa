@@ -53,7 +53,7 @@ from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 import six
 
 # Local imports (internal modules)
-from . import _, paypal
+from . import _, paypal, __version__
 from . import Utils
 from . import html_conv
 from .Console import Console as xConsole
@@ -111,9 +111,8 @@ def ssl_urlopen(url):
         return urlopen(url)
 
 
-currversion = '1.8'
 title_plug = 'Parsa TV '
-desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % currversion)
+desc_plugin = ('..:: Parsa TV by Lululla %s ::.. ' % __version__)
 plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('parsatv'))
 pluglogo = join(plugin_path, 'res/pics/logo.png')
 png = join(plugin_path, 'res/pics/tv.png')
@@ -375,7 +374,7 @@ class MainParsa(Screen):
                     break
         self.new_version = remote_version
         self.new_changelog = remote_changelog
-        if currversion < remote_version:
+        if __version__ < remote_version:
             self.Update = True
             self['key_yellow'].show()
             # self['key_green'].show()

@@ -8,6 +8,7 @@ import gettext
 import os
 PluginLanguageDomain = 'parsatv'
 PluginLanguagePath = 'Extensions/parsatv/res/locale'
+__version__ = "1.8"
 
 
 def paypal():
