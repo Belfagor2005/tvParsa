@@ -1,17 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-'''
-****************************************
-*        coded by Lululla & PCD        *
-*             skin by MMark            *
-*             12/09/2023               *
-*       Skin by MMark                  *
-****************************************
-'''
 from __future__ import print_function
-
-# Standard library
 import codecs
 from json import loads as json_loads
 from re import compile, DOTALL, sub
@@ -20,7 +10,6 @@ from datetime import datetime
 from os.path import exists, join, isfile
 from os import remove, stat, system as os_system
 
-# Third-party (Enigma2 core + Tools)
 from enigma import (
     RT_VALIGN_CENTER,
     RT_HALIGN_LEFT,
@@ -52,11 +41,19 @@ from Screens.Screen import Screen
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 import six
 
-# Local imports (internal modules)
 from . import _, paypal, __version__
 from . import Utils
 from . import html_conv
 from .Console import Console as xConsole
+
+'''
+****************************************
+*        coded by Lululla & PCD        *
+*             skin by MMark            *
+*             12/09/2023               *
+*       Skin by MMark                  *
+****************************************
+'''
 
 global downloadparsa, path_skin, pngs
 
